@@ -2,47 +2,47 @@ import "../styles/login.css";
 
 const LoginPage = () => {
     return ( 
-         <div className="LoginCSS">
-            <div>
-                test
-            </div>
-            <div className="wrapper">
-                <div className="logo">
-                    <div className="logopicture">
-                        <div className="group1">
+        <div>
+            <div className="LoginCSS">
+                <div className="wrapper">
+                    <div className="logo">
+                        <logo className="logopicture">
 
+                        </logo>
+                    </div>
+                    <div className="container">
+                        <div className="username">
+                            <div className="inputlayout">
+                                <p className="text">
+                                    Email
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                
-            <div className="container">
-                <body className="username">
-                    <div className="inputlayout">
-                        <text className="text">
-                            Email
-                        </text>
-                    </div>
-                </body>
+                        <div className="password">
+                            <div className="inputlayout">
+                                <p className="text">
+                                    Password
+                                </p>
+                            </div>
+                        </div>
+                        <button className="loginButton">
+                               <p> Login </p>
+                        </button>
+                        <div className="forgot">
+                            Forgot password?
+                        </div>
 
-                <body className="password">
-                    <div className="inputlayout">
-                        <text className="text">
-                            Password
-                        </text>
-                    </div>
-                </body>
-                <div className="loginButton">
-                    <div className="loginText">
-                        Login
-                    </div>
-                    <div className="forgot">
-                        Forgot Password?
                     </div>
                 </div>
-                
+                <div className="outsidetext">
+                    ENCRORED
+                </div>
+                <div>
+                    <p className="noacc">Don't have an account? </p>
+                    <p className="signup">Sign Up?</p>
+                </div>
             </div>
-        </div> 
-     </div>       
+        </div>      
     ) 
 }
 export default LoginPage
