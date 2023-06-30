@@ -23,7 +23,7 @@
 
   }
 
-  .username{
+  .userName{
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -32,7 +32,7 @@
     gap: 10px;
 
     position: absolute;
-    height: 66px;
+    height: 30px;
     left: 36.69px;
     right: 36.69px;
     top: 48px;
@@ -41,7 +41,7 @@
     border-radius: 50px;
   }
 
-  .noacc{
+  .noAccount{
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -77,7 +77,7 @@
     flex-grow: 0;
   }
 
-  .signup{
+  .signUp{
     width: 60px;
     height: 18px;
 
@@ -135,7 +135,7 @@
     gap: 10px;
 
     position: absolute;
-    height: 66px;
+    height: 30px;
     left: 36.69px;
     right: 36.69px;
     top: 138px;
@@ -163,7 +163,7 @@
 
 
   }
-  .logopicture{
+  .logoPicture{
     position: absolute;
     width: 217.6px;
     height: 217.6px;
@@ -179,7 +179,7 @@
     top: 17.92px;
   }
 
-  .inputlayout{
+  .inputLayout{
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -276,14 +276,12 @@
     color: #296EB4;
   }
 
- 
-
-  .outsidetext{
+  .outsideText{
     /* EncorEd */
-    position: absolute;
+    position: center;
     left: 44.86%;
     right: 44.86%;
-    top: 33.9%;
+    top: 70%;
     bottom: 61.44%;
 
     font-family: 'Inter';

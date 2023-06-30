@@ -2,17 +2,16 @@ import "../styles/login.css";
 
 const LoginPage = () => {
     return ( 
-        <div>
             <div className="LoginCSS">
                 <div className="wrapper">
                     <div className="logo">
-                        <logo className="logopicture">
+                        <logo className="logoPicture">
 
                         </logo>
                     </div>
                     <div className="container">
-                        <div className="username">
-                            <div className="inputlayout">
+                        <div className="userName">
+                            <div className="inputLayout">
                                 <p className="text">
                                     Email
                                 </p>
@@ -34,15 +33,15 @@ const LoginPage = () => {
 
                     </div>
                 </div>
-                <div className="outsidetext">
+                <div className="outsideText">
                     ENCRORED
                 </div>
                 <div>
-                    <p className="noacc">Don't have an account? </p>
-                    <p className="signup">Sign Up?</p>
+                    <p className="noAccount">Don't have an account? </p>
+                    <p className="signUp">Sign Up?</p>
                 </div>
             </div>
-        </div>      
+    
     ) 
 }
 export default LoginPage
