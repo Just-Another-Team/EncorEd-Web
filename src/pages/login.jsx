@@ -39,7 +39,7 @@ const LoginPage = () => {
                         </InputGroup>
                     </Form>
 
-                    <p style={{textAlign: 'center', marginTop: 32, color: '#FFFFFF'}}>Don't have an account? <a href="register" style={{color: '#FDB833', textDecoration: 'none'}}>Sign Up</a></p>
+                    <p style={{textAlign: 'center', marginTop: 32, color: '#FFFFFF'}}>Don't have an account? <a href="register" style={{color: '#FDB833',}}>Sign Up</a></p>
                 </Col>  
             </Row>
         </Container>
