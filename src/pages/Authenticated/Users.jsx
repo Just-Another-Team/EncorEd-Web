@@ -1,12 +1,12 @@
 import React from 'react'
 import { Container } from 'react-bootstrap'
 
-const Map = () => {
+const Users = () => {
     return(
-        <Container>
-            <h2>Maps</h2>
+        <Container style={{padding: 8}}>
+            <h1>Users</h1>
         </Container>
     )
 }
 
-export default Map
+export default Users

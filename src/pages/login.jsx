@@ -8,6 +8,8 @@ const LoginPage = () => {
 
     const loggedIn = (data) => {
         console.log(data)
+
+        window.location.href = 'dashboard/home'
     }
 
     return ( 
