@@ -8,7 +8,7 @@ import DashboardLayout from './pages/Authenticated/Dashboard';
 import Home from './pages/Authenticated/Home';
 import Subjects from './pages/Authenticated/Subjects';
 import Events from './pages/Authenticated/Events';
-import Map from './pages/Authenticated/Map';
+import MapPage from './pages/Authenticated/Map';
 import Users from './pages/Authenticated/Users';
 
 function App() {
@@ -20,7 +20,7 @@ function App() {
         <Route path='home' element={<Home />} />
         <Route path='subjects' element={<Subjects />} />
         <Route path='events' element={<Events />} />
-        <Route path='map' element={<Map />} />
+        <Route path='map' element={<MapPage />} />
         <Route path='groups' element={<Users />} />
       </Route>
     </Routes>

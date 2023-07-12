@@ -13,7 +13,7 @@ const LoginPage = () => {
     }
 
     return ( 
-        <Container style={{paddingTop: 36}}>
+        <Container fluid style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', background: 'linear-gradient(135deg, #45A1FD 0%, rgba(12, 99, 186, 0.85) 100%)', height: '100vh'}}>
             <Row style={{justifyContent:'center'}}>
                 <Col lg={6}>
                     <Stack gap={2} style={{marginBottom: 32, alignItems: 'center'}}>
