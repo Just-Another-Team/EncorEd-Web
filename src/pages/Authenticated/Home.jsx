@@ -1,5 +1,5 @@
 import React from "react";
-import { CardGroup, Col, Container, Row, Stack } from 'react-bootstrap'
+import { CardGroup, Col, Container, FloatingLabel, Form, Row, Stack } from 'react-bootstrap'
 import { ImageCard } from "../../components/Cards";
 
 const Home = () => {
@@ -8,7 +8,9 @@ const Home = () => {
             <Container style={{borderRadius: 12, backgroundColor: '#F6F5FF', margin: 8, padding: 24}}>
                 <Row>
                     <Col>
-                        <h1 style={{margin: 0, padding: 0}}> WELCOME "INSERT FULLNAME HERE"</h1>
+                        <h2 style={{margin: 0, padding: 0}}>
+                            <span style={{color: '#FDB833'}}>Welcome</span> <span style={{color: '#1789FC'}}>User Fullname</span>
+                        </h2>
                     </Col>
                 </Row>
             </Container>
@@ -16,7 +18,13 @@ const Home = () => {
             <Container style={{borderRadius: 12, backgroundColor: '#F6F5FF', margin: 8, padding: 24}}>
                 <Row>
                     <Col>
-                        <h4>Search bar</h4>
+                        <Form onSubmit={(e) => {e.preventDefault()}}>
+                            <FloatingLabel
+                            controlId="searchGeneral"
+                            label="Looking for a room, subject, or event?">
+                                <Form.Control type="text" placeholder="test"/>
+                            </FloatingLabel>
+                        </Form>
                     </Col>
                 </Row>
             </Container>
@@ -30,7 +38,7 @@ const Home = () => {
                 <Row>
                     <Col style={{display: 'flex', width: 1, gap: 12, overflow: 'auto'}}>
                         {Array.from({length: 1}).map((el, ind) => (
-                            <ImageCard /> 
+                            <ImageCard key={ind} src="/assets/EventTestPic.png"/> 
                         ))}
                     </Col>
                 </Row>
@@ -43,7 +51,7 @@ const Home = () => {
 
                 <Row>
                     <Col>
-                            "Weekly Calendar Here!"
+                        "Weekly Calendar Here!"
                     </Col>
                 </Row>
             </Container>
@@ -57,8 +65,8 @@ const Home = () => {
 
                 <Row xs={1} sm={2} lg={3} xl={5}>
                     {Array.from({length: 7}).map((el, ind) => (
-                        <Col style={{marginBottom: 16}}>
-                            <ImageCard /> 
+                        <Col key={ind} style={{marginBottom: 16}}>
+                            <ImageCard src="/assets/SubjectTestPic.png"/> 
                         </Col>
                     ))}
                 </Row>

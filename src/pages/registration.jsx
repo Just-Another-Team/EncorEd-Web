@@ -8,7 +8,6 @@ const RegistrationPage = () => {
     const {register, control, reset, handleSubmit, formState: {errors}} = useForm()
 
     const submitRegister = (data) => {
-        
         console.log(data)
     }
 

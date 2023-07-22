@@ -1,5 +1,6 @@
 import React from 'react'
 import { Container, Stack, Row, Col } from 'react-bootstrap'
+import { ImageCard } from "../../components/Cards";
 
 const Subjects = () => {
     return(
@@ -17,7 +18,7 @@ const Subjects = () => {
                         height: 240,
                         border: '4px solid #296EB4',
                         borderRadius: 12,
-                        backgroundImage: 'url(/assets/ImageTestPic.png)',
+                        backgroundImage: 'url(/assets/SubjectTestPic.png)',
                         backgroundRepeat: 'no-repeat',
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
@@ -43,9 +44,17 @@ const Subjects = () => {
                 </Row>
             </Container>
 
-            <Container style={{borderRadius: 12, height: 512, backgroundColor: '#F6F5FF', padding: 16}}>
+            <Container style={{display: 'flex', flexDirection: 'column', gap: 12, borderRadius: 12, backgroundColor: '#F6F5FF', margin: 8, padding: 16}}>
                 <Row>
                     <h5 style={{margin: 0, color: '#296EB4'}}>Subjects Enrolled</h5>
+                </Row>
+
+                <Row xs={1} sm={2} lg={3} xl={5}>
+                    {Array.from({length: 7}).map((el, ind) => (
+                        <Col key={ind} style={{marginBottom: 16}}>
+                            <ImageCard src='/assets/SubjectTestPic.png' /> 
+                        </Col>
+                    ))}
                 </Row>
             </Container>
 

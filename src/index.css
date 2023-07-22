@@ -17,6 +17,9 @@ code {
     monospace;
 }
 
+
+/* 
+change in a different CSS for login and registration to use
 .form-control::placeholder {
   color: #548BC3 !important;
 }
@@ -27,4 +30,4 @@ code {
 
 .form-control::-ms-input-placeholder {
   color: #548BC3 !important;
-}
+} */

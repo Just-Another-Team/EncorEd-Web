@@ -1,9 +1,9 @@
 import { Card } from "react-bootstrap"
 
-const ImageCard = () => {
+const ImageCard = ({src}) => {
     return(
         <Card style={{width: 192}}>
-            <Card.Img style={{height: 128}} src='/assets/ImageTestPic.png' />
+            <Card.Img style={{height: 128}} src={src} />
         </Card>
     )
 }
