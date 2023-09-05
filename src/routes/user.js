@@ -1,5 +1,11 @@
 const router = require('express').Router()
-const {addUser, updateUser, deleteUser, viewAllUser, viewUser} = require("../controller/user.controller")
+const {
+    addUser,
+    updateUser,
+    deleteUser,
+    viewAllUser,
+    viewUser
+} = require("../controller/user.controller")
 
 //Add
 router.post("/add", addUser);

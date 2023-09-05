@@ -1,4 +1,3 @@
-const {db, addDoc, getDoc, getDocs, doc, collection, updateDoc, deleteDoc} = require('./database');
 const express = require('express')
 const cors = require('cors');
 
@@ -13,9 +12,11 @@ app.use((req, res, next) => {
     next()
 })
 
-//All of this can be used in user router
 const userRouter = require("./routes/user")
 app.use("/user", userRouter)
+
+const subjectRouter = require("./routes/subject")
+app.use("/subject", subjectRouter)
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);

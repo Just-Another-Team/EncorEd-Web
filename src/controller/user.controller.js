@@ -1,5 +1,17 @@
-const {db, addDoc, getDoc, getDocs, doc, collection, updateDoc, deleteDoc} = require('../database');
-const {User, userConverter} = require("../models/user.model")
+const {
+    db,
+    addDoc,
+    getDoc,
+    getDocs,
+    doc,
+    collection,
+    updateDoc,
+    deleteDoc
+} = require('../database');
+const {
+    User,
+    userConverter
+} = require("../models/user.model")
 
 const userCollection = collection(db, "users").withConverter(userConverter)
 
@@ -24,10 +36,10 @@ const addUser = async (req, res) => {
 
         const docRef = await addDoc(userCollection, userVal)
 
-        res.status(200).json({id: docRef.id, message: "Data added successfully"})
+        res.status(200).json({id: docRef.id, message: "User added successfully"})
     }
     catch(e) {
-        res.status(400).json({error: true, message: e.message})
+        res.status(400).json({error: e.message})
     }
 }
 
@@ -37,7 +49,7 @@ const updateUser = async (req, res) => {
     console.log(id);
 
     try{
-        const userSnapshot = await doc(db, `users/${id}`);
+        const userSnapshot = await doc(db, `users/${id}`).withConverter(userConverter);
 
         const userVal = new User(
             req.body.firstName,
@@ -51,14 +63,14 @@ const updateUser = async (req, res) => {
         );
 
         updateDoc(userSnapshot, {
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
-            userName: req.body.userName,
-            password: req.body.password,
-            isadmin: req.body.admin,
-            isalumni: req.body.alumni,
-            status: req.body.status,
+            firstName: userVal.getFirstName(),
+            lastName: userVal.getLastName(),
+            email: userVal.getEmail(),
+            userName: userVal.getUsername(),
+            password: userVal.getPassword(),
+            isadmin: userVal.getAdmin(),
+            isalumni: userVal.getAdmin(),
+            status: userVal.getStatus(),
         })
 
         res.status(200).json("Data updated successfully")
@@ -86,12 +98,14 @@ const deleteUser = async (req, res) => {
 const viewAllUser = async (req, res) => {
     const getUserDocs = await getDocs(userCollection);
     
-    const users = {}
+    const users = []
 
     try {
-        getUserDocs.forEach((doc) => {
-            users[doc.id] = {...doc.data()}
-            console.log(doc.data())
+        getUserDocs.forEach((doc, ind) => {
+            users.push({
+                id: doc.id,
+                ...doc.data()
+            })
         });
 
         res.status(200).json(users);    
@@ -114,5 +128,23 @@ const viewUser = async (req, res) => {
         res.status(400).json({error: "Error", message: e.message})
     }
 }
+
+// Sorting Test
+// users.sort((first, last) => {
+//     let firstLName = first.lastName.toLowerCase()
+//     let lastLName = last.lastName.toLowerCase()
+
+//     console.log(`${firstLName} | ${lastLName}`)
+
+//     //Ascending Order
+//     if (firstLName < lastLName) return -1
+//     if (lastLName < firstLName) return 1
+
+//     //Descencding Order conditions
+//     //if (firstLName > lastLName) return -1
+//     //if (lastLName > firstLName) return 1
+
+//     return 0
+// })
 
 module.exports = {addUser, updateUser, deleteUser, viewUser, viewAllUser}

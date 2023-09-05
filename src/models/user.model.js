@@ -1,12 +1,12 @@
 class User {
-    constructor (firstName, lastName, email, userName, password, admin, alumni, status) {
+    constructor (firstName, lastName, email, userName, password, isadmin, isalumni, status) {
         this.setFirstName(firstName)
         this.setLastName(lastName)
         this.setEmail(email)
         this.setUsername(userName)
         this.setPassword(password)
-        this.setAdmin(admin)
-        this.setAlumni(alumni)
+        this.setAdmin(isadmin)
+        this.setAlumni(isalumni)
         this.setStatus(status)
     }
 
@@ -51,17 +51,17 @@ class User {
     }
 
     getAdmin() {
-        return this.admin
+        return this.isadmin
     }
     setAdmin(_admin) {
-        this.admin = _admin
+        this.isadmin = _admin
     }
 
     getAlumni() {
-        return this.alumni
+        return this.isalumni
     }
     setAlumni(_alumni) {
-        this.alumni = _alumni
+        this.isalumni = _alumni
     }
 
     getStatus() {
@@ -85,8 +85,8 @@ const userConverter = {
             email: user.email,
             userName: user.userName,
             password: user.password,
-            isadmin: user.admin,
-            isalumni: user.alumni,
+            isadmin: user.isadmin,
+            isalumni: user.isalumni,
             status: user.status
         }
     },
