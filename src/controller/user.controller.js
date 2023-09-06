@@ -6,7 +6,9 @@ const {
     doc,
     collection,
     updateDoc,
-    deleteDoc
+    deleteDoc,
+    query,
+    where
 } = require('../database');
 const {
     User,
@@ -101,6 +103,15 @@ const viewAllUser = async (req, res) => {
     const users = []
 
     try {
+        //Can be better
+        // const q = query(userCollection, where("lastName", "==", "Aguilar"));
+
+        // const getQuery = await getDocs(q)
+
+        // getQuery.forEach((doc, ind) => {
+        //     console.log(doc.data())
+        // })
+
         getUserDocs.forEach((doc, ind) => {
             users.push({
                 id: doc.id,
@@ -129,6 +140,30 @@ const viewUser = async (req, res) => {
     }
 }
 
+//For Login
+const userFound = async (req, res) => {
+    const username = req.body.username;
+    const password = req.body.password;
+
+    let user = {}
+
+    console.log(`${username} | ${password}`)
+
+    try {
+        //Can be better
+        const validateQuery = query(userCollection, where("userName", "==", username)); 
+
+        const getQuery = await getDocs(validateQuery)
+
+        res.status(200).json({
+            message: getQuery.empty ? "Username can be added" : "Username cannot be added - Username already exists"
+        })
+    }
+    catch (e) {
+        res.status(400).json({error: "Error", message: e.message})
+    }
+}
+
 // Sorting Test
 // users.sort((first, last) => {
 //     let firstLName = first.lastName.toLowerCase()
@@ -147,4 +182,11 @@ const viewUser = async (req, res) => {
 //     return 0
 // })
 
-module.exports = {addUser, updateUser, deleteUser, viewUser, viewAllUser}
+module.exports = {
+    addUser,
+    updateUser,
+    deleteUser,
+    viewUser,
+    viewAllUser,
+    userFound
+}

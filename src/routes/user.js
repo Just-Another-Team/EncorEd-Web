@@ -4,7 +4,8 @@ const {
     updateUser,
     deleteUser,
     viewAllUser,
-    viewUser
+    viewUser,
+    userFound
 } = require("../controller/user.controller")
 
 //Add
@@ -17,7 +18,10 @@ router.put("/update/:id", updateUser)
 router.delete("/delete/:id", deleteUser)
 
 //View
-router.get("/", viewAllUser)
-router.get("/:id", viewUser)
+router.get("/list", viewAllUser)
+router.get("/list/:id", viewUser)
+
+//Validate
+router.get("/valid", userFound)
 
 module.exports = router
