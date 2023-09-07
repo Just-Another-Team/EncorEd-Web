@@ -71,9 +71,9 @@ const subjectConverter = {
         return {
             name: subject.name,
             edpCode: subject.edpCode,
-            assignedWeek: subject.assignedWeek,
-            startTime: subject.startTime,
-            endTime: subject.endTime,
+            assignedWeek: subject.assignedWeek, //{Sunday, Monday, Tuesday, Wednesay, etc.}
+            startTime: subject.startTime, //Timestamp
+            endTime: subject.endTime, //Timestamp
             status: subject.status,
             roomId: subject.roomId
         }

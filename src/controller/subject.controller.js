@@ -46,7 +46,7 @@ const viewAllSubject = async (req, res) => {
     try {
         getSubjectDocs.forEach((subject) => {
             subjects.push({
-                id: subject.id,
+                id: subject.id, //This should have been an edp code
                 ...subject.data()
             })
         })
@@ -67,17 +67,55 @@ const viewSubject = async (req, res) => {
     try {
         res.status(200).json(subjectDoc.data())
     }
-    catch(e) {
+    catch (e) {
         res.status(400).json({error: "Error", message: e.message})
     }
 }
 
 const updateSubject = async (req, res) => {
+    const id = req.params.id;
 
+    try {
+        const subjectSnapshot = await doc(db, `/subjects/${id}`).withConverter(subjectConverter);
+
+        let subject = new Subject(
+            req.body.name,
+            req.body.edpCode,
+            req.body.assignedWeek,
+            req.body.startTime,
+            req.body.endTime,
+            req.body.status,
+            req.body.roomId
+        );
+
+        updateDoc(subjectSnapshot, {
+            name: subject.getName(),
+            edpCode: subject.getEdpCode(),
+            assignedWeek: subject.getAssignedWeek(),
+            startTime: subject.getStartTime(),
+            endTime: subject.getEndTime(),
+            status: subject.getStatus(),
+            roomId: subject.getRoomId()
+        })
+
+        res.status(200).json("Data updated successfully!")
+    } catch (e) {
+        res.status(400).json({error: e.message})
+    }
 }
 
 const deleteSubject = async (req, res) => {
+    const id = req.params.id;
 
+    try {
+        const subjectSnapshot = doc(db, `/subjects/${id}`).withConverter(subjectConverter);
+
+        await deleteDoc(subjectSnapshot);
+
+        res.status(200).json("Data deleted successfully.")
+    } catch (e) {
+        res.status(400).json({error: e.message})
+    }
 }
 
 module.exports = {addSubject, viewAllSubject, viewSubject, updateSubject, deleteSubject}

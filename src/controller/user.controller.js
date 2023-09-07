@@ -78,7 +78,7 @@ const updateUser = async (req, res) => {
         res.status(200).json("Data updated successfully")
     }
     catch(e) {
-        res.status(400).json(`Error Occured: ${e}`)
+        res.status(400).json({error: e.message})
     }
 }
 
@@ -88,7 +88,7 @@ const deleteUser = async (req, res) => {
     try{
         const userDoc = doc(db, "users", id).withConverter(userConverter); //Can be three parameters. See docs
 
-        deleteDoc(userDoc);
+        await deleteDoc(userDoc);
 
         res.status(200).json("Data delete successfully")
     }

@@ -13,7 +13,7 @@ router.put("/update/:id", updateSubject)
 
 router.delete("/delete/:id", deleteSubject)
 
-router.get("/", viewAllSubject)
-router.get("/:id", viewSubject)
+router.get("/list", viewAllSubject)
+router.get("/list/:id", viewSubject)
 
 module.exports = router
