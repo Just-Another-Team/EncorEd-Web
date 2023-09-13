@@ -30,10 +30,12 @@ const addUser = async (req, res) => {
             req.body.email,
             req.body.userName,
             req.body.password,
-            req.body.admin,
-            req.body.alumni,
+            req.body.isadmin,
+            req.body.isalumni,
             req.body.status   
         );
+
+        //send email and password to Firebase Authentication
 
         const docRef = await addDoc(userCollection, userVal)
 
@@ -58,20 +60,20 @@ const updateUser = async (req, res) => {
             req.body.email,
             req.body.userName,
             req.body.password,
-            req.body.admin,
-            req.body.alumni,
+            req.body.isadmin,
+            req.body.isalumni,
             req.body.status   
         );
 
         updateDoc(userSnapshot, {
-            firstName: userVal.getFirstName(),
-            lastName: userVal.getLastName(),
-            email: userVal.getEmail(),
-            userName: userVal.getUsername(),
-            password: userVal.getPassword(),
-            isadmin: userVal.getAdmin(),
-            isalumni: userVal.getAdmin(),
-            status: userVal.getStatus(),
+            firstName: userVal.getFirstName,
+            lastName: userVal.getLastName,
+            email: userVal.getEmail,
+            userName: userVal.getUsername,
+            password: userVal.getPassword,
+            isadmin: userVal.getAdmin,
+            isalumni: userVal.getAlumni,
+            status: userVal.getStatus,
         })
 
         res.status(200).json("Data updated successfully")

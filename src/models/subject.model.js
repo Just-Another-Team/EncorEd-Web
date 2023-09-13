@@ -1,68 +1,68 @@
 class Subject {
     constructor(name, edpCode, type, units, creationDate, createdBy, verifiedBy, status) {
-        this.setName(name);
-        this.setEdpCode(edpCode);
-        this.setType(type);
-        this.setUnits(units);
-        this.setCreationDate(creationDate);
-        this.setCreatedBy(createdBy);
-        this.setVerifiedBy(verifiedBy);
-        this.setStatus(status);
+        this.setName = name;
+        this.setEdpCode = edpCode;
+        this.setType = type;
+        this.setUnits = units;
+        this.setCreationDate = creationDate;
+        this.setCreatedBy = createdBy;
+        this.setVerifiedBy = verifiedBy;
+        this.setStatus = status;
     }
 
-    setName(_name) {
+    set setName(_name) {
         this.name = _name;
     }
-    getName() {
+    get getName() {
         return this.name;
     }
 
-    setEdpCode(_edpCode) {
+    set setEdpCode(_edpCode) {
         this.edpCode = _edpCode;
     }
-    getEdpCode() {
+    get getEdpCode() {
         return this.edpCode;
     }
 
-    setType(_type) {
+    set setType(_type) {
         this.type = _type;
     }
-    getType() {
+    get getType() {
         return this.type;
     }
 
-    setUnits(_units) {
+    set setUnits(_units) {
         this.units = _units;
     }
-    getUnits() {
+    get getUnits() {
         return this.units;
     }
 
-    setCreationDate(_creationDate) {
+    set setCreationDate(_creationDate) {
         this.creationDate = _creationDate;
     }
-    getCreationDate() {
+    get getCreationDate() {
         return this.creationDate;
     }
 
-    setCreatedBy(_createdBy) {
+    set setCreatedBy(_createdBy) {
         this.createdBy = _createdBy;
     }
-    getCreatedBy() {
+    get getCreatedBy() {
         return this.createdBy;
     }
 
-    setVerifiedBy(_verifiedBy) {
+    set setVerifiedBy(_verifiedBy) {
         this.verifiedBy = _verifiedBy
     }
-    getVerifiedBy() {
+    get getVerifiedBy() {
         return this.verifiedBy;
     }
 
-    setStatus(_status) {
+    set setStatus(_status) {
         this.status = _status
     }
-    getStatus() {
+    get getStatus() {
         return this.status;
     }
 }

@@ -1,73 +1,89 @@
 class User {
-    constructor (firstName, lastName, email, userName, password, isadmin, isalumni, status) {
-        this.setFirstName(firstName)
-        this.setLastName(lastName)
-        this.setEmail(email)
-        this.setUsername(userName)
-        this.setPassword(password)
-        this.setAdmin(isadmin)
-        this.setAlumni(isalumni)
-        this.setStatus(status)
+    constructor (firstName, lastName, email, userName, password, addedBy, joinDate, isadmin, isalumni, status) {
+        this.setFirstName = firstName
+        this.setLastName = lastName
+        this.setEmail = email
+        this.setUsername = userName
+        this.setPassword = password
+        this.setAddedBy = addedBy
+        this.setJoinDate = joinDate
+        this.setAdmin = isadmin
+        this.setAlumni = isalumni
+        this.setStatus = status
     }
 
-    getFirstName() {
+    get getFirstName() {
         return this.firstName
     }
-    setFirstName(_firstName) {
+    set setFirstName(_firstName) {
         //Validation
         this.firstName = _firstName;
     }
 
-    getLastName() {
+    get getLastName() {
         return this.lastName
     }
-    setLastName(_lastName) {
+    set setLastName(_lastName) {
         //Validation
         this.lastName = _lastName;
     }
 
-    getEmail() {
+    get getEmail() {
         return this.email
     }
-    setEmail(_email) {
+    set setEmail(_email) {
         //Validation
         this.email = _email
     }
 
-    getUsername() {
+    get getUsername() {
         return this.userName
     }
-    setUsername(_username) {
+    set setUsername(_username) {
         //Validation
         this.userName = _username
     }
 
-    getPassword() {
+    get getPassword() {
         return this.password
     }
-    setPassword(_password) {
+    set setPassword(_password) {
         //Validation
         this.password = _password
     }
 
-    getAdmin() {
+    get getAddedBy() {
+        return this.addedBy
+    }
+    set setAddedBy(_addedBy) {
+        this.addedBy = _addedBy
+    }
+
+    get getJoinDate() {
+        return this.joinDate
+    }
+    set setJoinDate(_joinDate) {
+        this.joinDate = _joinDate
+    }
+
+    get getAdmin() {
         return this.isadmin
     }
-    setAdmin(_admin) {
+    set setAdmin(_admin) {
         this.isadmin = _admin
     }
 
-    getAlumni() {
+    get getAlumni() {
         return this.isalumni
     }
-    setAlumni(_alumni) {
+    set setAlumni(_alumni) {
         this.isalumni = _alumni
     }
 
-    getStatus() {
+    get getStatus() {
         return this.status
     }
-    setStatus(_status) {
+    set setStatus(_status) {
         //Validation
         this.status = _status
     }
@@ -77,6 +93,7 @@ class User {
     }
 }
 
+//Converter must not have email and password
 const userConverter = {
     toFirestore: (user) => {
         return {
@@ -85,6 +102,8 @@ const userConverter = {
             email: user.email,
             userName: user.userName,
             password: user.password,
+            addedBy: user.addedBy,
+            joinDate: user.joinDate,
             isadmin: user.isadmin,
             isalumni: user.isalumni,
             status: user.status
@@ -92,12 +111,23 @@ const userConverter = {
     },
     fromFirestore: (snapshot, options) => {
         const data = snapshot.data(options)
+
+        // Do this when initiate an auth
+        // let user = new User();
+        // user.setFirstName = data.firstName
+        // user.setLastName = data.lastName
+        // user.setUsername = data.userName
+
+        // console.log(user);
+
         return new User(
             data.firstName,
             data.lastName,
             data.email,
             data.userName,
             data.password,
+            data.addedBy,
+            data.joinDate,
             data.isadmin,
             data.isalumni,
             data.status

@@ -101,14 +101,14 @@ const updateSubject = async (req, res) => {
         );
 
         updateDoc(subjectSnapshot, {
-            name: subject.getName(),
-            edpCode: subject.getEdpCode(),
-            type: subject.getType(),
-            units: subject.getUnits(),
-            creationDate: subject.getCreationDate(),
-            createdBy: subject.getCreatedBy(),
-            verifiedBy: subject.getVerifiedBy(),
-            status: subject.getStatus(),
+            name: subject.getName,
+            edpCode: subject.getEdpCode,
+            type: subject.getType,
+            units: subject.getUnits,
+            creationDate: subject.getCreationDate,
+            createdBy: subject.getCreatedBy,
+            verifiedBy: subject.getVerifiedBy,
+            status: subject.getStatus,
         })
 
         res.status(200).json({message: "Data updated successfully!"})

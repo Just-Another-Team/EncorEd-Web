@@ -48,9 +48,9 @@ const updateParticipant = async (req, res) => {
         );
 
         updateDoc(subScheduleSnapshot, {
-            subId: participant.getSubId(),
-            userId: participant.getUserId(),
-            isTeacher: participant.getIsTeacher(),
+            subId: participant.getSubId,
+            userId: participant.getUserId,
+            isTeacher: participant.getIsTeacher,
         })
 
         res.status(200).json({message: "Data updated successfully!"})

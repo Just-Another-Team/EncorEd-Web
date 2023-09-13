@@ -57,14 +57,14 @@ const updateSubjectSchedule = async (req, res) => {
         );
 
         updateDoc(subScheduleSnapshot, {
-            subId: subjectSchedule.getSubId(),
-            roomId: subjectSchedule.getRoomId(),
-            assignedWeek: subjectSchedule.getAssignedWeek(),
-            startTime: subjectSchedule.getStartTime(),
-            endTime: subjectSchedule.getEndTime(),
-            createdBy: subjectSchedule.getCreatedBy(),
-            verifiedBy: subjectSchedule.getVerifiedBy(),
-            status: subjectSchedule.getStatus()
+            subId: subjectSchedule.getSubId,
+            roomId: subjectSchedule.getRoomId,
+            assignedWeek: subjectSchedule.getAssignedWeek,
+            startTime: subjectSchedule.getStartTime,
+            endTime: subjectSchedule.getEndTime,
+            createdBy: subjectSchedule.getCreatedBy,
+            verifiedBy: subjectSchedule.getVerifiedBy,
+            status: subjectSchedule.getStatus
         })
 
         res.status(200).json({message: "Data updated successfully!"})
@@ -90,11 +90,11 @@ const deleteSubjectSchedule = async (req, res) => {
 }
 
 const viewAllSubjectSchedule = async (req, res) => {
-    const getSubSchedDocs = await getDocs(subjectScheduleCollection)
-
     const schedules = []
 
     try {
+        const getSubSchedDocs = await getDocs(subjectScheduleCollection)
+
         if (getSubSchedDocs.empty)
             throw new Error("Subject Schedule collections is empty");
 
@@ -158,4 +158,10 @@ const viewSubjectSchedule = async (req, res) => {
     }
 }
 
-module.exports = {addSubjectSchedule, deleteSubjectSchedule, updateSubjectSchedule, viewAllSubjectSchedule, viewSubjectSchedule}
+module.exports = {
+    addSubjectSchedule,
+    deleteSubjectSchedule,
+    updateSubjectSchedule,
+    viewAllSubjectSchedule,
+    viewSubjectSchedule
+}

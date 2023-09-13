@@ -1,28 +1,28 @@
 class Participant {
     constructor(subId, userId, isTeacher) {
-        this.setSubId(subId);
-        this.setUserId(userId);
-        this.setIsTeacher(isTeacher);
+        this.setSubId = subId;
+        this.setUserId = userId;
+        this.setIsTeacher = isTeacher;
     }
 
-    setSubId(_subId) {
+    set setSubId(_subId) {
         this.subId = _subId;
     }
-    getSubId() {
+    get getSubId() {
         return this.subId;
     }
 
-    setUserId(_userId) {
+    set setUserId(_userId) {
         this.userId = _userId
     }
-    getUserId() {
+    get getUserId() {
         return this.userId;
     }
 
-    setIsTeacher(_isTeacher) {
+    set setIsTeacher(_isTeacher) {
         this.isTeacher = _isTeacher;
     }
-    getIsTeacher() {
+    get getIsTeacher() {
         return this.isTeacher
     }
 }

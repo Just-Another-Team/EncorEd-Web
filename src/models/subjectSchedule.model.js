@@ -1,68 +1,68 @@
 class SubjectSchedule {
     constructor(subId, roomId, assignedWeek, startTime, endTime, createdBy, verifiedBy, status) {
-        this.setSubId(subId);
-        this.setRoomId(roomId);
-        this.setAssignedWeek(assignedWeek);
-        this.setStartTime(startTime);
-        this.setEndTime(endTime);
-        this.setCreatedBy(createdBy);
-        this.setVerifiedBy(verifiedBy);
-        this.setStatus(status);
+        this.setSubId = subId;
+        this.setRoomId = roomId;
+        this.setAssignedWeek = assignedWeek;
+        this.setStartTime = startTime;
+        this.setEndTime = endTime;
+        this.setCreatedBy = createdBy;
+        this.setVerifiedBy = verifiedBy;
+        this.setStatus = status;
     }
 
-    setSubId(_subId) {
+    set setSubId(_subId) {
         this.subId = _subId;
     }
-    getSubId() {
+    get getSubId() {
         return this.subId;
     }
 
-    setRoomId(_roomId) {
+    set setRoomId(_roomId) {
         this.roomId = _roomId;
     }
-    getRoomId() {
+    get getRoomId() {
         return this.roomId;
     }
 
-    setAssignedWeek(_assignedWeek) {
+    set setAssignedWeek(_assignedWeek) {
         this.assignedWeek = _assignedWeek;
     }
-    getAssignedWeek() {
+    get getAssignedWeek() {
         return this.assignedWeek;
     }
 
-    setStartTime(_startTime) {
+    set setStartTime(_startTime) {
         this.startTime = _startTime;
     }
-    getStartTime() {
+    get getStartTime() {
         return this.startTime;
     }
 
-    setEndTime(_endTime) {
+    set setEndTime(_endTime) {
         this.endTime = _endTime;
     }
-    getEndTime() {
+    get getEndTime() {
         return this.endTime;
     }
 
-    setCreatedBy(_createdBy) {
+    set setCreatedBy(_createdBy) {
         this.createdBy = _createdBy;
     }
-    getCreatedBy() {
+    get getCreatedBy() {
         return this.createdBy;
     }
 
-    setVerifiedBy(_verifiedBy) {
+    set setVerifiedBy(_verifiedBy) {
         this.verifiedBy = _verifiedBy;
     }
-    getVerifiedBy() {
+    get getVerifiedBy() {
         return this.verifiedBy;
     }
 
-    setStatus(_status) {
+    set setStatus(_status) {
         this.status = _status;
     }
-    getStatus() {
+    get getStatus() {
         return this.status
     }
 }

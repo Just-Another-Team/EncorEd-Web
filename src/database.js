@@ -13,9 +13,23 @@ const {
     deleteDoc,
     query,
     where,
+    onSnapshot,
     Timestamp
 } = require("firebase/firestore")
 
 const db = getFirestore(app)
     
-module.exports = {db, Timestamp, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc, collection, query, where}
+module.exports = {
+    db,
+    Timestamp,
+    doc,
+    addDoc,
+    getDoc,
+    getDocs,
+    updateDoc,
+    deleteDoc,
+    collection,
+    query,
+    where,
+    onSnapshot
+}
