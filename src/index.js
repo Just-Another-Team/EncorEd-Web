@@ -13,9 +13,11 @@ app.use((req, res, next) => {
 })
 
 const userRouter = require("./routes/user")
-app.use("/user", userRouter)
-
+const participantRouter = require("./routes/participant")
 const subjectRouter = require("./routes/subject")
+
+app.use("/user", userRouter)
+app.use("/participant", participantRouter)
 app.use("/subject", subjectRouter)
 
 app.listen(port, () => {

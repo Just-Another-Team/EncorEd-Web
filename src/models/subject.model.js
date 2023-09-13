@@ -1,68 +1,69 @@
 class Subject {
-    constructor(name, edpCode, assignedWeek, startTime, endTime, status, roomId) {
-        this.setName(name)
-        this.setEdpCode(edpCode)
-        this.setAssignedWeek(assignedWeek)
-        this.setStartTime(startTime)
-        this.setEndTime(endTime)
-        this.setStatus(status)
-        this.setRoomId(roomId)
+    constructor(name, edpCode, type, units, creationDate, createdBy, verifiedBy, status) {
+        this.setName(name);
+        this.setEdpCode(edpCode);
+        this.setType(type);
+        this.setUnits(units);
+        this.setCreationDate(creationDate);
+        this.setCreatedBy(createdBy);
+        this.setVerifiedBy(verifiedBy);
+        this.setStatus(status);
     }
 
     setName(_name) {
-        //Validation
-        this.name = _name
+        this.name = _name;
     }
     getName() {
-        return this.name
+        return this.name;
     }
 
     setEdpCode(_edpCode) {
-        //Validation
-        this.edpCode = _edpCode
+        this.edpCode = _edpCode;
     }
     getEdpCode() {
-        return this.edpCode
+        return this.edpCode;
     }
 
-    setAssignedWeek(_assignedWeek) {
-        //Validation
-        this.assignedWeek = _assignedWeek
+    setType(_type) {
+        this.type = _type;
     }
-    getAssignedWeek() {
-        return this.assignedWeek
-    }
-
-    setStartTime(_startTime) {
-        //Validation
-        this.startTime = _startTime
-    }
-    getStartTime() {
-        return this.startTime
+    getType() {
+        return this.type;
     }
 
-    setEndTime(_endTime) {
-        //Validation
-        this.endTime = _endTime
+    setUnits(_units) {
+        this.units = _units;
     }
-    getEndTime() {
-        return this.endTime
+    getUnits() {
+        return this.units;
+    }
+
+    setCreationDate(_creationDate) {
+        this.creationDate = _creationDate;
+    }
+    getCreationDate() {
+        return this.creationDate;
+    }
+
+    setCreatedBy(_createdBy) {
+        this.createdBy = _createdBy;
+    }
+    getCreatedBy() {
+        return this.createdBy;
+    }
+
+    setVerifiedBy(_verifiedBy) {
+        this.verifiedBy = _verifiedBy
+    }
+    getVerifiedBy() {
+        return this.verifiedBy;
     }
 
     setStatus(_status) {
-        //Validation
         this.status = _status
     }
     getStatus() {
-        return this.status
-    }
-
-    setRoomId(_roomId) {
-        //Validation
-        this.roomId = _roomId
-    }
-    getRoomId() {
-        return this.roomId
+        return this.status;
     }
 }
 
@@ -71,11 +72,12 @@ const subjectConverter = {
         return {
             name: subject.name,
             edpCode: subject.edpCode,
-            assignedWeek: subject.assignedWeek, //{Sunday, Monday, Tuesday, Wednesay, etc.}
-            startTime: subject.startTime, //Timestamp
-            endTime: subject.endTime, //Timestamp
-            status: subject.status,
-            roomId: subject.roomId
+            type: subject.type,
+            units: subject.units,
+            creationDate: subject.creationDate,
+            createdBy: subject.createdBy,
+            verifiedBy: subject.verifiedBy,
+            status: subject.status
         }
     },
     fromFirestore: (snapshot, options) => {
@@ -83,11 +85,12 @@ const subjectConverter = {
         return new Subject(
             data.name,
             data.edpCode,
-            data.assignedWeek,
-            data.startTime,
-            data.endTime,
-            data.status,
-            data.roomId
+            data.type,
+            data.units,
+            data.creationDate,
+            data.createdBy,
+            data.verifiedBy,
+            data.status
         )
     }
 }

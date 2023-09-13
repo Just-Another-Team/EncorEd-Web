@@ -1,5 +1,6 @@
 const {
     db,
+    Timestamp,
     addDoc,
     getDoc,
     getDocs,
@@ -16,24 +17,22 @@ const {
 const subjectCollection = collection(db, "subjects").withConverter(subjectConverter)
 
 const addSubject = async (req, res) => {
-    console.log(req.body)
-    
     try {
         let subject = new Subject(
             req.body.name,
             req.body.edpCode,
-            req.body.assignedWeek,
-            req.body.startTime,
-            req.body.endTime,
-            req.body.status,
-            req.body.roomId
+            req.body.type,
+            req.body.units,
+            new Date(req.body.creationDate),
+            req.body.createdBy,
+            req.body.verifiedBy,
+            req.body.status
         )
 
         const subjectDoc = await addDoc(subjectCollection, subject)
 
         res.status(200).json({id: subjectDoc.id, message: "Subject added successfully"})
-    }
-    catch(e) {
+    } catch (e) {
         res.status(400).json({error: e.message})
     }
 }
@@ -44,10 +43,22 @@ const viewAllSubject = async (req, res) => {
     const subjects = []
 
     try {
+        if (getSubjectDocs.empty)
+            throw new Error("Subject collections is empty");
+
         getSubjectDocs.forEach((subject) => {
+            const {name, edpCode, type, units, creationDate, createdBy, verifiedBy, status} = subject.data();
+
             subjects.push({
                 id: subject.id, //This should have been an edp code
-                ...subject.data()
+                name,
+                edpCode,
+                type,
+                units,
+                creationDate: new Timestamp(creationDate.seconds, creationDate.nanoseconds).toDate(),
+                createdBy,
+                verifiedBy,
+                status
             })
         })
 
@@ -81,24 +92,26 @@ const updateSubject = async (req, res) => {
         let subject = new Subject(
             req.body.name,
             req.body.edpCode,
-            req.body.assignedWeek,
-            req.body.startTime,
-            req.body.endTime,
-            req.body.status,
-            req.body.roomId
+            req.body.type,
+            req.body.units,
+            new Date(req.body.creationDate),
+            req.body.createdBy,
+            req.body.verifiedBy,
+            req.body.status
         );
 
         updateDoc(subjectSnapshot, {
             name: subject.getName(),
             edpCode: subject.getEdpCode(),
-            assignedWeek: subject.getAssignedWeek(),
-            startTime: subject.getStartTime(),
-            endTime: subject.getEndTime(),
+            type: subject.getType(),
+            units: subject.getUnits(),
+            creationDate: subject.getCreationDate(),
+            createdBy: subject.getCreatedBy(),
+            verifiedBy: subject.getVerifiedBy(),
             status: subject.getStatus(),
-            roomId: subject.getRoomId()
         })
 
-        res.status(200).json("Data updated successfully!")
+        res.status(200).json({message: "Data updated successfully!"})
     } catch (e) {
         res.status(400).json({error: e.message})
     }

@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+const { initializeApp } = require("firebase/app")
+
 const firebaseConfig = {
     apiKey: process.env.APIKEY,
     authDomain: process.env.AUTHDOMAIN,
@@ -10,7 +12,9 @@ const firebaseConfig = {
     measurementId: process.env.MEASUREMENTID
 };
 
-module.exports = {firebaseConfig}
+const app = initializeApp(firebaseConfig);
+
+module.exports = {app}
 
 
   

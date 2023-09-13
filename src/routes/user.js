@@ -5,7 +5,8 @@ const {
     deleteUser,
     viewAllUser,
     viewUser,
-    userFound
+    userFound,
+    verifyUser
 } = require("../controller/user.controller")
 
 //Add
@@ -23,5 +24,8 @@ router.get("/list/:id", viewUser)
 
 //Validate
 router.get("/valid", userFound)
+
+//Verify
+router.get("/verify", verifyUser)
 
 module.exports = router

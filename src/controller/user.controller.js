@@ -8,7 +8,6 @@ const {
     updateDoc,
     deleteDoc,
     query,
-    where
 } = require('../database');
 const {
     User,
@@ -152,7 +151,6 @@ const userFound = async (req, res) => {
     try {
         //Can be better
         const validateQuery = query(userCollection, where("userName", "==", username)); 
-
         const getQuery = await getDocs(validateQuery)
 
         res.status(200).json({
@@ -161,6 +159,30 @@ const userFound = async (req, res) => {
     }
     catch (e) {
         res.status(400).json({error: "Error", message: e.message})
+    }
+}
+
+const verifyUser = async(req, res) => {
+    const email = req.body.email
+    //console.log(email)
+    try{
+        //const userRef = doc(db, 'users', 'Test@gmail.com')
+        const validateQuery = query(userCollection, where("email", "==", email))
+        const userSnap = await getDocs(validateQuery)
+
+        // if(userSnap.exists()) {
+        //     console.log(userSnap.data())
+        //     return res.status(200).json({
+        //         message: userSnap.empty ? "Account can be added" : `Account cannot be added - already exists. id: ${userSnap.data.id}`
+        //     })
+        // }
+
+        return res.status(200).json({
+            message: userSnap.empty ? "Account can be added" : `Account cannot be added - already exists.`
+        })
+    }
+    catch (e){
+        res.status(400).json({error: "Error verifying", message: e.message})
     }
 }
 
@@ -188,5 +210,6 @@ module.exports = {
     deleteUser,
     viewUser,
     viewAllUser,
-    userFound
+    userFound,
+    verifyUser
 }
