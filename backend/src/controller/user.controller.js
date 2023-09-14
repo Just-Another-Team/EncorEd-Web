@@ -1,7 +1,9 @@
 
+
 const {
     db,
     addDoc,
+    setDoc,
     getDoc,
     getDocs,
     doc,
@@ -28,15 +30,22 @@ const addUser = async (req, res) => {
         const userVal = new User(
             req.body.firstName,
             req.body.lastName,
-            req.body.email,
             req.body.username,
-            req.body.password,
             req.body.isadmin,
             req.body.isalumni,
             req.body.status   
         );
 
-        const docRef = await addDoc(userCollection, userVal)
+        //const docRef = await addDoc(userCollection, userVal)
+        const docRef = doc(db, "users", req.body.email).withConverter(userConverter)
+
+        setDoc(docRef, userVal)
+        .then(() => {
+            console.log("Successfully Added")
+        })
+        .catch(error => {
+            console.log(error)
+        })
 
         res.status(200).json({id: docRef.id, message: "User added successfully"})
         //If document does not exist, the document create itself and autogenerates an id
@@ -144,49 +153,47 @@ const viewUser = async (req, res) => {
 }
 
 //For Login
-const userFound = async (req, res) => {
-    const email = req.body.email;
-    const password = req.body.password;
+// const userFound = async (req, res) => {
+//     const email = req.body.email;
+//     const password = req.body.password;
 
-    let user = {}
+//     let user = {}
 
-    console.log(`${email} | ${password}`)
+//     console.log(`${email} | ${password}`)
 
-    try {
-        //Can be better
-        const validateQuery = query(userCollection, where("email", "==", email)); 
+//     try {
+//         //Can be better
+//         const validateQuery = query(userCollection, where("email", "==", email)); 
 
-        const getQuery = await getDocs(validateQuery)
+//         const getQuery = await getDocs(validateQuery)
 
-        res.status(200).json({
-            message: getQuery.empty ? "Username can be added" : "Username cannot be added - Username already exists"
-        })
-    }
-    catch (e) {
-        res.status(400).json({error: "Error", message: e.message})
-    }
-}
+//         res.status(200).json({
+//             message: getQuery.empty ? "Username can be added" : "Username cannot be added - Username already exists"
+//         })
+//     }
+//     catch (e) {
+//         res.status(400).json({error: "Error", message: e.message})
+//     }
+// }
 
-const verifyUser = async(req, res) => {
+const verifyUser = async (req, res) => {
     const email = req.body.email
-    console.log(email)
+
     try{
-        const userRef = doc(db, 'users', 'Test@gmail.com')
-        const userSnap = await getDoc(userRef)
-        if(userSnap.exists()) {
-            console.log(userSnap.data())
-            return res.status(200).json({
-                message: userSnap.empty ? "Account can be added" : "Account cannot be added - already exists"
+        const docRef = doc(db, "users", email)
+        const docSnap = await getDoc(docRef)
+
+        if(docSnap.exists()) {
+            console.log(docSnap.data())
+            return res.status(400).json({
+                message: "Account cannot be added - already exists"
+                
             })
         }
-        // if (snapEmail.empty && snapName.empty) {
-        //     return res.status(200).json({
-        //         message: getQuery.empty ? "Account can be added" : "Account cannot be added - already exists"
-        //     })
-        // }
-        // else {
-        //     res.status(400).json({error: "Error", message: "Error"})
-        // }
+        else{
+            console.log("No Document")
+            res.status(200).json({ message: "Account can be added" })
+        }
     }
     catch (e){
         res.status(400).json({error: "Error verifying", message: e.message})

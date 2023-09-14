@@ -26,6 +26,6 @@ router.get("/list/:id", viewUser)
 router.get("/valid", userFound)
 
 //Verify
-router.get("/verify", verifyUser)
+router.put("/verify", verifyUser)
 
 module.exports = router

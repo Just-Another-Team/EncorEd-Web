@@ -1,12 +1,12 @@
 const { serverTimestamp } = require("firebase/firestore")
 
 class User {
-    constructor (firstName, lastName, email, username, password, isadmin, isalumni, status) {
+    constructor (firstName, lastName, username, isadmin, isalumni, status) {
         this.setFirstName(firstName)
         this.setLastName(lastName)
-        this.setEmail(email)
+        //this.setEmail(email)
         this.setUsername(username)
-        this.setPassword(password)
+        //this.setPassword(password)
         this.setAdmin(isadmin)
         this.setAlumni(isalumni)
         this.setStatus(status)
@@ -28,13 +28,13 @@ class User {
         this.lastName = _lastName;
     }
 
-    getEmail() {
-        return this.email
-    }
-    setEmail(_email) {
-        //Validation
-        this.email = _email
-    }
+    // getEmail() {
+    //     return this.email
+    // }
+    // setEmail(_email) {
+    //     //Validation
+    //     this.email = _email
+    // }
 
     getUsername() {
         return this.username
@@ -44,13 +44,13 @@ class User {
         this.username = _username
     }
 
-    getPassword() {
-        return this.password
-    }
-    setPassword(_password) {
-        //Validation
-        this.password = _password
-    }
+    // getPassword() {
+    //     return this.password
+    // }
+    // setPassword(_password) {
+    //     //Validation
+    //     this.password = _password
+    // }
 
     getAdmin() {
         return this.isadmin
@@ -75,7 +75,7 @@ class User {
     }
 
     toString() {
-        return `${this.firstName}, ${this.lastName}, ${this.email}, ${this.username}, ${this.status}` 
+        return `${this.firstName}, ${this.lastName}, ${this.username}, ${this.status}` 
     }
 }
 
@@ -85,9 +85,9 @@ const userConverter = {
         return {
             firstName: user.firstName,
             lastName: user.lastName,
-            email: user.email,
+            //email: user.email,
             username: user.username,
-            password: user.password,
+            //password: user.password,
             isadmin: user.isadmin,
             isalumni: user.isalumni,
             status: user.status,
@@ -99,9 +99,9 @@ const userConverter = {
         return new User(
             data.firstName,
             data.lastName,
-            data.email,
+            //data.email,
             data.username,
-            data.password,
+            //data.password,
             data.isadmin,
             data.isalumni,
             data.status

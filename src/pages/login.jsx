@@ -2,7 +2,8 @@ import React from "react"
 import {AiOutlineMail, AiOutlineLock} from 'react-icons/ai'
 import { useForm } from 'react-hook-form'
 import {Container, Row, Col, Form, InputGroup, Button, Stack} from 'react-bootstrap'
-import { getAuth, signInWithCustomToken, signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from "../firebase.js"
 import axios from "axios";
 
 const LoginPage = () => {
@@ -13,16 +14,36 @@ const LoginPage = () => {
     const loggedIn = (data) => {
         console.log(data)
         try{
-            axios.get('http://localhost:4000/user/valid', {
-                email: data.email,
-                password: data.password
-            })
-            console.log("login succesfully")
-            window.location.href = 'dashboard/home'
+            // axios.put('http://localhost:4000/user/verify', {
+            //     email: data.email
+            // })
+            // .then(() => {
+            //     signInWithEmailAndPassword(auth, data.email, data.password)
+            //     .then((userCredential) => {
+            //         // Signed in 
+            //         const user = userCredential.user;
+            //         // ...
+            //         console.log("login succesfully")
+            //         window.location.href = 'dashboard/home'
+            //     })
+            //     .catch((error) => {
+            //         console.log(error)
+            //     })
+            // })
+            signInWithEmailAndPassword(auth, data.email, data.password)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user;
+                    // ...
+                    console.log("login succesfully")
+                    window.location.href = 'dashboard/home'
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
         } catch(err) {
             console.log("err")
         }
-        window.location.href = 'dashboard/home'
     }
 
     return ( 

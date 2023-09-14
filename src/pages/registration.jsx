@@ -3,9 +3,11 @@ import {AiOutlineMail, AiOutlineLock, AiOutlineUser, AiOutlineCalendar} from 're
 import { useForm, Controller, useWatch, useFormState } from 'react-hook-form'
 import { Container, Row, Col, Form, InputGroup, Button} from 'react-bootstrap'
 import axios from "axios"
+import { createUserWithEmailAndPassword } from "firebase/auth"
+import { auth } from "../firebase.js"
 
 const RegistrationPage = () => {
-    
+
     const {register, control, reset, handleSubmit, formState: {errors}, watch, getValues, trigger} = useForm({
         defaultValues: {
             firstName: "",
@@ -20,26 +22,27 @@ const RegistrationPage = () => {
     //console.log(data)
     const submitRegister = (data) => {
         try{
-            axios.get('http://localhost:4000/user/verify', {
+            axios.put('http://localhost:4000/user/verify', {
                 email: data.email
             })
-            // .then(res => {
-            //     axios.post('http://localhost:4000/user/add', {
-            //     firstName: data.firstName,   
-            //     lastName: data.lastName,
-            //     email: data.email,
-            //     username: data.firstName + "" + data.lastName,
-            //     password: data.password,
-            //     isadmin: "false",
-            //     isalumni: "false",
-            //     status: "open",
-                
-            // })
-            //     console.log(res)
-            // })
-            // .catch(error => {
-            //     console.log(error)
-            // })
+            .then(() => {
+                axios.post('http://localhost:4000/user/add', {
+                firstName: data.firstName,   
+                lastName: data.lastName,
+                username: data.firstName + "" + data.lastName,
+                email: data.email,
+                isadmin: "false",
+                isalumni: "false",
+                status: "open",
+                })
+                createUserWithEmailAndPassword(auth, data.email, data.password)
+                console.log("Success")
+                reset()
+                //window.location.href = '/'
+            })
+            .catch(error => {
+                console.log(error)
+            })
             //window.location.href = '/'
         } catch(err) {
             console.log("err")

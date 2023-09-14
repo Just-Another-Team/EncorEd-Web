@@ -2,6 +2,19 @@ import "../styles/NavBar.css"
 import { useEffect, useState } from "react"
 import { FiHome, FiBook, FiMap, FiCalendar, FiUsers } from 'react-icons/fi'
 import { Button, Col, Container, Nav, Navbar, Row } from 'react-bootstrap'
+import { auth } from '../firebase.js'
+import { signOut } from 'firebase/auth'
+
+const logout = () => {
+    signOut(auth)
+    .then(() => {
+        console.log("logged out")
+        window.location.href = '/'
+    })
+    .catch((err) => {
+        console.log(err)
+    })
+}
 
 const TopNav = () => {
     return (
@@ -12,7 +25,7 @@ const TopNav = () => {
             </Col>
 
             <Col>
-                <Button size="sm" style={{fontWeight: '700', borderRadius: 24, paddingLeft: 32, paddingRight: 32}}>
+                <Button onClick={logout} size="sm" style={{fontWeight: '700', borderRadius: 24, paddingLeft: 32, paddingRight: 32}}>
                     LOGOUT
                 </Button>
 
