@@ -1,10 +1,12 @@
+const { serverTimestamp } = require("firebase/firestore")
+
 class User {
     constructor (firstName, lastName, email, userName, password, addedBy, joinDate, isadmin, isalumni, status) {
         this.setFirstName = firstName
         this.setLastName = lastName
-        this.setEmail = email
+        //this.setEmail = email
         this.setUsername = userName
-        this.setPassword = password
+        //this.setPassword = password
         this.setAddedBy = addedBy
         this.setJoinDate = joinDate
         this.setAdmin = isadmin
@@ -28,13 +30,13 @@ class User {
         this.lastName = _lastName;
     }
 
-    get getEmail() {
-        return this.email
-    }
-    set setEmail(_email) {
-        //Validation
-        this.email = _email
-    }
+    // get getEmail() {
+    //     return this.email
+    // }
+    // set setEmail(_email) {
+    //     //Validation
+    //     this.email = _email
+    // }
 
     get getUsername() {
         return this.userName
@@ -44,13 +46,13 @@ class User {
         this.userName = _username
     }
 
-    get getPassword() {
-        return this.password
-    }
-    set setPassword(_password) {
-        //Validation
-        this.password = _password
-    }
+    // get getPassword() {
+    //     return this.password
+    // }
+    // set setPassword(_password) {
+    //     //Validation
+    //     this.password = _password
+    // }
 
     get getAddedBy() {
         return this.addedBy
@@ -99,14 +101,15 @@ const userConverter = {
         return {
             firstName: user.firstName,
             lastName: user.lastName,
-            email: user.email,
+            //email: user.email,
             userName: user.userName,
-            password: user.password,
+           // password: user.password,
             addedBy: user.addedBy,
             joinDate: user.joinDate,
             isadmin: user.isadmin,
             isalumni: user.isalumni,
-            status: user.status
+            status: user.status,
+            createdAt: serverTimestamp()
         }
     },
     fromFirestore: (snapshot, options) => {
@@ -123,9 +126,9 @@ const userConverter = {
         return new User(
             data.firstName,
             data.lastName,
-            data.email,
+            //data.email,
             data.userName,
-            data.password,
+            //data.password,
             data.addedBy,
             data.joinDate,
             data.isadmin,
