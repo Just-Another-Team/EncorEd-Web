@@ -38,13 +38,14 @@ const addSubject = async (req, res) => {
 }
 
 const viewAllSubject = async (req, res) => {
-    const getSubjectDocs = await getDocs(subjectCollection)
-
+    
     const subjects = []
 
     try {
+        const getSubjectDocs = await getDocs(subjectCollection)
+
         if (getSubjectDocs.empty)
-            throw new Error("Subject collections is empty");
+            throw new Error("Subject collection is empty");
 
         getSubjectDocs.forEach((subject) => {
             const {name, edpCode, type, units, creationDate, createdBy, verifiedBy, status} = subject.data();
@@ -72,10 +73,10 @@ const viewAllSubject = async (req, res) => {
 const viewSubject = async (req, res) => {
     const id = req.params.id
 
-    const subjectRef = doc(db, "subjects", id).withConverter(subjectConverter)
-    const subjectDoc = await getDoc(subjectRef)
-
     try {
+        const subjectRef = doc(db, "subjects", id).withConverter(subjectConverter)
+        const subjectDoc = await getDoc(subjectRef)
+
         res.status(200).json(subjectDoc.data())
     }
     catch (e) {

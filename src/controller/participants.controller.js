@@ -76,15 +76,16 @@ const deleteParticipant = async (req, res) => {
 }
 
 const viewAllParticipants = async (req, res) => {
-    const getParticipantDocs = await getDocs(participantsCollection)
-
     const participants = []
 
     try {
+        const getParticipantDocs = await getDocs(participantsCollection)
+
+
         if (getParticipantDocs.empty)
             throw new Error("Participant collections is empty");
 
-            getParticipantDocs.forEach((participant) => {
+        getParticipantDocs.forEach((participant) => {
             const {
                 subId,
                 userId,

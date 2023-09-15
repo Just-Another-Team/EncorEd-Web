@@ -13,6 +13,12 @@ const {
     viewSubjectSchedule,
     updateSubjectSchedule
 } = require("../controller/subjectSchedule.controller");
+const {
+    addSubAttendance,
+    deleteSubAttendance,
+    updateSubAttendance,
+    viewAllSubAttendance
+} = require("../controller/subjectAttendance.controller")
 
 /* SUBJECT */
 router.post("/add", addSubject)
@@ -34,6 +40,13 @@ router.delete("/schedule/delete/:id", deleteSubjectSchedule)
 router.get("/schedule/list", viewAllSubjectSchedule)
 router.get("/schedule/list/:id", viewSubjectSchedule)
 
-/* SUBJECT PARTICIPANTS */
+/* SUBJECT ATTENDANCE */
+router.post("/attendance/add", addSubAttendance)
+
+router.put("/attendance/update/:id", updateSubAttendance)
+
+router.delete("/attendance/delete/:id", deleteSubAttendance)
+
+router.get("/attendance/list", viewAllSubAttendance)
 
 module.exports = router

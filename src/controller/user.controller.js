@@ -86,9 +86,10 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     const id = req.params.id;
 
+    // Instead of deleting the user completely, why not use the status?
+
     try{
         const userDoc = doc(db, "users", id).withConverter(userConverter); //Can be three parameters. See docs
-
         await deleteDoc(userDoc);
 
         res.status(200).json("Data delete successfully")
@@ -99,11 +100,12 @@ const deleteUser = async (req, res) => {
 }
 
 const viewAllUser = async (req, res) => {
-    const getUserDocs = await getDocs(userCollection);
     
     const users = []
 
     try {
+        const getUserDocs = await getDocs(userCollection);
+
         //Can be better
         // const q = query(userCollection, where("lastName", "==", "Aguilar"));
 
