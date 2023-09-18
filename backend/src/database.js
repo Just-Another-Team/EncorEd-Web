@@ -20,4 +20,4 @@ const {
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
 
-module.exports = {db, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, collection, query, where}
+module.exports = {app, db, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, collection, query, where}

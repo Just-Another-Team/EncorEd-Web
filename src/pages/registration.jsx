@@ -31,11 +31,12 @@ const RegistrationPage = () => {
                 lastName: data.lastName,
                 username: data.firstName + "" + data.lastName,
                 email: data.email,
+                password: data.password,
                 isadmin: "false",
                 isalumni: "false",
                 status: "open",
                 })
-                createUserWithEmailAndPassword(auth, data.email, data.password)
+                
                 console.log("Success")
                 reset()
                 //window.location.href = '/'

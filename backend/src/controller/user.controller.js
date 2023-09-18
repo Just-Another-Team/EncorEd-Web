@@ -1,5 +1,5 @@
 
-
+const { auth, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword  } = require('../authentication.js');
 const {
     db,
     addDoc,
@@ -42,15 +42,13 @@ const addUser = async (req, res) => {
         setDoc(docRef, userVal)
         .then(() => {
             console.log("Successfully Added")
+            createUserWithEmailAndPassword(auth, req.body.email, req.body.password)
         })
         .catch(error => {
             console.log(error)
         })
 
         res.status(200).json({id: docRef.id, message: "User added successfully"})
-        //If document does not exist, the document create itself and autogenerates an id
-        //When the first data added, the database identifies its keys and use them as the template for the next add operation
-        //Can use setDoc()
     }
     catch(e) {
         res.status(400).json({error: e.message})
@@ -153,28 +151,28 @@ const viewUser = async (req, res) => {
 }
 
 //For Login
-// const userFound = async (req, res) => {
-//     const email = req.body.email;
-//     const password = req.body.password;
+const userFound = async (req, res) => {
+    const email = req.body.email;
+    const password = req.body.password;
 
-//     let user = {}
+    let user = {}
 
-//     console.log(`${email} | ${password}`)
+    console.log(`${email} | ${password}`)
 
-//     try {
-//         //Can be better
-//         const validateQuery = query(userCollection, where("email", "==", email)); 
+    try {
+        //Can be better
+        const validateQuery = query(userCollection, where("email", "==", email)); 
 
-//         const getQuery = await getDocs(validateQuery)
+        const getQuery = await getDocs(validateQuery)
 
-//         res.status(200).json({
-//             message: getQuery.empty ? "Username can be added" : "Username cannot be added - Username already exists"
-//         })
-//     }
-//     catch (e) {
-//         res.status(400).json({error: "Error", message: e.message})
-//     }
-// }
+        res.status(200).json({
+            message: getQuery.empty ? "Username can be added" : "Username cannot be added - Username already exists"
+        })
+    }
+    catch (e) {
+        res.status(400).json({error: "Error", message: e.message})
+    }
+}
 
 const verifyUser = async (req, res) => {
     const email = req.body.email
@@ -197,6 +195,26 @@ const verifyUser = async (req, res) => {
     }
     catch (e){
         res.status(400).json({error: "Error verifying", message: e.message})
+    }
+}
+
+const loginUser = async (req, res) => {
+    const email = req.body.email
+    const password = req.body.password
+
+    try {
+        signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            //const user = userCredential.user;
+            console.log("login succesfully")
+            window.location.href = 'dashboard/home'
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+    }
+    catch(error) {
+        console.log(error)
     }
 }
 
@@ -226,5 +244,6 @@ module.exports = {
     viewUser,
     viewAllUser,
     userFound,
-    verifyUser
+    verifyUser,
+    loginUser
 }

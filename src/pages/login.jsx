@@ -14,33 +14,17 @@ const LoginPage = () => {
     const loggedIn = (data) => {
         console.log(data)
         try{
-            // axios.put('http://localhost:4000/user/verify', {
-            //     email: data.email
-            // })
-            // .then(() => {
-            //     signInWithEmailAndPassword(auth, data.email, data.password)
-            //     .then((userCredential) => {
-            //         // Signed in 
-            //         const user = userCredential.user;
-            //         // ...
-            //         console.log("login succesfully")
-            //         window.location.href = 'dashboard/home'
-            //     })
-            //     .catch((error) => {
-            //         console.log(error)
-            //     })
-            // })
-            signInWithEmailAndPassword(auth, data.email, data.password)
-                .then((userCredential) => {
-                    // Signed in 
-                    const user = userCredential.user;
-                    // ...
-                    console.log("login succesfully")
-                    window.location.href = 'dashboard/home'
+            axios.put('http://localhost:4000/user/verify', {
+                email: data.email
+            })
+            .then(() => {
+                axios.post('http://localhost:4000/user/login', {
+                    email: data.email,
+                    password: data.password
                 })
-                .catch((error) => {
-                    console.log(error)
-                })
+                
+            })
+            
         } catch(err) {
             console.log("err")
         }
