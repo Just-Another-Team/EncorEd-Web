@@ -3,8 +3,6 @@ import {AiOutlineMail, AiOutlineLock, AiOutlineUser, AiOutlineCalendar} from 're
 import { useForm, Controller, useWatch, useFormState } from 'react-hook-form'
 import { Container, Row, Col, Form, InputGroup, Button} from 'react-bootstrap'
 import axios from "axios"
-import { createUserWithEmailAndPassword } from "firebase/auth"
-import { auth } from "../firebase.js"
 
 const RegistrationPage = () => {
 
@@ -39,7 +37,7 @@ const RegistrationPage = () => {
                 
                 console.log("Success")
                 reset()
-                //window.location.href = '/'
+                window.location.href = '/'
             })
             .catch(error => {
                 console.log(error)

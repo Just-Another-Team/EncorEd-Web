@@ -202,20 +202,34 @@ const loginUser = async (req, res) => {
     const email = req.body.email
     const password = req.body.password
 
-    try {
-        signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            //const user = userCredential.user;
-            console.log("login succesfully")
-            window.location.href = 'dashboard/home'
-        })
-        .catch((error) => {
-            console.log(error)
-        })
+    try{
+        const docRef = doc(db, "users", email)
+        const docSnap = await getDoc(docRef)
+
+        if(docSnap.exists()) {
+            try {
+                signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    //const user = userCredential.user;
+                    console.log(docSnap.data())
+                    return res.status(200).json()
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+            }
+            catch(error) {
+                console.log(error)
+            }
+        }
+        else{
+            res.status(400).json({ message: "No Document" })
+        }
     }
-    catch(error) {
-        console.log(error)
+    catch (e){
+        res.status(400).json({error: "Error verifying", message: e.message})
     }
+    
 }
 
 // Sorting Test

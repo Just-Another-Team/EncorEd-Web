@@ -2,8 +2,6 @@ import React from "react"
 import {AiOutlineMail, AiOutlineLock} from 'react-icons/ai'
 import { useForm } from 'react-hook-form'
 import {Container, Row, Col, Form, InputGroup, Button, Stack} from 'react-bootstrap'
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from "../firebase.js"
 import axios from "axios";
 
 const LoginPage = () => {
@@ -14,15 +12,13 @@ const LoginPage = () => {
     const loggedIn = (data) => {
         console.log(data)
         try{
-            axios.put('http://localhost:4000/user/verify', {
-                email: data.email
+            axios.post('http://localhost:4000/user/login', {
+                email: data.email,
+                password: data.password
             })
             .then(() => {
-                axios.post('http://localhost:4000/user/login', {
-                    email: data.email,
-                    password: data.password
-                })
-                
+                console.log("login succesfully")
+                window.location.href = 'dashboard/home'
             })
             
         } catch(err) {

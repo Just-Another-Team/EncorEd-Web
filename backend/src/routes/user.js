@@ -6,7 +6,8 @@ const {
     viewAllUser,
     viewUser,
     userFound,
-    verifyUser
+    verifyUser,
+    loginUser
 } = require("../controller/user.controller")
 
 //Add
@@ -27,5 +28,7 @@ router.get("/valid", userFound)
 
 //Verify
 router.put("/verify", verifyUser)
+
+router.post("/login", loginUser)
 
 module.exports = router
