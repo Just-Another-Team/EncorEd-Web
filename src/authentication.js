@@ -2,9 +2,15 @@ const { app } = require('../config')
 const { 
     getAuth,
     createUserWithEmailAndPassword,
-    signInWithEmailAndPassword
+    signInWithEmailAndPassword,
+    fetchSignInMethodsForEmail
 } = require("firebase/auth")
 
 const auth = getAuth(app);
 
-module.exports = {auth}
+module.exports = {
+    auth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    fetchSignInMethodsForEmail
+}

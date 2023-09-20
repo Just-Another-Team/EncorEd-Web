@@ -1,12 +1,12 @@
-const { serverTimestamp } = require("firebase/firestore")
+const {Timestamp} = require("../database")
 
 class User {
     constructor (firstName, lastName, email, userName, password, addedBy, joinDate, isadmin, isalumni, status) {
         this.setFirstName = firstName
         this.setLastName = lastName
-        //this.setEmail = email
+        this.setEmail = email
         this.setUsername = userName
-        //this.setPassword = password
+        this.setPassword = password
         this.setAddedBy = addedBy
         this.setJoinDate = joinDate
         this.setAdmin = isadmin
@@ -30,13 +30,13 @@ class User {
         this.lastName = _lastName;
     }
 
-    // get getEmail() {
-    //     return this.email
-    // }
-    // set setEmail(_email) {
-    //     //Validation
-    //     this.email = _email
-    // }
+    get getEmail() {
+        return this.email
+    }
+    set setEmail(_email) {
+        //Validation
+        this.email = _email
+    }
 
     get getUsername() {
         return this.userName
@@ -46,13 +46,13 @@ class User {
         this.userName = _username
     }
 
-    // get getPassword() {
-    //     return this.password
-    // }
-    // set setPassword(_password) {
-    //     //Validation
-    //     this.password = _password
-    // }
+    get getPassword() {
+        return this.password
+    }
+    set setPassword(_password) {
+        //Validation
+        this.password = _password
+    }
 
     get getAddedBy() {
         return this.addedBy
@@ -109,32 +109,25 @@ const userConverter = {
             isadmin: user.isadmin,
             isalumni: user.isalumni,
             status: user.status,
-            createdAt: serverTimestamp()
+            //createdAt: serverTimestamp() -- CreatedAt and JoinDate are the same
         }
     },
     fromFirestore: (snapshot, options) => {
         const data = snapshot.data(options)
 
         // Do this when initiate an auth
-        // let user = new User();
-        // user.setFirstName = data.firstName
-        // user.setLastName = data.lastName
-        // user.setUsername = data.userName
+        let user = new User();
 
-        // console.log(user);
+        user.setFirstName = data.firstName
+        user.setLastName = data.lastName
+        user.setUsername = data.userName
+        user.setAddedBy = data.addedBy
+        user.setJoinDate = new Timestamp(data.joinDate.seconds, data.joinDate.nanoseconds).toDate(),
+        user.setAdmin = data.isadmin
+        user.setAlumni = data.isalumni
+        user.setStatus = data.status
 
-        return new User(
-            data.firstName,
-            data.lastName,
-            //data.email,
-            data.userName,
-            //data.password,
-            data.addedBy,
-            data.joinDate,
-            data.isadmin,
-            data.isalumni,
-            data.status
-        )
+        return user
     }
 }
 

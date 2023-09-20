@@ -15,6 +15,7 @@ const {
     query,
     where,
     onSnapshot,
+    serverTimestamp,
     Timestamp
 } = require("firebase/firestore")
 
@@ -33,5 +34,6 @@ module.exports = {
     collection,
     query,
     where,
-    onSnapshot
+    onSnapshot,
+    serverTimestamp
 }

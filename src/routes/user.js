@@ -6,11 +6,30 @@ const {
     viewAllUser,
     viewUser,
     userFound,
-    verifyUser
+    verifyUser,
+    signIn
 } = require("../controller/user.controller")
 
 //Add
 router.post("/add", addUser);
+// (req, res) => {
+//     try {
+//         const {firstName, lastName, email, userName, password } = req.body;
+
+//         const userInput = {
+//             firstName,
+//             lastName,
+//             userName,
+//             addedBy: null,
+//             isAdmin: true,
+//             isAlumni: false,
+//             status: "Open"
+//         }
+
+        
+//     } catch (e) {
+//         res.status(400).json({error: "Router error", message: e.message})
+//     }
 
 //Update
 router.put("/update/:id", updateUser)
@@ -22,10 +41,13 @@ router.delete("/delete/:id", deleteUser)
 router.get("/list", viewAllUser)
 router.get("/list/:id", viewUser)
 
-//Validate
-router.get("/valid", userFound)
+router.post("/signIn", signIn)
 
-//Verify
-router.get("/verify", verifyUser)
+//Actually, this is not needed. Thank you Firebase Authentication!
+// //Validate
+// router.get("/valid", userFound)
+
+// //Verify
+// router.get("/verify", verifyUser)
 
 module.exports = router

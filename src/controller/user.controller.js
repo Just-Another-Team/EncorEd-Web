@@ -9,46 +9,74 @@ const {
     updateDoc,
     deleteDoc,
     query,
+    serverTimestamp,
 } = require('../database');
 const {
     User,
     userConverter
-} = require("../models/user.model")
+} = require("../models/user.model");
+const { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } = require('../authentication');
 
 const userCollection = collection(db, "users").withConverter(userConverter)
 
 const addUser = async (req, res) => {
-    console.log(req.body);
 
     try{
+        const {firstName, lastName, email, userName, password } = req.body;
+    
+        const userInput = {
+            firstName,
+            lastName,
+            userName,
+            joinDate: serverTimestamp(),
+            addedBy: null,
+            isAdmin: true,
+            isAlumni: false,
+            status: "Open"
+        }
+
+        /* Middleware shenanigans must be located here */
+
         const userVal = new User(
-            req.body.firstName,
-            req.body.lastName,
-            req.body.username,
-            req.body.isadmin,
-            req.body.isalumni,
-            req.body.status   
-        );
-
+            userInput.firstName,
+            userInput.lastName,
+            userInput.email,
+            userInput.userName,
+            userInput.password,
+            userInput.addedBy,
+            userInput.joinDate,
+            userInput.isAdmin,
+            userInput.isAlumni,
+            userInput.status
+        )
+        
         //const docRef = await addDoc(userCollection, userVal)
-        const docRef = doc(db, "users", req.body.email).withConverter(userConverter)
+        const docRef = doc(db, "users", email).withConverter(userConverter)
+    
+        await createUserWithEmailAndPassword(auth, email, password)
+            .then(() => {
+                console.log("Successfully Added - Authentication")
+            })
+            .catch(error => {
+                // res.status(400).json({error: "Controller Error", type: "Authentication", message: error.message})
+                throw {type: "Authentication", message: error.message}
+            })
 
-        setDoc(docRef, userVal)
-        .then(() => {
-            console.log("Successfully Added")
-        })
-        .catch(error => {
-            console.log(error)
-        })
-
+        await setDoc(docRef, userVal)
+            .then(() => {
+                console.log("Successfully Added - Firestore")
+            })
+            .catch(error => {
+                // res.status(400).json({error: "Controller Error", type: "Firestore", message: error.message})
+                throw {type: "Firestore", message: error.message}
+            })
+    
         res.status(200).json({id: docRef.id, message: "User added successfully"})
-        //If document does not exist, the document create itself and autogenerates an id
-        //When the first data added, the database identifies its keys and use them as the template for the next add operation
-        //Can use setDoc()
     }
     catch(e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({error: "Controller Error", type: e.type, message: e.message})
     }
+
 }
 
 const updateUser = async (req, res) => {
@@ -148,7 +176,23 @@ const viewUser = async (req, res) => {
     }
 }
 
-//For Login
+const signIn = async (req, res) => {
+    console.log(req.body)
+
+    //If input is not an email
+
+    await signInWithEmailAndPassword(auth, req.body.emailUserName, req.body.password)
+        .then((result) => {
+            console.log(result);
+            res.status(200).json("It's good")
+        })
+        .catch((err) => {
+            console.log(err)
+            res.status(400).json({message: "A Big Bruh happened"})
+        })
+}
+
+//For Login -- Deprecated
 const userFound = async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
@@ -167,11 +211,11 @@ const userFound = async (req, res) => {
         })
     }
     catch (e) {
-        res.status(400).json({error: "Error", message: e.message})
+        res.status(400).json({error: "Controller Error", message: e.message})
     }
 }
 
-//for registration only
+//for registration only -- Deprecated
 const verifyUser = async (req, res) => {
     const email = req.body.email
 
@@ -196,30 +240,13 @@ const verifyUser = async (req, res) => {
     }
 }
 
-// Sorting Test
-// users.sort((first, last) => {
-//     let firstLName = first.lastName.toLowerCase()
-//     let lastLName = last.lastName.toLowerCase()
-
-//     console.log(`${firstLName} | ${lastLName}`)
-
-//     //Ascending Order
-//     if (firstLName < lastLName) return -1
-//     if (lastLName < firstLName) return 1
-
-//     //Descencding Order conditions
-//     //if (firstLName > lastLName) return -1
-//     //if (lastLName > firstLName) return 1
-
-//     return 0
-// })
-
 module.exports = {
     addUser,
     updateUser,
     deleteUser,
     viewUser,
     viewAllUser,
+    signIn,
     userFound,
     verifyUser
 }
