@@ -1,30 +1,35 @@
-//tag <navbar>
-// use bootsrap components
-import React from "react"
-import { Button, Col, Container, Row } from 'react-bootstrap'
-import { Outlet } from "react-router-dom"
-import { SideBar, TopNav } from "../../components/NavBars"
+import React from "react";
+import {
+    Box,
+    Container,
+    Toolbar,
+    Typography
+} from '@mui/material'
+import Navbar from "../../components/NavBar/Navbar";
+import Sidebar from "../../components/NavBar/Sidebar";
+import { Outlet } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-const DashboardLayout = () => {
+import { auth, onAuthStateChanged } from '../../app/firebase/authentication';
+import { useEffect } from 'react';
 
-    return ( 
-        <Container fluid style={{height: '100vh'}}>
 
-            <Row style={{minHeight: 72}}>
-                <TopNav />
-            </Row>
+const Dashboard = () => {
+    const selected = useSelector((state) => state.pageSelect.page)
 
-            <Row>
-                <Col style={{maxWidth: 256, padding: 0}}>
-                    <SideBar />
-                </Col>
+    return(
+        <Box sx={{display: 'flex'}}>
+            <Navbar />
+            <Sidebar selected={selected}/>
+            <Container maxWidth="lg" component="main" sx={{ flexGrow: 1, p: 3, }}>
+                <Toolbar variant="regular"/>
+                
+                {/* Test for the Data Grid */}
 
-                <Col style={{padding: 16}}>
-                    <Outlet />
-                </Col>
-            </Row>
-
-        </Container>
-    ) 
+                <Outlet />
+            </Container>
+        </Box>
+    )
 }
-export default DashboardLayout
+
+export default Dashboard
