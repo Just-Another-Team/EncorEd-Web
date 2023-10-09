@@ -15,6 +15,7 @@ const UserInput = () => {
         maxWidth="xl"
         sx={{
             minHeight: "100vh",
+            minWidth: "100%",
             display: "flex",
             alignItems: 'center',
             justifyContent: 'center',
