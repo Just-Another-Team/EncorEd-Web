@@ -19,7 +19,8 @@ const LandingPage = () => {
             display: "flex",
             padding: 0,
             overflow: "hidden",
-            backgroundColor: "#FED485"
+            backgroundColor: "#FED485",
+            minWidth: "100%",
         }}>
             <Box flex={0.85}>
                 {/* Spacer */}
@@ -31,7 +32,7 @@ const LandingPage = () => {
                 alignItems: 'center',
                 justifyContent: "center",
                 backgroundColor: "#45A1FD",
-                color: "#FFFFFF",
+                color: "#FFFFFF"
             }}>
                 <Stack sx={{width: "34rem"}} spacing={2}>
                     <Typography fontWeight={700} variant="h3" component="h3">

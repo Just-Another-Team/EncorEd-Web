@@ -14,10 +14,13 @@ const Login = () => {
             alignItems: 'center',
             justifyContent: 'center',
             padding: 8,
-            background: "linear-gradient(113deg, #45A1FD 0%, rgba(12, 99, 186, 0.85) 100%)"
+            background: "linear-gradient(113deg, #45A1FD 0%, rgba(12, 99, 186, 0.85) 100%)",
+            minWidth: "100%",
         }}>
             <img alt="EncorEd Logo" src="/assets/LoginLogo.svg"/>
             <LoginUserForm />
+            
+            <h4>Don't have an account? <a style={{color:"indigo"}} href="/register">Sign Up</a></h4>
         </Container>
     )
 }
