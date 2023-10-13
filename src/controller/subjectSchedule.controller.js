@@ -1,37 +1,51 @@
 const {
     db,
     Timestamp,
-    addDoc,
-    getDoc,
-    getDocs,
-    doc,
-    collection,
-    updateDoc,
-    deleteDoc
+    serverTimestamp,
 } = require('../database');
 const {
     SubjectSchedule,
     subScheduleConverter
 } = require("../models/subjectSchedule.model")
 
-const subjectScheduleCollection = collection(db, "subjectSchedules").withConverter(subScheduleConverter)
+const subjectScheduleCollection = db.collection('/subjectSchedules/').withConverter(subScheduleConverter)
 
 const addSubjectSchedule = async (req, res) => {
+    
     try {
+        
+        const {
+            subId,
+            roomId,
+            assignedWeek,
+            startTime,
+            endTime,
+            createdBy,
+            verifiedBy,
+            status
+        } = req.body
+    
         let subjectSchedule = new SubjectSchedule(
-            req.body.subId,
-            req.body.roomId,
-            req.body.assignedWeek,
-            new Date(req.body.startTime),
-            new Date(req.body.endTime),
-            req.body.createdBy,
-            req.body.verifiedBy,
-            req.body.status
+            subId,
+            roomId,
+            assignedWeek, 
+            new Date(startTime),
+            new Date(endTime),
+            createdBy,
+            verifiedBy,
+            status
         )
+    
+        const subjectScheduleDocRef = db.doc(`/subjectSchedule/`).withConverter(subScheduleConverter)
+    
+        await subjectScheduleDocRef.create(subjectSchedule)
+            .then((result) => {
+                res.status(200).json({id: subjectScheduleDoc.id, message: "Subject Schedule added successfully"})
+            })
+            .catch((err) => {
+                throw {name: "Subject Schedule", type: "Add", message: err.message}
+            })
 
-        const subjectScheduleDoc = await addDoc(subjectScheduleCollection, subjectSchedule)
-
-        res.status(200).json({id: subjectScheduleDoc.id, message: "Subject Schedule added successfully"})
     } catch (e) {
         res.status(400).json({error: e.message})
     }
@@ -41,8 +55,6 @@ const updateSubjectSchedule = async (req, res) => {
     const id = req.params.id;
 
     try {
-        const subScheduleSnapshot = await doc(db, `/subjectSchedules/${id}`).withConverter(subScheduleConverter);
-
         //If ID exist
 
         let subjectSchedule = new SubjectSchedule(
@@ -56,20 +68,17 @@ const updateSubjectSchedule = async (req, res) => {
             req.body.status
         );
 
-        updateDoc(subScheduleSnapshot, {
-            subId: subjectSchedule.getSubId,
-            roomId: subjectSchedule.getRoomId,
-            assignedWeek: subjectSchedule.getAssignedWeek,
-            startTime: subjectSchedule.getStartTime,
-            endTime: subjectSchedule.getEndTime,
-            createdBy: subjectSchedule.getCreatedBy,
-            verifiedBy: subjectSchedule.getVerifiedBy,
-            status: subjectSchedule.getStatus
-        })
+        const subScheduleDocRef = db.doc(`/subjectSchedules/${id}`).withConverter(subScheduleConverter);
 
-        res.status(200).json({message: "Data updated successfully!"})
+        await subScheduleDocRef.update(Object.assign({}, subjectSchedule))
+            .then((result) => {
+                res.status(200).json({message: "Data updated successfully!"})
+            })
+            .catch((err) => {
+                throw {name: "Subject Schedule", type: "Update", message: err.message}
+            })
     } catch (e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: e.name, type: e.type, error: e.message})
     }
 }
 
@@ -77,15 +86,15 @@ const deleteSubjectSchedule = async (req, res) => {
     const id = req.params.id;
 
     try {
-        const subScheduleSnapshot = doc(db, `/subjectSchedules/${id}`).withConverter(subjectScheduleCollection);
+        const subScheduleDocRef = db.doc(`/subjectSchedules/${id}`).withConverter(subjectScheduleCollection);
 
         //If id exists
 
-        await deleteDoc(subScheduleSnapshot);
+        await subScheduleDocRef.delete();
 
         res.status(200).json({message: "Data deleted successfully."})
     } catch (e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Subject Schedule", type: "Delete", error: e.message})
     }
 }
 
@@ -93,10 +102,10 @@ const viewAllSubjectSchedule = async (req, res) => {
     const schedules = []
 
     try {
-        const getSubSchedDocs = await getDocs(subjectScheduleCollection)
+        const getSubSchedDocs = await subjectScheduleCollection.get();
 
         if (getSubSchedDocs.empty)
-            throw new Error("Subject Schedule collections is empty");
+            throw {message: "Subject Schedule collections is empty"};
 
         getSubSchedDocs.forEach((schedule) => {
             const {

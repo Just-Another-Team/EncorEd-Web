@@ -1,7 +1,7 @@
 const {Timestamp} = require("../database")
 
 class User {
-    constructor (firstName, lastName, email, userName, password, addedBy, joinDate, isadmin, isalumni, status) {
+    constructor (firstName, lastName, email, userName, password, addedBy, joinDate, systemRole, isalumni, status) {
         this.setFirstName = firstName
         this.setLastName = lastName
         this.setEmail = email
@@ -9,7 +9,7 @@ class User {
         this.setPassword = password
         this.setAddedBy = addedBy
         this.setJoinDate = joinDate
-        this.setAdmin = isadmin
+        this.setSystemRole = systemRole
         this.setAlumni = isalumni
         this.setStatus = status
     }
@@ -68,11 +68,11 @@ class User {
         this.joinDate = _joinDate
     }
 
-    get getAdmin() {
-        return this.isadmin
+    get getSystemRole() {
+        return this.systemRole
     }
-    set setAdmin(_admin) {
-        this.isadmin = _admin
+    set setSystemRole(_systemRole) {
+        this.systemRole = _systemRole
     }
 
     get getAlumni() {
@@ -106,7 +106,7 @@ const userConverter = {
            // password: user.password,
             addedBy: user.addedBy,
             joinDate: user.joinDate,
-            isadmin: user.isadmin,
+            systemRole: user.systemRole,
             isalumni: user.isalumni,
             status: user.status,
             //createdAt: serverTimestamp() -- CreatedAt and JoinDate are the same
@@ -123,7 +123,7 @@ const userConverter = {
         user.setUsername = data.userName
         user.setAddedBy = data.addedBy
         user.setJoinDate = new Timestamp(data.joinDate.seconds, data.joinDate.nanoseconds).toDate(),
-        user.setAdmin = data.isadmin
+        user.setSystemRole = data.systemRole
         user.setAlumni = data.isalumni
         user.setStatus = data.status
 

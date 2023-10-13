@@ -1,21 +1,14 @@
 const {
     db,
     Timestamp,
-    addDoc,
-    getDoc,
-    getDocs,
-    doc,
-    collection,
-    updateDoc,
-    deleteDoc,
-    where
+    Filter,
 } = require('../database');
 const {
     Participant,
     participantConverter
 } = require("../models/participant.model")
 
-const participantsCollection = collection(db, "participants").withConverter(participantConverter)
+const participantsCollection = db.collection(`/participants/`).withConverter(participantConverter)
 
 const addParticipant = async (req, res) => {
     try {
@@ -25,11 +18,17 @@ const addParticipant = async (req, res) => {
             req.body.isTeacher,
         )
 
-        const participantDoc = await addDoc(participantsCollection, participant)
+        await participantsCollection.doc().withConverter(participantConverter).create(participant)
+            .then((result) => {
+                res.status(200).json({message: "Participants added successfully"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
 
-        res.status(200).json({id: participantDoc.id, message: "Participants added successfully"})
+        //const participantDoc = await addDoc(participantsCollection, participant)
     } catch (e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Participant", type: "Add", error: e.message})
     }
 }
 
@@ -37,7 +36,7 @@ const updateParticipant = async (req, res) => {
     const id = req.params.id;
 
     try {
-        const subScheduleSnapshot = await doc(db, `/participants/${id}`).withConverter(participantConverter);
+        const subScheduleSnapshot = db.doc(`/participants/${id}`).withConverter(participantConverter);
 
         //If ID exist
 
@@ -47,15 +46,21 @@ const updateParticipant = async (req, res) => {
             req.body.isTeacher,
         );
 
-        updateDoc(subScheduleSnapshot, {
-            subId: participant.getSubId,
-            userId: participant.getUserId,
-            isTeacher: participant.getIsTeacher,
-        })
+        await subScheduleSnapshot.update(participantConverter.toFirestore(participant)) //EHHHH IDK ABOUT THIS ONE CHIEF
+            .then((result) => {
+                res.status(200).json({message: "Data updated successfully!"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
 
-        res.status(200).json({message: "Data updated successfully!"})
+        // await updateDoc(subScheduleSnapshot, {
+        //     subId: participant.getSubId,
+        //     userId: participant.getUserId,
+        //     isTeacher: participant.getIsTeacher,
+        // })
     } catch (e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Participants", type: "Update", error: e.message})
     }
 }
 
@@ -63,15 +68,21 @@ const deleteParticipant = async (req, res) => {
     const id = req.params.id;
 
     try {
-        const participantSnapshot = doc(db, `/participants/${id}`).withConverter(participantConverter);
+        const participantSnapshot = db.doc(`/participants/${id}`).withConverter(participantConverter);
 
         //If id exists
 
-        await deleteDoc(participantSnapshot);
+        await participantSnapshot.delete()
+            .then((result) => {
+                res.status(200).json({message: "Data deleted successfully."})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
 
-        res.status(200).json({message: "Data deleted successfully."})
+        //await deleteDoc();
     } catch (e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Participants", type: "Update", error: e.message})
     }
 }
 
@@ -79,11 +90,11 @@ const viewAllParticipants = async (req, res) => {
     const participants = []
 
     try {
-        const getParticipantDocs = await getDocs(participantsCollection)
+        const getParticipantDocs = await participantsCollection.get();
 
 
         if (getParticipantDocs.empty)
-            throw new Error("Participant collections is empty");
+            throw {message: "Participant collections is empty"};
 
         getParticipantDocs.forEach((participant) => {
             const {
@@ -93,7 +104,7 @@ const viewAllParticipants = async (req, res) => {
             } = participant.data();
 
             participants.push({
-                id: schedule.id,
+                id: participant.id,
                 subId: subId,
                 userId: userId,
                 isTeacher: isTeacher,
@@ -112,12 +123,13 @@ const viewParticipantsBySubject = async (req, res) => {
     const participants = []
 
     try {
-        const viewBySubject = query(participantsCollection, where("subId", "==", subId))
+        //const viewBySubject = query(participantsCollection, where("subId", "==", subId))
+        const viewBySubject = participantsCollection.where(Filter.where("subId", "==", subId))
 
-        const getParticipantDocs = await getDocs(viewBySubject)
+        const getParticipantDocs = await viewBySubject.get()
 
         if (getParticipantDocs.empty)
-            throw new Error(`Query does not find users relating to subject ${subId}`);
+            throw {message: `Query does not find users relating to subject ${subId}`};
 
         getParticipantDocs.forEach((participant) => {
             const {
@@ -127,7 +139,7 @@ const viewParticipantsBySubject = async (req, res) => {
             } = participant.data();
 
             participants.push({
-                id: schedule.id,
+                id: participant.id,
                 subId: subId,
                 userId: userId,
                 isTeacher: isTeacher,
@@ -146,9 +158,10 @@ const viewParticipantsByUser = async (req, res) => {
     const participants = []
 
     try {
-        const viewByUser = query(participantsCollection, where("userId", "==", userId))
+        //const viewByUser = query(participantsCollection, where("userId", "==", userId))
+        const viewByUser = participantsCollection.where(Filter.where("userId", "==", userId));
 
-        const getParticipantDocs = await getDocs(viewByUser)
+        const getParticipantDocs = await viewByUser.get();
 
         if (getParticipantDocs.empty)
             throw new Error(`Query does not find subjects relating to user ${userId}`);
@@ -161,7 +174,7 @@ const viewParticipantsByUser = async (req, res) => {
             } = participant.data();
 
             participants.push({
-                id: schedule.id,
+                id: participant.id,
                 subId: subId,
                 userId: userId,
                 isTeacher: isTeacher,

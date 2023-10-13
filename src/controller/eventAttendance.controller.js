@@ -1,21 +1,13 @@
 const {
     db,
     Timestamp,
-    addDoc,
-    getDoc,
-    getDocs,
-    doc,
-    collection,
-    updateDoc,
-    deleteDoc,
-    where
 } = require('../database');
 const {
     EventAttendance,
     eventAttendanceConverter
 } = require("../models/eventAttendance.model")
 
-const eventAttendanceCollection = collection(db, "eventAttendance").withConverter(eventAttendanceConverter)
+const eventAttendanceCollection = db.collection(`/eventAttendance/`).withConverter(eventAttendanceConverter)
 
 const addEventAttendance = async (req, res) => {
     try {
@@ -29,11 +21,19 @@ const addEventAttendance = async (req, res) => {
             remarks
         )
 
-        const eventAttendanceDoc = await addDoc(eventAttendanceCollection, eventAttendance)
+        await eventAttendanceCollection.doc().create(eventAttendance)
+            .then((result) => {
+                res.status(200).json({message: "Event Attendance added successfully"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
 
-        res.status(200).json({id: eventAttendanceDoc.id, message: "Event Attendance added successfully"})
+        //const eventAttendanceDoc = await db.doc(`eventAttendance`).create(eventAttendance)
+
+        
     } catch (e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Event Attendance", type: "Add", error: e.message})
         console.log(e)
     }
 }
@@ -50,22 +50,28 @@ const updateEventAttendace = async (req, res) => {
             remarks
         } = req.body;
 
-        const eventAttendanceSnapshot = doc(db, `eventAttendance/${id}`).withConverter(eventAttendanceCollection);
+        const eventAttendanceDocRef = db.doc(`/eventAttendance/${id}`).withConverter(eventAttendanceCollection);
+
+        console.log(req.body)
 
         let eventAttendance = new EventAttendance(
             eventSchedId,
             attendeeId,
+            status,
             new Date(submittedDate),
             remarks,
-            status,
         )
 
-        await updateDoc(eventAttendanceSnapshot, Object.assign({}, eventAttendance))
-
-        res.status(200).json({message: "Event Attendance updated successfully"})
+        await eventAttendanceDocRef.update(Object.assign({}, eventAttendance))
+            .then((result) => {
+                res.status(200).json({message: "Event Attendance updated successfully"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
     }
     catch(e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Event Attendance", type: "Update", error: e.message})
     }
 }
 
@@ -73,13 +79,17 @@ const deleteEventAttendance = async (req, res) => {
     const id = req.params.id;
 
     try{
-        const eventAttendanceDoc = doc(db, "eventAttendance", id).withConverter(eventAttendanceConverter); //Can be three parameters. See docs
-        await deleteDoc(eventAttendanceDoc);
-
-        res.status(200).json({message: "Event attendance delete successfully"})
+        const eventAttendanceDocRef = db.doc(`/eventAttendance/${id}`).withConverter(eventAttendanceConverter); //Can be three parameters. See docs
+        await eventAttendanceDocRef.delete()
+            .then((result) => {
+                res.status(200).json({message: "Event attendance delete successfully"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
     }
     catch(e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Event Attendance", type: "Delete", error: e.message})
     }
 }
 
@@ -87,10 +97,10 @@ const viewAllEventAttendances = async (req, res) => {
     const eventAttendances = []
 
     try {
-        const getEventAttendanceDocs = await getDocs(eventAttendanceCollection)
+        const getEventAttendanceDocs = await eventAttendanceCollection.get();
 
         if (getEventAttendanceDocs.empty)
-            throw new Error("Event Attendance collections is empty");
+            throw {message: "Event Attendance collections is empty"};
 
         getEventAttendanceDocs.forEach((eventAttendance) => {
             const {
@@ -106,7 +116,7 @@ const viewAllEventAttendances = async (req, res) => {
                 eventSchedId: eventSchedId,
                 attendeeId: attendeeId,
                 status: status,
-                submittedDate: new Timestamp(submittedDate.seconds, submittedDate.nanoseconds).toDate(),
+                submittedDate: new Timestamp(submittedDate._seconds, submittedDate._nanoseconds).toDate(),
                 remarks: remarks
             })
         })
@@ -114,7 +124,7 @@ const viewAllEventAttendances = async (req, res) => {
         res.status(200).json(eventAttendances)
     }
     catch(e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Event Attendance", type: "Retrieval All", error: e.message})
         console.log(e)
     }
 }

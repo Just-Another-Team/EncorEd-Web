@@ -1,21 +1,14 @@
 const {
     db,
     Timestamp,
-    addDoc,
-    getDoc,
-    getDocs,
-    doc,
-    collection,
-    updateDoc,
-    deleteDoc,
-    where
+    serverTimestamp
 } = require('../database');
 const {
     Event,
     eventConverter
 } = require("../models/event.model")
 
-const eventCollection = collection(db, "events").withConverter(eventConverter)
+const eventCollection = db.collection(`/events/`).withConverter(eventConverter)
 
 const addEvent = async (req, res) => {
     try {
@@ -30,41 +23,48 @@ const addEvent = async (req, res) => {
             status
         )
 
-        console.log(event);
+        // console.log(event);
 
-        const eventDoc = await addDoc(eventCollection, event)
-
-        res.status(200).json({id: eventDoc.id, message: "Event added successfully"})
+        await db.collection(`/events/`).doc().withConverter(eventConverter).create(event)
+            .then((result) => {
+                res.status(200).json({message: "Event added successfully"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
+        
     } catch (e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Event", type: "Add", error: e.message})
     }
 }
 
 const updateEvent = async (req, res) => {
     const id = req.params.id;
 
-    console.log(id);
-
     try{
         const { name, desc, creationDate, createdBy, verifiedBy, status } = req.body;
 
-        const eventSnapshot = await doc(db, `events/${id}`).withConverter(eventConverter);
+        const eventSnapshot = db.doc(`/events/${id}`).withConverter(eventConverter);
 
         const eventVal = new Event(
             name,
             desc,
-            creationDate,
+            new Date(creationDate),
             createdBy,
             verifiedBy,
             status 
         );
 
-        updateDoc(eventSnapshot, Object.assign({}, eventVal))
-
-        res.status(200).json({message: "Event updated successfully"})
+        await eventSnapshot.update(Object.assign({}, eventVal))
+            .then((result) => {
+                res.status(200).json({message: "Event updated successfully"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
     }
     catch(e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Event", type: "Update", error: e.message})
     }
 }
 
@@ -72,13 +72,18 @@ const deleteEvent = async (req, res) => {
     const id = req.params.id;
 
     try{
-        const eventDoc = doc(db, "events", id).withConverter(eventConverter); //Can be three parameters. See docs
-        await deleteDoc(eventDoc);
+        const eventDoc = db.doc(`/events/${id}`).withConverter(eventConverter);
 
-        res.status(200).json({message: "Event delete successfully"})
+        await eventDoc.delete()
+            .then((result) => {
+                res.status(200).json({message: "Event delete successfully"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
     }
     catch(e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Event", type: "Delete", error: e.message})
     }
 }
 
@@ -86,10 +91,10 @@ const viewAllEvents = async (req, res) => {
     const events = []
 
     try {
-        const getEventDocs = await getDocs(eventCollection)
+        const getEventDocs = await eventCollection.get()
 
         if (getEventDocs.empty)
-            throw new Error("Event collections is empty");
+            throw {message: "Event collections is empty"};
 
         getEventDocs.forEach((event) => {
             const {
@@ -100,6 +105,8 @@ const viewAllEvents = async (req, res) => {
                 verifiedBy,
                 status
             } = event.data();
+
+            console.log(event.data())
 
             events.push({
                 id: event.id,
@@ -124,8 +131,8 @@ const viewEvent = async (req, res) => {
     const id = req.params.id
 
     try {
-        const eventRef = doc(db, "events", id).withConverter(eventConverter)
-        const eventDoc = await getDoc(eventRef)
+        const eventRef = db.doc(`/events/${id}`).withConverter(eventConverter)
+        const eventDoc = await eventRef.get()
 
         res.status(200).json(eventDoc.data())
     }

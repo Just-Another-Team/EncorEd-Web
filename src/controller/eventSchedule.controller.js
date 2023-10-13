@@ -1,21 +1,13 @@
 const {
     db,
     Timestamp,
-    addDoc,
-    getDoc,
-    getDocs,
-    doc,
-    collection,
-    updateDoc,
-    deleteDoc,
-    where
 } = require('../database');
 const {
     EventSchedule,
     eventScheduleConverter
 } = require("../models/eventSchedule.model")
 
-const eventScheduleCollection = collection(db, "eventSchedules").withConverter(eventScheduleConverter)
+const eventScheduleCollection = db.collection(`/eventSchedules/`).withConverter(eventScheduleConverter)
 
 const addEventSchedule = async (req, res) => {
     try {
@@ -33,13 +25,17 @@ const addEventSchedule = async (req, res) => {
             inCampus
         )
 
-        console.log(eventSchedule);
+        await eventScheduleCollection.doc().create(Object.assign({}, eventSchedule))
+            .then((result) => {
+                res.status(200).json({message: "Event Schedule added successfully"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
 
-        const eventScheduleDoc = await addDoc(eventScheduleCollection, eventSchedule)
-
-        res.status(200).json({id: eventScheduleDoc.id, message: "Event Schedule added successfully"})
+        
     } catch (e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Event Schedule", type: "Add", error: e.message})
         console.log(e)
     }
 }
@@ -60,7 +56,7 @@ const updateEventSchedule = async (req, res) => {
             inCampus 
         } = req.body;
 
-        const eventScheduleSnapshot = doc(db, `eventSchedules/${id}`).withConverter(eventScheduleConverter);
+        const eventScheduleDocRef = db.doc(`/eventSchedules/${id}`).withConverter(eventScheduleConverter);
 
         let eventSchedule = new EventSchedule(
             eventId,
@@ -74,12 +70,16 @@ const updateEventSchedule = async (req, res) => {
             inCampus
         )
 
-        await updateDoc(eventScheduleSnapshot, Object.assign({}, eventSchedule))
-
-        res.status(200).json({message: "Event Schedule updated successfully"})
+        await eventScheduleDocRef.update(Object.assign({}, eventSchedule))
+            .then((result) => {
+                res.status(200).json({message: "Event Schedule updated successfully"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
     }
     catch(e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Event Schedule", type: "Update", error: e.message})
     }
 }
 
@@ -87,13 +87,17 @@ const deleteEventSchedule = async (req, res) => {
     const id = req.params.id;
 
     try{
-        const eventScheduleDoc = doc(db, "eventSchedules", id).withConverter(eventScheduleConverter); //Can be three parameters. See docs
-        await deleteDoc(eventScheduleDoc);
-
-        res.status(200).json({message: "Event schedule delete successfully"})
+        const eventScheduleDocRef = db.doc(`eventSchedules/${id}`).withConverter(eventScheduleConverter); //Can be three parameters. See docs
+        await eventScheduleDocRef.delete()
+            .then((result) => {
+                res.status(200).json({message: "Event schedule delete successfully"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
     }
     catch(e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Event Schedule", type: "Delete", error: e.message})
     }
 }
 
@@ -101,10 +105,10 @@ const viewAllEventSchedules = async (req, res) => {
     const eventSchedules = []
 
     try {
-        const getEventScheduleDocs = await getDocs(eventScheduleCollection)
+        const getEventScheduleDocs = await eventScheduleCollection.get();
 
         if (getEventScheduleDocs.empty)
-            throw new Error("Event schedules collections is empty");
+            throw {message: "Event schedules collections is empty"}
 
         getEventScheduleDocs.forEach((eventSchedule) => {
             const {
@@ -145,8 +149,9 @@ const viewEventSchedule = async (req, res) => {
     const id = req.params.id
 
     try {
-        const eventScheduleRef = doc(db, "eventSchedules", id).withConverter(eventScheduleConverter)
-        const eventScheduleDoc = await getDoc(eventScheduleRef)
+        const eventScheduleRef = await db.doc(`eventSchedules/${id}`).withConverter(eventScheduleConverter)
+
+        const eventScheduleDoc = await eventScheduleRef.get()
 
         res.status(200).json(eventScheduleDoc.data())
     }

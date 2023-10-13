@@ -1,16 +1,27 @@
-const { app } = require('../config')
+// I just realized that this must be in the client side...
+
+const { clientApp, adminApp } = require('../config')
 const { 
-    getAuth,
+    getAuth: firebaseAdminAuth,
+} = require("firebase-admin/auth")
+const {
+    getAuth: firebaseClientAuth,
+    EmailAuthProvider,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
-    fetchSignInMethodsForEmail
+    onAuthStateChanged,
+    signOut
 } = require("firebase/auth")
 
-const auth = getAuth(app);
+const adminAuth = firebaseAdminAuth(adminApp);
+const clientAuth = firebaseClientAuth(clientApp)
 
 module.exports = {
-    auth,
+    adminAuth,
+    clientAuth,
+    EmailAuthProvider,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
-    fetchSignInMethodsForEmail
+    onAuthStateChanged,
+    signOut
 }

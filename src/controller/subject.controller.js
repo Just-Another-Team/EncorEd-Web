@@ -1,20 +1,13 @@
 const {
     db,
-    Timestamp,
-    addDoc,
-    getDoc,
-    getDocs,
-    doc,
-    collection,
-    updateDoc,
-    deleteDoc
+    Timestamp
 } = require('../database');
 const {
     Subject,
     subjectConverter
 } = require("../models/subject.model")
 
-const subjectCollection = collection(db, "subjects").withConverter(subjectConverter)
+const subjectCollection = db.collection(`/subjects/`).withConverter(subjectConverter)
 
 const addSubject = async (req, res) => {
     try {
@@ -29,11 +22,18 @@ const addSubject = async (req, res) => {
             req.body.status
         )
 
-        const subjectDoc = await addDoc(subjectCollection, subject)
+        const subjectDocRef = await db.doc(`/subjects/`).withConverter(subjectConverter)
 
-        res.status(200).json({id: subjectDoc.id, message: "Subject added successfully"})
+        await subjectDocRef.create(subject)
+            .then((result) => {
+                res.status(200).json({message: "Subject added successfully"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
+
     } catch (e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Subject", type: "Add", error: e.message})
     }
 }
 
@@ -42,7 +42,7 @@ const viewAllSubject = async (req, res) => {
     const subjects = []
 
     try {
-        const getSubjectDocs = await getDocs(subjectCollection)
+        const getSubjectDocs = await subjectCollection.get();
 
         if (getSubjectDocs.empty)
             throw new Error("Subject collection is empty");
@@ -74,8 +74,8 @@ const viewSubject = async (req, res) => {
     const id = req.params.id
 
     try {
-        const subjectRef = doc(db, "subjects", id).withConverter(subjectConverter)
-        const subjectDoc = await getDoc(subjectRef)
+        const subjectRef = db.doc(`/subjects/${id}`).withConverter(subjectConverter)
+        const subjectDoc = await subjectRef.get();
 
         res.status(200).json(subjectDoc.data())
     }
@@ -88,7 +88,7 @@ const updateSubject = async (req, res) => {
     const id = req.params.id;
 
     try {
-        const subjectSnapshot = await doc(db, `/subjects/${id}`).withConverter(subjectConverter);
+        const subjectDocRef = await db.doc(`/subjects/${id}`).withConverter(subjectConverter);
 
         let subject = new Subject(
             req.body.name,
@@ -101,20 +101,26 @@ const updateSubject = async (req, res) => {
             req.body.status
         );
 
-        updateDoc(subjectSnapshot, {
-            name: subject.getName,
-            edpCode: subject.getEdpCode,
-            type: subject.getType,
-            units: subject.getUnits,
-            creationDate: subject.getCreationDate,
-            createdBy: subject.getCreatedBy,
-            verifiedBy: subject.getVerifiedBy,
-            status: subject.getStatus,
-        })
+        await subjectDocRef.update(Object.create({}, subject))
+            .then((result) => {
+                res.status(200).json({message: "Data updated successfully!"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
 
-        res.status(200).json({message: "Data updated successfully!"})
+        // await updateDoc(subjectSnapshot, {
+        //     name: subject.getName,
+        //     edpCode: subject.getEdpCode,
+        //     type: subject.getType,
+        //     units: subject.getUnits,
+        //     creationDate: subject.getCreationDate,
+        //     createdBy: subject.getCreatedBy,
+        //     verifiedBy: subject.getVerifiedBy,
+        //     status: subject.getStatus,
+        // })
     } catch (e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Subject", type: "Update", error: e.message})
     }
 }
 
@@ -122,13 +128,17 @@ const deleteSubject = async (req, res) => {
     const id = req.params.id;
 
     try {
-        const subjectSnapshot = doc(db, `/subjects/${id}`).withConverter(subjectConverter);
+        const subjectDocRef = db.doc(`/subjects/${id}`).withConverter(subjectConverter);
 
-        await deleteDoc(subjectSnapshot);
-
-        res.status(200).json("Data deleted successfully.")
+        await subjectDocRef.delete()
+            .then((result) => {
+                res.status(200).json("Data deleted successfully.")
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
     } catch (e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Subject", type: "Delete", error: e.message})
     }
 }
 

@@ -37,7 +37,7 @@ router.put("/schedule/update/:id", updateEventSchedule)
 
 router.delete("/schedule/delete/:id", deleteEventSchedule)
 
-router.get("/schedule/list", viewAllEventSchedules)
+router.get("/schedule/list/", viewAllEventSchedules)
 router.get("/schedule/list/:id", viewEventSchedule)
 
 /* EVENT ATTENDANCE */

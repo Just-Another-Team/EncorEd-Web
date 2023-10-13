@@ -1,21 +1,13 @@
 const {
     db,
     Timestamp,
-    addDoc,
-    getDoc,
-    getDocs,
-    doc,
-    collection,
-    updateDoc,
-    deleteDoc,
-    where
 } = require('../database');
 const {
     Attendees,
     attendeesConverter
 } = require("../models/attendees.model")
 
-const attendeesCollection = collection(db, "attendees").withConverter(attendeesConverter)
+const attendeesCollection = db.collection(`/attendees/`).withConverter(attendeesConverter)
 
 const addAttendee = async (req, res) => {
     try {
@@ -29,11 +21,17 @@ const addAttendee = async (req, res) => {
 
         console.log(attendee);
 
-        const attendeeDoc = await addDoc(attendeesCollection, attendee)
+        await attendeesCollection.add(attendee)
+            .then((result) => {
+                res.status(200).json({message: "Attendee added successfully"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
 
-        res.status(200).json({id: attendeeDoc.id, message: "Attendee added successfully"})
+        //const attendeeDoc = await addDoc(attendeesCollection, attendee)
     } catch (e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Attendees", type: "Add", error: e.message})
     }
 }
 
@@ -45,7 +43,7 @@ const updateAttendee = async (req, res) => {
     try{
         const { eventId, userId, isHost } = req.body;
 
-        const attendeeSnapshot = await doc(db, "attendees", id).withConverter(attendeesConverter);
+        const attendeeSnapshot = db.doc(`/attendees/${id}`).withConverter(attendeesConverter);
 
         const attendeeVal = new Attendees(
             eventId,
@@ -53,12 +51,17 @@ const updateAttendee = async (req, res) => {
             isHost
         );
 
-        updateDoc(attendeeSnapshot, Object.assign({}, attendeeVal))
-
-        res.status(200).json({message: "Attendee updated successfully"})
+        await attendeeSnapshot.update(attendeesConverter.toFirestore(attendeeVal))
+            .then((result) => {
+                res.status(200).json({message: "Attendee updated successfully"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
+        //updateDoc(attendeeSnapshot, Object.assign({}, attendeeVal))
     }
     catch(e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Attendees", type: "Update", error: e.message})
     }
 }
 
@@ -66,24 +69,30 @@ const deleteAttendee = async (req, res) => {
     const id = req.params.id;
 
     try{
-        const attendeeDoc = doc(db, "attendees", id).withConverter(attendeesConverter); //Can be three parameters. See docs
-        await deleteDoc(attendeeDoc);
-
-        res.status(200).json({message: "Attendee delete successfully"})
+        const attendeeDoc = db.doc(`/attendees/${id}`).withConverter(attendeesConverter); //Can be three parameters. See docs
+        await attendeeDoc.delete()
+            .then((result) => {
+                res.status(200).json({message: "Attendee delete successfully"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
+        
     }
     catch(e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Attendees", type: "Delete", error: e.message})
     }
 }
+
 
 const viewAllAttendees = async (req, res) => {
     const attendees = []
 
     try {
-        const getAttendeeDocs = await getDocs(attendeesCollection)
+        const getAttendeeDocs = await attendeesCollection.get()
 
         if (getAttendeeDocs.empty)
-            throw new Error("Attendee collections is empty");
+            throw {message: "Attendee collections is empty"};
 
         getAttendeeDocs.forEach((attendee) => {
             const {
@@ -103,7 +112,7 @@ const viewAllAttendees = async (req, res) => {
         res.status(200).json(attendees)
     }
     catch(e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Attendees", type: "Retrieve All", error: e.message})
         console.log(e)
     }
 }
@@ -112,13 +121,13 @@ const viewAttendee = async (req, res) => {
     const id = req.params.id
 
     try {
-        const attendeeRef = doc(db, "attendees", id).withConverter(attendeesConverter)
-        const attendeeDoc = await getDoc(attendeeRef)
+        const attendeeRef = db.doc(`/attendees/${id}`).withConverter(attendeesConverter)
+        const attendeeDoc = await attendeeRef.get()
 
         res.status(200).json(attendeeDoc.data())
     }
     catch (e) {
-        res.status(400).json({error: "Error", message: e.message})
+        res.status(400).json({name: "Attendees", type: "Retrieve All", error: e.message})
         console.log(e);
     }
 }

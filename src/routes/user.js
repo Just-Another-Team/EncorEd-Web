@@ -1,35 +1,24 @@
 const router = require('express').Router()
+const isAuthentication = require('../auth/authenticated');
+const isAuthorized = require('../auth/authorized');
 const {
     addUser,
     updateUser,
     deleteUser,
     viewAllUser,
     viewUser,
-    userFound,
-    verifyUser,
-    signIn
+    signIn,
+    signUp,
+    addAppAdmin
 } = require("../controller/user.controller")
 
+//If user exists
+
 //Add
+//router.post("/add", isAuthentication, isAuthorized(['superadmin', 'admin']), addUser);
 router.post("/add", addUser);
-// (req, res) => {
-//     try {
-//         const {firstName, lastName, email, userName, password } = req.body;
-
-//         const userInput = {
-//             firstName,
-//             lastName,
-//             userName,
-//             addedBy: null,
-//             isAdmin: true,
-//             isAlumni: false,
-//             status: "Open"
-//         }
-
-        
-//     } catch (e) {
-//         res.status(400).json({error: "Router error", message: e.message})
-//     }
+router.post("/signUp", signUp);
+router.post("/admin/add", addAppAdmin)
 
 //Update
 router.put("/update/:id", updateUser)
@@ -40,14 +29,5 @@ router.delete("/delete/:id", deleteUser)
 //View
 router.get("/list", viewAllUser)
 router.get("/list/:id", viewUser)
-
-router.post("/signIn", signIn)
-
-//Actually, this is not needed. Thank you Firebase Authentication!
-// //Validate
-// router.get("/valid", userFound)
-
-// //Verify
-// router.get("/verify", verifyUser)
 
 module.exports = router

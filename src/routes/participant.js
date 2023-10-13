@@ -15,7 +15,7 @@ router.put("/update/:id", updateParticipant)
 router.delete("/delete/:id", deleteParticipant)
 
 router.get("/list/all", viewAllParticipants);
-router.get("/list/subject", viewParticipantsBySubject);
-router.get("/list/user", viewParticipantsByUser)
+router.get("/list/subject/:id", viewParticipantsBySubject);
+router.get("/list/user/:id", viewParticipantsByUser)
 
 module.exports = router

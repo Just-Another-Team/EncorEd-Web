@@ -1,40 +1,41 @@
 const {
     db,
     Timestamp,
-    addDoc,
-    getDoc,
-    getDocs,
-    doc,
-    collection,
-    updateDoc,
-    deleteDoc,
-    where
 } = require('../database');
 const {
     Institution,
     institutionConverter
 } = require("../models/institution.model")
 
-const institutionCollection = collection(db, "institutions").withConverter(institutionConverter)
+const institutionCollection = db.collection(`/institutions/`).withConverter(institutionConverter)
 
 const addInstitution = async (req, res) => {
     try {
-        const { name, desc, creationDate, status } = req.body;
+        const { name, desc, status = "Open" } = req.body;
 
         let institution = new Institution(
             name,
             desc,
-            new Date(creationDate),
+            new Date(),
             status
         )
 
-        console.log(institution);
+        //If name is same as institution id
 
-        const institutionDoc = await addDoc(institutionCollection, institution)
+        const institutionId = institution.name.toLowerCase().replace(/\s/g,'');
 
-        res.status(200).json({id: institutionDoc.id, message: "Institution added successfully"})
+        await institutionCollection.doc(institutionId).create(institution)
+            .then((result) => {
+                res.status(200).json({message: "Institution added successfully"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
+
+        //res.status(200).json({message: "Institution debugged successfully"})
     } catch (e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Institution", type: "Add", error: e.message})
+        console.log(e);
     }
 }
 
@@ -42,29 +43,29 @@ const updateInstitution = async (req, res) => {
     const id = req.params.id;
 
     try {
-        const institutionSnapshot = await doc(db, `/institutions/${id}`).withConverter(institutionConverter);
+        const institutionDocRef = db.doc(`/institutions/${id}`).withConverter(institutionConverter);
 
         //If ID exist
 
-        const { name, desc, creationDate, status } = req.body;
+        const { name, desc, status } = req.body;
 
         let institution = new Institution(
             name,
             desc,
-            new Date(creationDate),
+            new Date(),
             status
         )
 
-        updateDoc(institutionSnapshot, {
-            name: institution.getName,
-            desc: institution.getDesc,
-            creationDate: institution.getCreationDate,
-            status: institution.getStatus
-        })
+        await institutionDocRef.update(Object.assign({}, institution))
+            .then((result) => {
+                res.status(200).json({message: "Institution updated successfully!"})
+            })
+            .catch((err) => {
+                throw {message: err.message}
+            })
 
-        res.status(200).json({message: "Institution updated successfully!"})
     } catch (e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "Institution", type: "Update", error: e.message})
     }
 }
 
@@ -72,15 +73,20 @@ const deleteInstitution = async (req, res) => {
     const id = req.params.id;
 
     try {
-        const institutionSnapshot = doc(db, `/institutions/${id}`).withConverter(institutionConverter);
+        const institutionSnapshot = db.doc(`/institutions/${id}`).withConverter(institutionConverter);
 
         //If id exists
 
-        await deleteDoc(institutionSnapshot);
-
-        res.status(200).json({message: "Institution deleted successfully."})
+        await institutionSnapshot.delete()
+            .then((result) => {
+                res.status(200).json({message: "Institution deleted successfully."})
+            })
+            .catch((err) => {
+                throw {error: err, message: err.message}
+            })
     } catch (e) {
         res.status(400).json({error: e.message})
+        console.log(e.error)
     }
 }
 
@@ -88,10 +94,10 @@ const viewAllInstitutions = async (req, res) => {
     const institutions = []
 
     try {
-        const getInstitutionDocs = await getDocs(institutionCollection)
+        const getInstitutionDocs = await institutionCollection.get()
 
         if (getInstitutionDocs.empty)
-            throw new Error("Institutions collections is empty");
+            throw {message: "Institutions collections is empty"};
 
         getInstitutionDocs.forEach((institution) => {
             const {
@@ -119,12 +125,23 @@ const viewAllInstitutions = async (req, res) => {
 }
 
 const viewInstitution = async (req, res) => {
-    
+    const id = req.params.id;
+
+    try {
+        const institutionRef = doc(db, "institution", id).withConverter(userConverter)
+        const institutionDoc = await getDoc(institutionRef);
+
+        res.status(200).json(institutionDoc.data())
+    }
+    catch (e) {
+        res.status(400).json({error: "Error", message: e.message})
+    }
 }
 
 module.exports = {
     addInstitution,
     updateInstitution,
     deleteInstitution,
-    viewAllInstitutions
+    viewAllInstitutions,
+    viewInstitution
 }

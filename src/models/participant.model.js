@@ -37,7 +37,7 @@ const participantConverter = {
     },
     fromFirestore: (snapshot, options) => {
         const data = snapshot.data(options)
-        return new Subject(
+        return new Participant(
             data.subId,
             data.userId,
             data.isTeacher
