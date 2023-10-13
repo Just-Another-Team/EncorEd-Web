@@ -1,60 +1,89 @@
 import http from "./http-common"
-import { auth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "../firebase/authentication"
+import {
+    auth,
+    signInWithCustomToken,
+    signInWithEmailAndPassword,
+    signOut 
+} from "../firebase/authentication"
+import encoredRoleService from "./encored-role-service"
 
 class EncorEdAuthService {
-    signUp(data) {
-        return http.post("/user/signUp", data)
+    async signUp(data) {
+        return await http.post("/user/signUp", data)
     }
 
     async signIn(userData) {
         console.log("Signing In")
 
-        //Sign in with firebase
-        const account = await signInWithEmailAndPassword(auth, userData.emailUserName, userData.password)
-            .then((result) => {
+        if (userData.token) {
+            const account = await signInWithCustomToken(auth, userData.token)
+                .then(async (result) => {
 
-                const loggedIn = {
-                    user: {
-                        displayName: result.user.displayName,
-                        email: result.user.email,
-                    },
-                    token: result.user.accessToken
-                }
+                    const userData = await this.get(result.user.email)
+                        .then((res) => res)
+                        .catch((error) => {throw error})
 
-                return loggedIn
-            })
-            .catch((error) => {
-                throw error
-            })
+                    const loggedIn = {
+                        user: {
+                            displayName: result.user.displayName,
+                            email: result.user.email,
+                            ...userData.data,
+                        },
+                        token: result.user.accessToken,
+                    }
 
-        return account
+                    return loggedIn
+                })
+                .catch((error) => {
+                    throw error
+                })
+
+            return account
+        }
+
+        if (userData.emailUserName && userData.password) {
+            const account = await signInWithEmailAndPassword(auth, userData.emailUserName, userData.password)
+                .then(async (result) => {
+
+                    const userData = await this.get(result.user.email)
+                        .then((res) => res)
+                        .catch((error) => {throw error})
+
+                    // Works only for institutional admins assigning a role
+                    // const assignedRoles = await encoredRoleService.getRoles(result.user.email);
+                    // console.log("roles", assignedRoles.data)
+
+                    const loggedIn = {
+                        user: {
+                            displayName: result.user.displayName,
+                            email: result.user.email,
+                            ...userData.data,
+                            //role
+                        },
+                        token: result.user.accessToken,
+                        userData,
+                    }
+
+                    return loggedIn
+                })
+                .catch((error) => {
+                    throw error
+                })
+
+            return account
+        }
     }
 
     async signOut() {
         console.log("Signing Out")
 
-        await signOut(auth)
+        return await signOut(auth)
             .then((res) => {
-                console.log(res)
+                return res
             })
             .catch((error) => {
-                console.log(error)
+                throw error
             })
-    }
-
-    // Maybe??
-    userLoggedIn() {
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log("Logged In")
-                console.log(user)
-                
-                
-            } else {
-                console.log("Logged Out")
-                console.log(user)
-            }
-        })
     }
 
     addUser(data) {
@@ -73,6 +102,10 @@ class EncorEdAuthService {
 
     getAll() {
         return http.get("/user/list")
+    }
+
+    get(data) {
+        return http.get(`/user/list/${data}`)
     }
 }
 

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import EncorEdAuthService from "../../app/api/encored-auth-service"
+import storage from 'redux-persist/lib/storage'
 
 const initialState = {
     loading: null,
@@ -9,23 +10,50 @@ const initialState = {
 }
 
 export const signIn = createAsyncThunk(
-    "user/signUp",
-    async ({emailUserName, password}, {rejectWithValue}) => {
-        try {
-            const user = await EncorEdAuthService.signIn({emailUserName, password})
+    "user/signIn",
+    async (userData, {rejectWithValue}) => {
+        return await EncorEdAuthService.signIn(userData)
+            .then((res) => {
+                if (res.user.systemRole.user) throw "auth/user-invalid-role"
 
-            return user
-        } catch (error) {
-            return rejectWithValue(error)
-        }
+                return res
+            })
+            .catch((error) => rejectWithValue(error))
+    }
+)
+
+export const signUp = createAsyncThunk(
+    "user/signUp",
+    async (credential, {rejectWithValue}) => {
+        const {firstName, lastName, email, userName, password} = credential
+
+        return await EncorEdAuthService.signUp({firstName, lastName, email, userName, password})
+            .then((res) => {
+                return res
+            })
+            .catch((error) => {
+                return rejectWithValue(error)
+            })
+    }
+)
+
+//For viewing other users
+export const getUser = createAsyncThunk(
+    "user/viewUser",
+    async (credential, {rejectWithValue}) => {
+        //console.log(credential.user.email)
+        return EncorEdAuthService.get(credential.user.email)
+            .then((res) => {
+                return res.data
+            })
+            .catch((error) => rejectWithValue(error))
     }
 )
 
 export const logOutUser = createAsyncThunk(
     "user/signOut",
     async () => {
-        await EncorEdAuthService.signOut();
-        localStorage.removeItem('user')
+        return await EncorEdAuthService.signOut();
     }
 )
 
@@ -33,10 +61,12 @@ const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        setCredentials: (state, action) => {
-            state.user = action.payload.user
-            state.token = action.payload.token
-        },
+        logOut: (state, action) => {
+            state.loading = false
+            state.user = null
+            state.token = null
+            state.error = false;
+        }
     },
     extraReducers: builder => {
         //Signing Up
@@ -76,10 +106,32 @@ const authSlice = createSlice({
             state.loading = false
             state.error = actions.payload
         })
+
+        //Signing up
+        builder.addCase(signUp.pending, (state) => {
+            state.loading = true
+            state.user = null
+            state.token = null
+            state.error = null
+        })
+        builder.addCase(signUp.fulfilled, (state, actions) => {
+            state.loading = false
+            state.user = actions.payload.user
+            state.token = actions.payload.token
+            state.error = null
+        })
+        builder.addCase(signUp.rejected, (state, actions) => {
+            state.loading = false
+            state.user = null
+            state.token = null
+            state.error = actions.payload.response.data
+        })
+
+        //get User 
     }
 })
 
-export const { setCredentials } = authSlice.actions
+export const { setCredentials, logOut } = authSlice.actions
 
 // export const selectCurrentUser = (state) => state.auth.user
 // export const selectCurrentToken = (state) => state.auth.token

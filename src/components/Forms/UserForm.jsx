@@ -30,14 +30,17 @@ const UserForm = ({title, type, submitName = "SUBMIT", inputs, errors, control, 
                 </Grid>
             )}
 
-            
             {inputs.map((el, ind) => (
                 <Grid key={ind} item xs={12} marginBottom={2}>
                     <Controller
                     name={el.key}
                     control={control}
                     rules={{
-                        required: `${el.label} is required`
+                        required: `${el.label} is required`,
+                        minLength: type === "register" && el.key === "password" ? {
+                            value: 8,
+                            message: "Password must be 8 characters long"
+                        } : null
                     }} //-Give each controller the error
                     render={({field}) => (
                         <TextField
@@ -45,6 +48,8 @@ const UserForm = ({title, type, submitName = "SUBMIT", inputs, errors, control, 
                         label={el.label}
                         type={el.type}
                         error={el.error ? true : false}
+                        multiline={el.rows > 0 ? true : false}
+                        rows={el.rows}
                         helperText={el.error ? el.error.message : null}
                         {...field}/>
                     )}/>

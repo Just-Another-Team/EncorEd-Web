@@ -49,7 +49,7 @@ const LandingPage = () => {
                     <Stack direction={"row"} spacing={2}>
                         {/* <Button size="large" variant="contained">SIGN IN</Button> */}
                         <LPButton size="large" href="login" variant="contained">SIGN IN</LPButton>
-                        <LPButton size="large" href="register" variant="outlined">SIGN UP</LPButton>
+                        <LPButton size="large" href="register/user" variant="outlined">SIGN UP</LPButton>
                     </Stack>
                 </Stack>
             </Box>

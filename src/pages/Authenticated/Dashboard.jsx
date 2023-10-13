@@ -9,18 +9,15 @@ import Navbar from "../../components/NavBar/Navbar";
 import Sidebar from "../../components/NavBar/Sidebar";
 import { Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
-
-import { auth, onAuthStateChanged } from '../../app/firebase/authentication';
-import { useEffect } from 'react';
+import ConnectedSideBar from "../../components/NavBar/hooks/SidebarHook";
 
 
 const Dashboard = () => {
-    const selected = useSelector((state) => state.pageSelect.page)
 
     return(
         <Box sx={{display: 'flex'}}>
             <Navbar />
-            <Sidebar selected={selected}/>
+            <ConnectedSideBar />
             <Container maxWidth="lg" component="main" sx={{ flexGrow: 1, p: 3, }}>
                 <Toolbar variant="regular"/>
                 
