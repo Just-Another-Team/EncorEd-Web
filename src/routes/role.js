@@ -20,6 +20,13 @@ const {
 /* CRUD Role */
 router.post("/add", addClientRole)
 router.post("/admin/add", addAdminRole)
+//Update
+//Delete
+
+router.get("/list/")
+router.get("/list/:id")
+router.get("/list/:institution")
+router.get("/list/:institution/:id")
 
 /* Assigning Roles */
 router.post("/assign", assignRole)

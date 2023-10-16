@@ -30,6 +30,9 @@ router.delete("/delete/:id", deleteSubject)
 router.get("/list", viewAllSubject)
 router.get("/list/:id", viewSubject)
 
+// router.get("/list/:institutionId/") <- Get Subject By Institution
+// router.get("/list/:institutionId/:id") <- Get Subject By Institution and by Id
+
 /* SUBJECT SCHEDULE */
 router.post("/schedule/add", addSubjectSchedule)
 

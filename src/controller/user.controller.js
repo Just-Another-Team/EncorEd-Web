@@ -20,7 +20,7 @@ const userCollection = db.collection("/users/").withConverter(userConverter)
 // Okay maybe this goes for institutional admins already
 const addUser = async (req, res) => {
     try{
-        const { firstName, lastName, email, userName, password, role } = req.body;
+        const { firstName, lastName, email, userName, password, addedBy } = req.body;
     
         const userInput = {
             firstName,
@@ -29,12 +29,8 @@ const addUser = async (req, res) => {
             userName,
             password,
             joinDate: serverTimestamp,
-            addedBy: null,
-            systemRole: {
-                user: true,
-                admin: false,
-                superadmin: false
-            },
+            addedBy,
+            //I got beef with this, but at least it worked
             isAlumni: false,
             status: "Open"
         }
@@ -44,6 +40,7 @@ const addUser = async (req, res) => {
         /* Middleware shenanigans must be located here */
 
         const userVal = new User(
+            null,
             userInput.firstName,
             userInput.lastName,
             userInput.email,
@@ -51,7 +48,6 @@ const addUser = async (req, res) => {
             userInput.password,
             userInput.addedBy,
             userInput.joinDate,
-            userInput.systemRole,
             userInput.isAlumni,
             userInput.status
         )
@@ -140,21 +136,13 @@ const deleteUser = async (req, res) => {
 }
 
 const viewAllUser = async (req, res) => {
-    const users = []
-
     try {
         const getUserDocs = await userCollection.get();
 
-        //Querying goes here
+        const docRef = getUserDocs.docs.map(doc => doc.data())
+        console.log(docRef)
 
-        getUserDocs.forEach((doc, ind) => {
-            users.push({
-                id: doc.id,
-                ...doc.data()
-            })
-        });
-
-        res.status(200).json(users);    
+        res.status(200).json(docRef);    
     }
     catch (e) {
         res.status(400).json({error: true, message: e.message})
@@ -189,11 +177,6 @@ const signUp = async (req, res) => {
             password,
             joinDate: serverTimestamp,
             addedBy: null,
-            systemRole: {
-                user: false,
-                admin: true,
-                superadmin: false
-            },
             isAlumni: false,
             status: "Open"
         }
@@ -203,6 +186,7 @@ const signUp = async (req, res) => {
         /* Middleware shenanigans must be located here */
 
         const userVal = new User(
+            null,
             userInput.firstName,
             userInput.lastName,
             userInput.email,
@@ -210,7 +194,6 @@ const signUp = async (req, res) => {
             userInput.password,
             userInput.addedBy,
             userInput.joinDate,
-            userInput.systemRole,
             userInput.isAlumni,
             userInput.status
         )
@@ -250,6 +233,28 @@ const signUp = async (req, res) => {
     }
 }
 
+const assignInstitution = async (req, res) => {
+    try {
+        const { institution, userId } = req.body;
+
+        const userVal = new User()
+        userVal.setInstitution = institution
+
+        const userRef = userCollection.doc(`${userId}`)
+
+        await userRef.update({institution: userVal.getInstitution})
+            .then(() => {
+                res.status(200).json({message: "Debug success"})
+            })
+            .catch((error) => {
+                throw {message: error.message}
+            })
+    } catch (error) {
+        res.status(400).json({name: "Institution", error: "Controller Error", message: error.message})
+    }
+}
+
+/* Application Admin */
 const addAppAdmin = async (req, res) => {
     try{
         const { firstName, lastName, email, userName, password } = req.body;
@@ -262,20 +267,14 @@ const addAppAdmin = async (req, res) => {
             password,
             joinDate: serverTimestamp,
             addedBy: null,
-            systemRole: {
-                user: false,
-                admin: false,
-                superadmin: true
-            },
             isAlumni: false,
             status: "Open"
         }
 
-        let user = {};
-
         /* Middleware shenanigans must be located here */
 
         const userVal = new User(
+            null,
             userInput.firstName,
             userInput.lastName,
             userInput.email,
@@ -283,12 +282,9 @@ const addAppAdmin = async (req, res) => {
             userInput.password,
             userInput.addedBy,
             userInput.joinDate,
-            userInput.systemRole,
             userInput.isAlumni,
             userInput.status
         )
-
-        console.log(userVal)
 
         await adminAuth.createUser({
             email: userVal.getEmail,
@@ -323,12 +319,16 @@ const addAppAdmin = async (req, res) => {
     }
 }
 
+
 module.exports = {
     addUser,
     updateUser,
     deleteUser,
     viewUser,
     viewAllUser,
+    //Institutional Admin
     signUp,
-    addAppAdmin
+    assignInstitution,
+    //Application Admin
+    addAppAdmin,
 }

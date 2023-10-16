@@ -9,7 +9,8 @@ const {
     viewUser,
     signIn,
     signUp,
-    addAppAdmin
+    addAppAdmin,
+    assignInstitution
 } = require("../controller/user.controller")
 
 //If user exists
@@ -22,6 +23,7 @@ router.post("/admin/add", addAppAdmin)
 
 //Update
 router.put("/update/:id", updateUser)
+router.patch("/assignInstitution", assignInstitution)
 
 //Delete
 router.delete("/delete/:id", deleteUser)

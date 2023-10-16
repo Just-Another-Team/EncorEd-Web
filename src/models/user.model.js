@@ -1,7 +1,8 @@
 const {Timestamp} = require("../database")
 
 class User {
-    constructor (firstName, lastName, email, userName, password, addedBy, joinDate, systemRole, isalumni, status) {
+    constructor (institution, firstName, lastName, email, userName, password, addedBy, joinDate, isalumni, status) {
+        this.setInstitution = institution
         this.setFirstName = firstName
         this.setLastName = lastName
         this.setEmail = email
@@ -9,9 +10,16 @@ class User {
         this.setPassword = password
         this.setAddedBy = addedBy
         this.setJoinDate = joinDate
-        this.setSystemRole = systemRole
         this.setAlumni = isalumni
         this.setStatus = status
+    }
+
+    get getInstitution() {
+        return this.institution
+    }
+    set setInstitution(_institution) {
+        //Validation
+        this.institution = _institution;
     }
 
     get getFirstName() {
@@ -68,13 +76,6 @@ class User {
         this.joinDate = _joinDate
     }
 
-    get getSystemRole() {
-        return this.systemRole
-    }
-    set setSystemRole(_systemRole) {
-        this.systemRole = _systemRole
-    }
-
     get getAlumni() {
         return this.isalumni
     }
@@ -99,6 +100,7 @@ class User {
 const userConverter = {
     toFirestore: (user) => {
         return {
+            institution: user.institution,
             firstName: user.firstName,
             lastName: user.lastName,
             //email: user.email,
@@ -106,7 +108,6 @@ const userConverter = {
            // password: user.password,
             addedBy: user.addedBy,
             joinDate: user.joinDate,
-            systemRole: user.systemRole,
             isalumni: user.isalumni,
             status: user.status,
             //createdAt: serverTimestamp() -- CreatedAt and JoinDate are the same
@@ -118,12 +119,12 @@ const userConverter = {
         // Do this when initiate an auth
         let user = new User();
 
+        user.setInstitution = data.institution
         user.setFirstName = data.firstName
         user.setLastName = data.lastName
         user.setUsername = data.userName
         user.setAddedBy = data.addedBy
         user.setJoinDate = new Timestamp(data.joinDate.seconds, data.joinDate.nanoseconds).toDate(),
-        user.setSystemRole = data.systemRole
         user.setAlumni = data.isalumni
         user.setStatus = data.status
 

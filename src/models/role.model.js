@@ -1,6 +1,78 @@
 class Role {
+    constructor(_institution, _systemRole, _institutionalRole) {
+        this.institution = _institution
+        this.systemRole = _systemRole
+        this.institutionalRole = _institutionalRole
+    }
+
+    get institution() {
+        return this._institution
+    }
+
+    set institution(value) {
+        this._institution = value
+    }
+
+    get systemRole() {
+        return this._systemRole
+    }
+
+    set systemRole(value) {
+        this._systemRole = value
+    }
+
+    get institutionalRole () {
+        return this._institutionalRole
+    }
+
+    set institutionalRole(value) {
+        this._institutionalRole = value
+    }
+}
+
+class SystemRole {
+    constructor(_superAdmin, _admin, _employee, _user) {
+        this.superAdmin = _superAdmin
+        this.admin = _admin
+        this.employee = _employee
+        this.user = _user
+    }
+
+    get superAdmin() {
+        return this._superAdmin
+    }
+
+    set superAdmin(value) {
+        this._superAdmin = value
+    }
+
+    get admin() {
+        return this._admin
+    }
+
+    set admin(value) {
+        this._admin = value
+    }
+
+    get employee() {
+        return this._employee
+    }
+
+    set employee(value) {
+        this._employee = value
+    }
+
+    get user() {
+        return this._user
+    }
+
+    set user(value) {
+        this._user = value
+    }
+}
+
+class InstitutionalRole {
     constructor(
-        _institution,
         _name,
         _desc,
         _canViewMap,
@@ -41,7 +113,6 @@ class Role {
         _canBanInstitution,
         _canRestoreInstitution
     ) {
-        this.institution = _institution;
         this.name = _name;
         this.desc = _desc;
         this.canViewMap = _canViewMap;
@@ -80,14 +151,6 @@ class Role {
         this.canDeleteInstitution = _canDeleteInstitution;
         this.canBanInstitution = _canBanInstitution;
         this.canRestoreInstitution = _canRestoreInstitution;
-    }
-
-    get institution() {
-        return this._institution
-    }
-
-    set institution(value) {
-        this._institution = value
     }
 
     get name() {
@@ -413,95 +476,22 @@ class Role {
 
 const roleConverter = {
     toFirestore: (permission) => {
-        //console.log(permission)
+        console.log(permission)
 
         return {
             institution: permission.institution,
-            name: permission.name,
-            desc: permission.desc,
-            canViewMap: permission.canViewMap,
-            canAddMap: permission.canAddMap,
-            canEditMap: permission.canEditMap,
-            canDeleteMap: permission.canDeleteMap,
-            canUnlockMap: permission.canUnlockMap,
-            canViewSubject: permission.canViewSubject,
-            canAddSubject: permission.canAddSubject,
-            addSubjectRequireVerification: permission.addSubjectRequireVerification,
-            canEditSubject: permission.canEditSubject,
-            editSubjectRequireVerification: permission.editSubjectRequireVerification,
-            canDeleteSubject: permission.canDeleteSubject,
-            canVerifySubject: permission.canVerifySubject,
-            canViewEvent: permission.canViewEvent,
-            canAddEvent: permission.canAddEvent,
-            canEditEvent: permission.canEditEvent,
-            canDeleteEvent: permission.canDeleteEvent,
-            canViewUser: permission.canViewUser,
-            canAddUser: permission.canAddUser,
-            canEditUser: permission.canEditUser,
-            canDeleteUser: permission.canDeleteUser,
-            canBanUser: permission.canBanUser,
-            canRestoreUser: permission.canRestoreUser,
-            canViewGroup: permission.canViewGroup,
-            canAddGroup: permission.canAddGroup,
-            canEditGroup: permission.canEditGroup,
-            canDeleteGroup: permission.canDeleteGroup,
-            canViewRole: permission.canViewRole,
-            canAddRole: permission.canAddRole,
-            canEditRole: permission.canEditRole,
-            canDeleteRole: permission.canDeleteRole,
-            canViewInstitution: permission.canViewInstitution,
-            canAddInstitution: permission.canAddInstitution,
-            canEditInstitution: permission.canEditInstitution,
-            canDeleteInstitution: permission.canDeleteInstitution,
-            canBanInstitution: permission.canBanInstitution,
-            canRestoreInstitution: permission.canRestoreInstitution,
+            systemRole: permission.systemRole,
+            institutionRole: permission.institutionalRole,
         }
     },
     fromFirestore: (snapshot, options) => {
         const data = snapshot.data(options)
         return new Role(
             data.institution,
-            data.name,
-            data.desc,
-            data.canViewMap,
-            data.canAddMap,
-            data.canEditMap,
-            data.canDeleteMap,
-            data.canUnlockMap,
-            data.canViewSubject,
-            data.canAddSubject,
-            data.addSubjectRequireVerification,
-            data.canEditSubject,
-            data.editSubjectRequireVerification,
-            data.canDeleteSubject,
-            data.canVerifySubject,
-            data.canViewEvent,
-            data.canAddEvent,
-            data.canEditEvent,
-            data.canDeleteEvent,
-            data.canVerifyEvent,
-            data.canViewUser,
-            data.canAddUser,
-            data.canEditUser,
-            data.canDeleteUser,
-            data.canBanUser,
-            data.canRestoreUser,
-            data.canViewGroup,
-            data.canAddGroup,
-            data.canEditGroup,
-            data.canDeleteGroup,
-            data.canViewRole,
-            data.canAddRole,
-            data.canEditRole,
-            data.canDeleteRole,
-            data.canViewInstitution,
-            data.canAddInstitution,
-            data.canEditInstitution,
-            data.canDeleteInstitution,
-            data.canBanInstitution,
-            data.canRestoreInstitution
+            data.systemRole,
+            data.institutionRole
         )
     }
 }
 
-module.exports = {roleConverter, Role}
+module.exports = {roleConverter, SystemRole, InstitutionalRole, Role}

@@ -1,4 +1,6 @@
 class Institution {
+    //Add created by attribute
+
     constructor(name, desc, creationDate, status) {
         this.setName = name
         this.setDesc = desc

@@ -27,8 +27,11 @@ router.put("/update/:id", updateEvent)
 
 router.delete("/delete/:id", deleteEvent)
 
-router.get("/list/all", viewAllEvents)
+router.get("/list/", viewAllEvents)
 router.get("/list/:id", viewEvent)
+
+//router.get("/list/:institution/")
+//router.get("/list/:institution/:id")
 
 /* EVENT SCHEDULE */
 router.post("/schedule/add", addEventSchedule)

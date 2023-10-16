@@ -11,7 +11,6 @@ const {
 const { roleCollection } = require('./role.controller');
 
 const userRoleCollection = db.collection(`/userRole/`).withConverter(userRoleConverter)
-const userRoleCollectionGroup = db.collectionGroup(`userRole`).withConverter(userRoleConverter)
 
 const assignRole = async (req, res) => {
     try {
@@ -43,21 +42,16 @@ const viewAssignedRoles = async (req, res) => {
         const userRoleRef = await userRoleCollection.where('userId', '==', userId).get();
 
         if (userRoleRef.empty)
-            throw {message: "User role not found"}
+            throw {message: "User Id not found"}
 
-        let userRole = []
+        const userRoleIds = userRoleRef.docs.map(data => data.data()._roleId)
 
-        userRoleRef.forEach(_userRole => {
-            userRole.push(_userRole.data().roleId)
-        })
+        const roleRef = await roleCollection.where(FieldPath.documentId(), 'in', userRoleIds).get()
 
-        let roles = []
+        if (roleRef.empty)
+            throw {message: "User does not contain any roles"}
 
-        const roleRef = await roleCollection.where(FieldPath.documentId(), 'in', userRole).get()
-
-        roleRef.forEach(_role => {
-            roles.push(_role.data())
-        })
+        const roles = roleRef.docs.map(role => role.data())
 
         res.status(200).json(roles)
     } catch(e) {
