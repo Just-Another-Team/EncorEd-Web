@@ -2,32 +2,32 @@ import {useForm} from 'react-hook-form'
 import AddUserForm from '../AddUserForm';
 import axios from 'axios'
 
-const AddUserForm = () => {
+const AddUserFormHook = () => {
     
     const {handleSubmit, reset, control, setValue} = useForm({
         defaultValues: {
             firstName: "",
+            middleName: "",
             lastName: "",
             email: "",
             userName: "",
             password: "",
-            confirmPassword: "",
-            agree: false
         }
     });
 
     const inputs = [
         {key: 'firstName', label: "First name", type: "text", helperText: ""},
+        {key: 'middleName', label: "Middle name", type: "text", helperText: ""},
         {key: 'lastName', label: "Last name", type: "text", helperText: ""},
         {key: 'email', label: "Email", type: "email", helperText: ""},
         {key: 'userName', label: "Username", type: "text", helperText: ""},
         {key: 'password', label: "Password", type: "password", helperText: ""},
-        {key: 'confirmPassword', label: "Confirm Password", type: "password", helperText: ""},
     ]
 
     const onSubmit = async (data) => {
         const {
             firstName,
+            middleName,
             lastName,
             email,
             userName,
@@ -36,6 +36,7 @@ const AddUserForm = () => {
 
         const userInput = {
             firstName,
+            middleName,
             lastName,
             email,
             userName,
@@ -55,11 +56,9 @@ const AddUserForm = () => {
         //     })
 
         //Uhhhh load this please
-        if (valid)
-            reset()
     }
 
     return <AddUserForm title='Add User' type={"usercreation"} inputs={inputs} control={control} onSubmit={onSubmit} handleSubmit={handleSubmit} />
 }
 
-export default AddUserForm
+export {AddUserFormHook}

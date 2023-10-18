@@ -3,7 +3,7 @@ import {
     Box, Button, Grid, TextField, Typography, Modal
 } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid'
-import { AddUserForm } from '../../../../components/Forms/AddUserForm'
+import { AddUserFormHook } from '../../../../components/Forms/Formhooks/AddUserForm-Hooks'
 
 // Must be changed
 const columns = [
@@ -97,7 +97,7 @@ const UserList = () => {
                         boxShadow: 24,
                         p: 4,
                     }}>
-                        <AddUserForm/>
+                        <AddUserFormHook/>
                     </Box>
                     </div>
                 </Modal>

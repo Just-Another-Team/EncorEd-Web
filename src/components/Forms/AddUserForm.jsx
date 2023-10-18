@@ -13,29 +13,50 @@ import { Controller } from "react-hook-form";
 const AddUserForm = ({title, type, submitName = "CREATE", inputs, errors, control, onSubmit, handleSubmit}) => {
     return (
         <Grid
+        onSubmit={handleSubmit(onSubmit)}
         component="form"
         container
         maxWidth="sm"
         sx={{
             backgroundColor: "#FFFFFF",
             borderRadius: 4,
-            padding: 3
+            paddingLeft: 6,
+            paddingRight: 6,
+            paddingTop: 4,
+            paddingBottom: 4
         }}>
-            {/* In array */}
-            <Grid item xs={12} marginBottom={2}>
-                <Typography variant="h5" component="h5" textAlign={"center"}>Create Institution</Typography>
-            </Grid>
-            <Grid item xs={12} marginBottom={1}>
-                <TextField fullWidth label="Institution name" helperText="Error"/>
-            </Grid>
-            <Grid item xs={12} marginBottom={3}>
-                <TextField fullWidth multiline label="Description" helperText="Error" rows={4}/>
-            </Grid>
-            <Grid item xs={12}>
-                <Button fullWidth size="large" variant="contained">SUBMIT</Button>
-            </Grid>
+            {title !== "" && (
+                <Grid item xs={12} marginBottom={2}>
+                    <Typography variant="h5" component="h5" textAlign={"center"}>{title}</Typography>
+                </Grid>
+            )}
+
+            
+            {inputs.map((el, ind) => (
+                <Grid key={ind} item xs={12} marginBottom={2}>
+                    <Controller
+                    name={el.key}
+                    control={control}
+                    rules={{
+                        required: `${el.label} is required`
+                    }} //-Give each controller the error
+                    render={({field}) => (
+                        <TextField
+                        fullWidth
+                        label={el.label}
+                        type={el.type}
+                        error={el.error ? true : false}
+                        helperText={el.error ? el.error.message : null}
+                        {...field}/>
+                    )}/>
+                </Grid>
+            ))}
+            
+            <Grid item xs={12} marginTop={3}>
+                <Button fullWidth type="submit" size="large" variant="contained">{submitName}</Button>
+            </Grid> 
         </Grid>
     )
 }
 
-export { AddUserForm } 
+export default AddUserForm
