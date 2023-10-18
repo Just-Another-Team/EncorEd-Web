@@ -24,6 +24,7 @@ const AddUserFormHook = () => {
         {key: 'password', label: "Password", type: "password", helperText: ""},
     ]
 
+
     const onSubmit = async (data) => {
         const {
             firstName,
@@ -58,7 +59,7 @@ const AddUserFormHook = () => {
         //Uhhhh load this please
     }
 
-    return <AddUserForm title='Add User' type={"usercreation"} inputs={inputs} control={control} onSubmit={onSubmit} handleSubmit={handleSubmit} />
+    return <AddUserForm title='Add Institution User' type={"usercreation"} inputs={inputs} control={control} onSubmit={onSubmit} handleSubmit={handleSubmit} />
 }
 
-export {AddUserFormHook}
+export { AddUserFormHook }
