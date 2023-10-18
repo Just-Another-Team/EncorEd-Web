@@ -5,9 +5,9 @@ class Institution {
         return http.post("/institution/add", data)
     }
 
-    viewInstitution(data) {
-        console.log(data)
-        //return httpCommon.get("/institution/list/id")
+    viewInstitution(id) {
+        console.log(id)
+        return http.get(`/institution/list/${id}`)
     }
 
     viewInstitutions() {

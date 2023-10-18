@@ -35,7 +35,7 @@ const LoginUserForm = () => {
                 
                 alert("Successfully logged in!")
 
-                window.location.href = (res.user.systemRole.admin && "/dashboard/home") || (res.user.systemRole.superadmin && "/admin/dashboard/home")
+                window.location.href = ((res.user.role.find(data => data._systemRole._admin) || res.user.role.find(data => data._systemRole._employee)) && "/dashboard/home") || (res.user.role.find(data => data._systemRole._superAdmin) && "/admin/dashboard/home")
                 reset()
             })
             .catch((err) => {

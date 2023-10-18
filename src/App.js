@@ -3,10 +3,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import "../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js";
 import {Routes, Route, Navigate} from 'react-router-dom';
 import { useEffect } from 'react';
-import { auth, onAuthStateChanged } from './app/firebase/authentication';
+import { auth, onAuthStateChanged, signOut } from './app/firebase/authentication';
 import { useDispatch, useSelector } from 'react-redux';
 import { logOut } from './features/auth/authSlice';
 import { reset } from './features/navigation/navigationSlice';
+import { getSubjects } from './features/subject/subjectSlice';
+import { getEvents } from './features/event/eventSlice';
 
 import Login from './pages/Login/Login';
 import LandingPage from './pages/LandingPage';
@@ -28,18 +30,14 @@ import RegistrationInstitutionForm from './components/Forms/Formhooks/UserForm-R
 import Profile from './pages/Authenticated/Profile/Profile';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 
-
-
 function App() {
   const userLoggedIn = useSelector(state => state.authentication);
   const dispatch = useDispatch();
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      
       if (user) {
         console.log("Logged In")
-        console.log(userLoggedIn)
       } 
       else {
         dispatch(reset())
@@ -57,13 +55,12 @@ function App() {
       <Route path='/register' element={<UserInput />}>
         <Route path='user' element={<RegistrationUserForm />} />
         <Route path='institution' element={userLoggedIn.user  ? <RegistrationInstitutionForm /> : <Navigate replace to="/register/user" />} />
-        {/* <Route path='user' element={<RegistrationUserForm />} />
-        <Route path='institution' element={<RegistrationInstitutionForm />} /> */}
+
       </Route>
-      {/* <Route path='/addInstitution' element={<InstitutionForm />} /> */}
 
       {/* Authenticated Pages */}
-      <Route path='/dashboard' element={userLoggedIn.user && userLoggedIn.user.systemRole.admin ? <Dashboard /> : <Navigate replace to="/login" />}>
+      {/*  */}
+      <Route path='/dashboard' element={userLoggedIn.user && (userLoggedIn.user.role.find(data => data._systemRole._employee) || userLoggedIn.user.role.find(data => data._systemRole._admin)) ? <Dashboard /> : <Navigate replace to="/login" />}> 
         <Route path='home' element={<InstitutionalHome />} />
 
         <Route path='subject' element={<Subject />} />
@@ -81,39 +78,14 @@ function App() {
       </Route>
 
       {/* userLoggedIn.user.isadmin ? <Navigate replace to="/admin/dashboard/home" /> : */}
-      <Route path='/admin/dashboard' element={userLoggedIn.user && userLoggedIn.user.systemRole.superadmin ? <AdminDashboard /> : <Navigate replace to="/login" />}>
-        <Route path='home' element={<AdminHome />}/>
+      {/*  */}
+      <Route path='/admin/dashboard' >
+        <Route path='home' element={userLoggedIn.user && userLoggedIn.user.role.find(data => data._systemRole._superAdmin) ? <AdminDashboard /> : <Navigate replace to="/login" />}/>
 
         <Route path='users' />
 
         <Route path='institutions' />
       </Route>
-
-      {/* <Route path='/' element={<LandingPage />} />
-      <Route path="/login" element={<LoginPage/>}/>
-      <Route path="/register" element={<RegistrationPage/>}/>
-      <Route path='/dashboard' element={<DashboardLayout />}>
-        <Route path='home' element={<Home />} />
-
-        <Route path='subjects' element={<Subjects />} />
-        <Route path='subject/:id' element={<SelectedSubject />} />
-
-        <Route path='events' element={<Events />} />
-        <Route path='event/:id' element={<SelectedEvent />} />
-
-        <Route path='maplist' element={<MapList />} />
-        <Route path='map' element={<MapPage />} />
-
-        <Route path='usergroups' element={<UserGroup />} />
-
-        <Route path='user/:id' element={<SelectedUser />}/>
-        <Route path='group/:id' element={<SelectedGroup />}/>
-        <Route path='role/:id' element={<SelectedRole />}/>
-
-        <Route path='Institution' element={<Institution />} />
-
-        <Route path='profile/:id'/>
-      </Route> */}
     </Routes>
   );
 }

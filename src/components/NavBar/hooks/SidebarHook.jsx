@@ -12,7 +12,7 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 
 const ConnectedSideBar = ({selected}) => {
     const select = useDispatch()
-    const userRole = useSelector(state => state.authentication.user.systemRole)
+    const userRole = useSelector(state => state.authentication.user.role)
     const selectedPage = useSelector(state => state.pageSelect)
 
     const navigations = [
@@ -31,7 +31,7 @@ const ConnectedSideBar = ({selected}) => {
         {name: "Institutions", icon: <OrganizationOutline />, href: "/admin/dashboard/institutions"},
     ]
 
-    return <Sidebar navigations={(userRole.admin && navigations) || (userRole.superadmin && adminNavigations)} select={select} selectedPage={selectedPage}/>
+    return <Sidebar navigations={(userRole.find(data => data._systemRole._employee) && navigations) || (userRole.find(data => data._systemRole._superAdmin) && adminNavigations)} select={select} selectedPage={selectedPage}/>
 }
 
 export default ConnectedSideBar

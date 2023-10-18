@@ -14,7 +14,8 @@ export const signIn = createAsyncThunk(
     async (userData, {rejectWithValue}) => {
         return await EncorEdAuthService.signIn(userData)
             .then((res) => {
-                if (res.user.systemRole.user) throw "auth/user-invalid-role"
+                //console.log(res.user.role.)
+                //if (res.user.systemRole.user) throw "auth/user-invalid-role"
 
                 return res
             })
@@ -37,15 +38,23 @@ export const signUp = createAsyncThunk(
     }
 )
 
-//For viewing other users
 export const getUser = createAsyncThunk(
     "user/viewUser",
     async (credential, {rejectWithValue}) => {
         //console.log(credential.user.email)
-        return EncorEdAuthService.get(credential.user.email)
+        return await EncorEdAuthService.get(credential.user.email)
             .then((res) => {
                 return res.data
             })
+            .catch((error) => rejectWithValue(error))
+    }
+)
+
+export const updateUser = createAsyncThunk(
+    "user/updateUser",
+    async (data, {rejectWithValue}) => {
+        return await EncorEdAuthService.updateUser()
+            .then((res) => res.data)
             .catch((error) => rejectWithValue(error))
     }
 )

@@ -5,73 +5,59 @@ import {
     signInWithEmailAndPassword,
     signOut 
 } from "../firebase/authentication"
-import encoredRoleService from "./encored-role-service"
+import EncoredRoleService from "./encored-role-service"
+import EncoredInstitutionService from "./encored-institution-service"
 
 class EncorEdAuthService {
     async signUp(data) {
         return await http.post("/user/signUp", data)
     }
 
+    //These functions should be in the backend. Not here
     async signIn(userData) {
         console.log("Signing In")
 
-        if (userData.token) {
-            const account = await signInWithCustomToken(auth, userData.token)
-                .then(async (result) => {
+        const account = await signInWithEmailAndPassword(auth, userData.emailUserName, userData.password)
+            .then(async (result) => {
 
-                    const userData = await this.get(result.user.email)
-                        .then((res) => res)
-                        .catch((error) => {throw error})
+                //Get User data
+                const userData = await this.get(result.user.email)
+                    .then((res) => res)
+                    .catch((error) => {throw error})
 
-                    const loggedIn = {
-                        user: {
-                            displayName: result.user.displayName,
-                            email: result.user.email,
-                            ...userData.data,
-                        },
-                        token: result.user.accessToken,
-                    }
+                //Get User Role
+                const userRole = await EncoredRoleService.getRoles(result.user.email)
+                    .then((res) => res)
+                    .catch((error) => {throw error})
 
-                    return loggedIn
-                })
-                .catch((error) => {
-                    throw error
-                })
+                //Get User Institution
+                const userInstitution = await EncoredInstitutionService.viewInstitution(userData.data.institution)
+                    .then((res) => res)
+                    .catch((error) => {throw error})
 
-            return account
-        }
+                //Get Events from Institution
+                const loggedIn = {
+                    user: {
+                        displayName: result.user.displayName,
+                        email: result.user.email,
+                        role: userRole.data,
+                        ...userData.data,
+                        institution: userInstitution.data,
+                        //role
+                    },
+                    token: result.user.accessToken,
+                    userData,
+                }
 
-        if (userData.emailUserName && userData.password) {
-            const account = await signInWithEmailAndPassword(auth, userData.emailUserName, userData.password)
-                .then(async (result) => {
+                console.log(loggedIn)
 
-                    const userData = await this.get(result.user.email)
-                        .then((res) => res)
-                        .catch((error) => {throw error})
+                return loggedIn
+            })
+            .catch((error) => {
+                throw error
+            })
 
-                    // Works only for institutional admins assigning a role
-                    // const assignedRoles = await encoredRoleService.getRoles(result.user.email);
-                    // console.log("roles", assignedRoles.data)
-
-                    const loggedIn = {
-                        user: {
-                            displayName: result.user.displayName,
-                            email: result.user.email,
-                            ...userData.data,
-                            //role
-                        },
-                        token: result.user.accessToken,
-                        userData,
-                    }
-
-                    return loggedIn
-                })
-                .catch((error) => {
-                    throw error
-                })
-
-            return account
-        }
+        return account
     }
 
     async signOut() {
@@ -86,12 +72,14 @@ class EncorEdAuthService {
             })
     }
 
+    //For User only
     addUser(data) {
         return http.post("/user/add", data)
     }
 
     updateUser(data) {
         const {id, userData} = data
+        
         return http.put(`/user/update/${id}`, userData)
     }
 
