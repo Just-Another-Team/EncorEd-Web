@@ -1,25 +1,55 @@
 import http from "./http-common"
-import { auth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "../firebase/authentication"
+import {
+    auth,
+    signInWithCustomToken,
+    signInWithEmailAndPassword,
+    signOut 
+} from "../firebase/authentication"
+import EncoredRoleService from "./encored-role-service"
+import EncoredInstitutionService from "./encored-institution-service"
 
 class EncorEdAuthService {
-    signUp(data) {
-        return http.post("/user/signUp", data)
+    async signUp(data) {
+        return await http.post("/user/signUp", data)
     }
 
+    //These functions should be in the backend. Not here
     async signIn(userData) {
         console.log("Signing In")
 
-        //Sign in with firebase
         const account = await signInWithEmailAndPassword(auth, userData.emailUserName, userData.password)
-            .then((result) => {
+            .then(async (result) => {
 
+                //Get User data
+                const userData = await this.get(result.user.email)
+                    .then((res) => res)
+                    .catch((error) => {throw error})
+
+                //Get User Role
+                const userRole = await EncoredRoleService.getRoles(result.user.email)
+                    .then((res) => res)
+                    .catch((error) => {throw error})
+
+                //Get User Institution
+                const userInstitution = await EncoredInstitutionService.viewInstitution(userData.data.institution)
+                    .then((res) => res)
+                    .catch((error) => {throw error})
+
+                //Get Events from Institution
                 const loggedIn = {
                     user: {
                         displayName: result.user.displayName,
                         email: result.user.email,
+                        role: userRole.data,
+                        ...userData.data,
+                        institution: userInstitution.data,
+                        //role
                     },
-                    token: result.user.accessToken
+                    token: result.user.accessToken,
+                    userData,
                 }
+
+                console.log(loggedIn)
 
                 return loggedIn
             })
@@ -33,36 +63,23 @@ class EncorEdAuthService {
     async signOut() {
         console.log("Signing Out")
 
-        await signOut(auth)
+        return await signOut(auth)
             .then((res) => {
-                console.log(res)
+                return res
             })
             .catch((error) => {
-                console.log(error)
+                throw error
             })
     }
 
-    // Maybe??
-    userLoggedIn() {
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log("Logged In")
-                console.log(user)
-                
-                
-            } else {
-                console.log("Logged Out")
-                console.log(user)
-            }
-        })
-    }
-
+    //For User only
     addUser(data) {
         return http.post("/user/add", data)
     }
 
     updateUser(data) {
         const {id, userData} = data
+        
         return http.put(`/user/update/${id}`, userData)
     }
 
@@ -73,6 +90,10 @@ class EncorEdAuthService {
 
     getAll() {
         return http.get("/user/list")
+    }
+
+    get(data) {
+        return http.get(`/user/list/${data}`)
     }
 }
 

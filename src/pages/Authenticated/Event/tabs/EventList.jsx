@@ -1,30 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { 
     Box, Grid, Typography,
 } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid'
 import SubjectEventCard from "../../../../components/Cards/SubjectEventCard";
+import { useDispatch, useSelector } from "react-redux";
+import { getEvents } from "../../../../features/event/eventSlice";
 
 // Must be changed
 const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'firstName', headerName: 'First name', width: 130 },
-    { field: 'lastName', headerName: 'Last name', width: 130 },
-    {
-      field: 'age',
-      headerName: 'Age',
-      type: 'number',
-      width: 90,
-    },
-    {
-      field: 'fullName',
-      headerName: 'Full name',
-      description: 'This column has a value getter and is not sortable.',
-      sortable: false,
-      width: 160,
-      valueGetter: (params) =>
-        `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-    },
+    { field: 'id', headerName: 'ID', flex: 1, },
+    { field: 'name', headerName: 'Event Name', flex: 1, },
+    { field: 'desc', headerName: 'Description', flex: 1, },
   ];
 
 const rows = [
@@ -55,7 +42,16 @@ const rows = [
   { id: 25, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
 ];
 
+var eventRows = []
+
 const EventList = () => {
+    const events = useSelector(state => state.events)
+    const eventDispatch = useDispatch();
+
+    useEffect(() => {
+        eventDispatch(getEvents())
+    }, [])
+
     return(
         <>
             <Box
@@ -76,7 +72,7 @@ const EventList = () => {
             <Box marginBottom={2}>
 
                 <DataGrid
-                    rows={rows}
+                    rows={!events.loading && events.event}
                     columns={columns}
                     initialState={{
                         pagination: {

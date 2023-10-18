@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import { 
     Box,
 } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid'
+import { useDispatch, useSelector } from "react-redux";
+import { getSubjects } from "../../../../features/subject/subjectSlice";
 
 // Must be changed
 const columns = [
@@ -19,16 +21,21 @@ const columns = [
     { 
         field: 'edpCode',
         headerName: 'EDP',
-        flex: 1
+        flex: 0.7
     },
     {
-        field: 'subjectType',
+        field: 'type',
         headerName: 'Type',
         flex: 1
     },
     {
         field: 'units',
         headerName: 'Units',
+        flex: 0.5,
+    },
+    {
+        field: 'creationDate',
+        headerName: 'Date Created',
         flex: 1,
     },
     {
@@ -37,29 +44,37 @@ const columns = [
         flex: 1,
     },
     {
+        field: 'verifiedBy',
+        headerName: 'Verified By',
+        flex: 1,
+    },
+    {
         field: 'status',
         headerName: 'Status',
-        flex: 1,
+        flex: 0.6,
     },
 ];
 
-const subject = (id, name, edpCode, subjectType, units, createdBy, status) => {
-    return {id: id, name: name, edpCode: edpCode, subjectType: subjectType, units: units, createdBy: createdBy, status: status}
+const subjectRow = (id, name, edpCode, type, units, creationDate, createdBy, verifiedBy, status) => {
+    return {id: id, name: name, edpCode: edpCode, type: type, units: units, creationDate: creationDate, createdBy: `${createdBy.firstName} ${createdBy.lastName}`, verifiedBy: verifiedBy, status: status}
 }
 
-const rows = [
-    subject(1, "Subject 1", 75343, "Lecture", 3, "Admin", "Verified"),
-    subject(2, "Subject 1", 75344, "Laboratory", 3, "Admin", "Awaiting Approval"),
-    subject(3, "Subject 2", 75343, "Lecture", 3, "Admin", "Verified")
-];
-
 const SubList = () => {
+    const subjects = useSelector(state => state.subjects.subject)
+    const subjectDispatch = useDispatch();
+
+    useEffect(() => {
+        subjectDispatch(getSubjects())
+    }, [])
+
     return(
         <>            
             <Box marginBottom={2}>
 
                 <DataGrid
-                    rows={rows}
+                    rows={!subjects.loading && subjects.map((el) => {
+                        return subjectRow(el.id, el.name, el.edpCode, el.type, el.units, el.creationDate, el.createdBy, el.verifiedBy, el.status)
+                    })}
                     columns={columns}
                     initialState={{
                         pagination: {
