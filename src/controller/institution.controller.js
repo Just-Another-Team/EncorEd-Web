@@ -128,8 +128,7 @@ const viewInstitution = async (req, res) => {
     const id = req.params.id;
 
     try {
-        const institutionRef = doc(db, "institution", id).withConverter(userConverter)
-        const institutionDoc = await getDoc(institutionRef);
+        const institutionDoc = await institutionCollection.doc(id).get();
 
         res.status(200).json(institutionDoc.data())
     }
