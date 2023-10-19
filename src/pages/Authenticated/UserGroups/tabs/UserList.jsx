@@ -81,25 +81,28 @@ const UserList = () => {
                 </Grid>
                 <Modal
                     open={open}
-                    onClose={handleClose}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
+                    // onClose={handleClose} //close on clicking outside modal
+                    aria-labelledby="Add Institutional User"
+                    aria-describedby="Form for adding institutional users"
                     >
-                    <div>
                     <Box sx={{
                         position: 'absolute',
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: 400,
-                        bgcolor: 'background.paper',
-                        border: '2px solid #000',
+                        width: 500,
+                        bgcolor: "#45A1FD",
+                        border: '1px solid #000',
+                        borderRadius: '20px',
                         boxShadow: 24,
-                        p: 4,
                     }}>
-                        <AddUserFormHook/>
+                        <div style={{textAlign: 'right'}}>
+                            <Button style={{color:'black', fontWeight: 'bolder', fontSize: '20px', paddingRight:0, borderRadius:'20px'}} onClick={handleClose}>x</Button>
+                        </div>
+                        <div style={{padding: '35px', paddingTop: '0px'}}>
+                            <AddUserFormHook/>
+                        </div>
                     </Box>
-                    </div>
                 </Modal>
             </Box>
 

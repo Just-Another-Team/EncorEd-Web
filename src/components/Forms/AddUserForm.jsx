@@ -18,7 +18,7 @@ const AddUserForm = ({title, type, submitName = "CREATE", inputs, errors, contro
         container
         maxWidth="sm"
         sx={{
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "white",
             borderRadius: 4,
             paddingLeft: 6,
             paddingRight: 6,
@@ -45,6 +45,7 @@ const AddUserForm = ({title, type, submitName = "CREATE", inputs, errors, contro
                         fullWidth
                         label={el.label}
                         type={el.type}
+                        sx={{backgroundColor:"white"}}
                         error={el.error ? true : false}
                         helperText={el.error ? el.error.message : null}
                         {...field}/>
