@@ -22,12 +22,11 @@ const Navbar = () => {
     const handleSignOut = (e) => {
         logoutDispatch(logOutUser()).unwrap()
             .then((res) => {
-                alert("Signing Out Success")
-
+                console.log("Signing Out Success")
                 window.location.href = "/login"
             })
             .catch((error) => {
-                alert("Signing Out Failed")
+                console.log("Signing Out Failed")
                 console.log(error)
             })
     }
@@ -70,7 +69,9 @@ const Navbar = () => {
                     variant="h6"
                     fontWeight={400}
                     component={Link}
-                    to="/dashboard/profile"
+                    //to={(loggedIn.role && "/dashboard/profile") || (loggedIn.role && "/admin/dashboard/profile")}
+                    //to={((loggedIn.role.find(data => data._systemRole._admin) || loggedIn.role.find(data => data._systemRole._employee)) && "/dashboard/profile") || (loggedIn.role.find(data => data._systemRole._superAdmin) && "/admin/dashboard/profile")}
+                    to={"/dashboard/profile"}
                     sx={{
                         textDecoration: 'none',
                         color: '#FFFFFF'

@@ -15,7 +15,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import dayjs from 'dayjs'
 import { Controller, useForm } from "react-hook-form";
-import { updateUser } from "../../../features/auth/authSlice";
+import { setUser, signIn, updateUser } from "../../../features/auth/authSlice";
 
 const Profile = () => {
     const editUserDispatch = useDispatch()
@@ -43,25 +43,26 @@ const Profile = () => {
         const {firstName, lastName, email, password} = data
 
         const input = {
-            institution: user.institution.id,
+            id: user.email,
             firstName,
             lastName,
             email,
             password
         }
 
-        console.log(input)
+        editUserDispatch(updateUser(input)).unwrap()
+            .then((res) => {
+                alert(`${res}\nPlease login again to complete the process.`)
 
-        // editUserDispatch(updateUser(input)).unwrap()
-        //     .then((res) => {
-        //         console.log(res)
+                //editUserDispatch(signIn({emailUserName: input.email, password: input.password}))
+                window.location.reload()
 
-        //         reset()
-        //         setEditProfile(false)
-        //     })
-        //     .catch((error) => {
-        //         console.log(error)
-        //     })
+                reset()
+                setEditProfile(false)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     const cancelEdit = (e) => {
@@ -123,7 +124,7 @@ const Profile = () => {
                                 <Typography variant="body1">{dayjs(user.joinDate).format("MMMM D, YYYY")}</Typography>
                             </Grid>
 
-                            {user.institution !== null && (
+                            {user.institution !== null || user.institution.id !== null && (
                                 <Grid item xs={6} marginBottom={2}>
                                     <Typography variant="body1" fontWeight={700}>Institution:</Typography>
                                     <Typography variant="body1">{user.institution.name}</Typography>
@@ -132,7 +133,7 @@ const Profile = () => {
 
                             {user.addedBy !== null && (
                                 <Grid marginBottom={2}>
-                                    <Typography variant="body1">Added By:</Typography>
+                                    <Typography variant="body1" fontWeight={700}>Added By:</Typography>
                                     <Typography variant="body1">{user.addedBy}</Typography>
                                 </Grid>
                             )}

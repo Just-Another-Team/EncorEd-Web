@@ -31,18 +31,18 @@ import Profile from './pages/Authenticated/Profile/Profile';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 
 function App() {
-  const userLoggedIn = useSelector(state => state.authentication);
+  const userAuth = useSelector(state => state.authentication);
   const dispatch = useDispatch();
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("Logged In")
-      } 
-      else {
+      if (!user) {
         dispatch(reset())
         dispatch(logOut())
+        return
       }
+
+      console.log("Logged In")
     })
   }, [])
 
@@ -54,13 +54,13 @@ function App() {
       <Route path='/login' element={<Login />}/>
       <Route path='/register' element={<UserInput />}>
         <Route path='user' element={<RegistrationUserForm />} />
-        <Route path='institution' element={userLoggedIn.user  ? <RegistrationInstitutionForm /> : <Navigate replace to="/register/user" />} />
+        <Route path='institution' element={<RegistrationInstitutionForm />} /> {/* userLoggedIn.user  ? <RegistrationInstitutionForm /> : <Navigate replace to="/register/user" /> */}
 
       </Route>
 
       {/* Authenticated Pages */}
-      {/*  */}
-      <Route path='/dashboard' element={userLoggedIn.user && (userLoggedIn.user.role.find(data => data._systemRole._employee) || userLoggedIn.user.role.find(data => data._systemRole._admin)) ? <Dashboard /> : <Navigate replace to="/login" />}> 
+      {/* element={userLoggedIn.user && userLoggedIn.user.role && (userLoggedIn.user.role.find(data => data._systemRole._employee) || userLoggedIn.user.role.find(data => data._systemRole._admin)) ? <Dashboard /> : <Navigate replace to="/login" />} */}
+      <Route path='/dashboard' element={<Dashboard />}> 
         <Route path='home' element={<InstitutionalHome />} />
 
         <Route path='subject' element={<Subject />} />
@@ -75,16 +75,20 @@ function App() {
         <Route path='institution' element={<Institution />} />
 
         <Route path='profile' element={<Profile />}/>
+
+        
       </Route>
 
       {/* userLoggedIn.user.isadmin ? <Navigate replace to="/admin/dashboard/home" /> : */}
-      {/*  */}
+      {/* element={userLoggedIn.user && userLoggedIn.user.role && userLoggedIn.user.role.find(data => data._systemRole._superAdmin) ? <AdminDashboard /> : <Navigate replace to="/login" />} */}
       <Route path='/admin/dashboard' >
-        <Route path='home' element={userLoggedIn.user && userLoggedIn.user.role.find(data => data._systemRole._superAdmin) ? <AdminDashboard /> : <Navigate replace to="/login" />}/>
+        <Route path='home' />
 
         <Route path='users' />
 
         <Route path='institutions' />
+
+        <Route path='profile' element={<Profile />}/>
       </Route>
     </Routes>
   );

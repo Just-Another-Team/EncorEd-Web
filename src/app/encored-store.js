@@ -7,6 +7,7 @@ import eventSlice from "../features/event/eventSlice";
 
 import storage from 'redux-persist/lib/storage'
 import { persistReducer, persistStore } from 'redux-persist'
+import roleSlice from "../features/role/roleSlice";
 
 const persistConfig = {
     key: "root",
@@ -20,6 +21,7 @@ const store = configureStore({
     reducer: {
         pageSelect: pagePersistedReducer, 
         authentication: authPersistedReducer,
+        role: roleSlice,
         institution: institutionSlice,
         subjects: subjectSlice,
         events: eventSlice

@@ -5,6 +5,11 @@ class Institution {
         return http.post("/institution/add", data)
     }
 
+    // assignInstitution(data) {
+    //     console.log(data)
+    //     return http.post(`/role/assign/${data.userId}`, data)
+    // }
+
     viewInstitution(id) {
         console.log(id)
         return http.get(`/institution/list/${id}`)

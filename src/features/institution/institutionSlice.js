@@ -11,12 +11,9 @@ const initialState = {
 export const addInstitution = createAsyncThunk(
     "/institution/add",
     async (institutionVal, {rejectWithValue}) => {
-        try {
-            const institution = await Institution.addInstitution(institutionVal);
-            return institution;
-        } catch (error) {
-            return rejectWithValue(error)
-        }
+        return await Institution.addInstitution(institutionVal)
+            .then((res) => res)
+            .catch((error) => rejectWithValue(error))
     }
 )
 

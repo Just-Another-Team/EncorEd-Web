@@ -4,12 +4,15 @@ import {
     TextField,
     Button,
     Checkbox,
-    FormControlLabel
+    FormControlLabel,
+    CircularProgress,
 } from "@mui/material";
 import React from "react";
 import { Controller } from "react-hook-form";
+import { useSelector } from "react-redux";
 
-const UserForm = ({title, type, submitName = "SUBMIT", inputs, errors, control, onSubmit, handleSubmit}) => {
+const UserForm = ({title, type, submitName = "SUBMIT", inputs, errors, control, onSubmit, handleSubmit, loading}) => {
+
     return (
         <Grid
         onSubmit={handleSubmit(onSubmit)}
@@ -69,7 +72,9 @@ const UserForm = ({title, type, submitName = "SUBMIT", inputs, errors, control, 
             )}
             
             <Grid item xs={12} marginTop={3}>
-                <Button fullWidth type="submit" size="large" variant="contained">{submitName}</Button>
+                <Button fullWidth type="submit" size="large" variant="contained" disabled={loading}>
+                    {loading ? <CircularProgress size={26}/> : submitName}
+                </Button>
             </Grid> 
         </Grid>
     )
