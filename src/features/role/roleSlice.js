@@ -35,36 +35,36 @@ const assignRole = createAsyncThunk(
 const roleSlice = createSlice({
     name: 'role',
     initialState,
-    reducers: {},
-    extraReducers: (builder) => {
+    //reducers: {},
+    extraReducers: builder => {
         //Add Role
-        {
-            builder.addCase(addRole.pending, (state, actions) => {
-                state.loading = true
-            })
-            builder.addCase(addRole.fulfilled, (state, actions) => {
-                state.loading = false
-            })
-            builder.addCase(addRole.rejected, (state, actions) => {
-                state.loading = false
-                state.error = actions.payload
-            })
-        }
+        // {
+        //     builder.addCase(addRole.pending, (state, actions) => {
+        //         state.loading = true
+        //     })
+        //     builder.addCase(addRole.fulfilled, (state, actions) => {
+        //         state.loading = false
+        //     })
+        //     builder.addCase(addRole.rejected, (state, actions) => {
+        //         state.loading = false
+        //         state.error = actions.payload
+        //     })
+        // }
 
-        //Assign Role
-        {
-            builder.addCase(assignRole.pending, (state, actions) => {
-                state.loading = true
-            })
-            builder.addCase(assignRole.fulfilled, (state, actions) => {
-                state.loading = false
-                //state.roles 
-            })
-            builder.addCase(assignRole.rejected, (state, actions) => {
-                state.loading = false
-                state.error = actions.payload
-            })
-        }
+        // //Assign Role
+        // {
+        //     builder.addCase(assignRole.pending, (state, actions) => {
+        //         state.loading = true
+        //     })
+        //     builder.addCase(assignRole.fulfilled, (state, actions) => {
+        //         state.loading = false
+        //         //state.roles 
+        //     })
+        //     builder.addCase(assignRole.rejected, (state, actions) => {
+        //         state.loading = false
+        //         state.error = actions.payload
+        //     })
+        // }
     }
 })
 
