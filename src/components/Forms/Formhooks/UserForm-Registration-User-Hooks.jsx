@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { signIn, signUp } from '../../../features/auth/authSlice';
 
 const RegistrationUserForm = () => {
-    const userSelector = useSelector(state => state.authentication);
+    const user = useSelector(state => state.authentication);
     const registrationDispatch = useDispatch();
 
     const {handleSubmit, reset, control, setError, formState: {errors}} = useForm({
@@ -30,21 +30,24 @@ const RegistrationUserForm = () => {
     ]
 
     const onSubmit = (data) => {
+        const {email, password} = data
+
         registrationDispatch(signUp(data)).unwrap()
-            .then((res) => {
+            .then((signUpRes) => {
                 alert("Sign Up Successful!")
 
                 //Sign in
-                registrationDispatch(signIn(res.data)).unwrap()
-                    .then((res) => {
-                        console.log(res)
-
-                        window.location.href = "/register/institution"
-                        reset()
+                registrationDispatch(signIn({emailUserName: email, password: password, type: "register"})).unwrap()
+                    .then((signInRes) => {
+                        //reset()
+                        //if (!userSelector.loading) window.location.href = "/register/institution"
                     })
                     .catch((error) => {
                         console.log(error)
                     })
+
+                
+                //window.location.href = "/register/institution"
                 //reset()
             })
             .catch((error) => {
@@ -53,9 +56,11 @@ const RegistrationUserForm = () => {
                 if (err === "auth/email-already-exists" || err === "auth/invalid-email")
                     setError("email", {message: "Email already exists"})
             })
+        
+        //if (!userSelector.loading) window.location.href = "/register/institution"
     }
 
-    return <UserForm title='Create Account' type={"register"} inputs={inputs} control={control} onSubmit={onSubmit} handleSubmit={handleSubmit} />
+    return <UserForm loading={user.loading} title='Create Account' type={"register"} inputs={inputs} control={control} onSubmit={onSubmit} handleSubmit={handleSubmit} />
 }
 
 export default RegistrationUserForm

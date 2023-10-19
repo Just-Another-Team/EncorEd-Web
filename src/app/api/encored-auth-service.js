@@ -9,29 +9,71 @@ import EncoredRoleService from "./encored-role-service"
 import EncoredInstitutionService from "./encored-institution-service"
 
 class EncorEdAuthService {
-    async signUp(data) {
-        return await http.post("/user/signUp", data)
+    signUp(data) {
+        return http.post("/user/signUp", data)
     }
 
     //These functions should be in the backend. Not here
-    async signIn(userData) {
+    //This is where the problem lies
+    async signIn(credential) {
         console.log("Signing In")
 
-        const account = await signInWithEmailAndPassword(auth, userData.emailUserName, userData.password)
+        console.log(credential)
+
+        //Get User data
+        const userData = await this.get(credential.emailUserName)
+            .then((res) => res)
+            .catch((error) => error)
+
+        //If backend refused to connect
+        if (userData.code === "ERR_NETWORK")
+            return userData
+
+        const account = await signInWithEmailAndPassword(auth, credential.emailUserName, credential.password)
             .then(async (result) => {
+
+                //Get User Roles
+                // const userRole = credential.type !== "register" ? await EncoredRoleService.getRoles(result.user.email)
+                //     .then((res) => res)
+                //     .catch((error) => {throw error}) : null
+
+                //Get User Institution
+                // const userInstitution = await EncoredInstitutionService.viewInstitution(userData.data.institution)
+                //     .then((res) => res)
+                //     .catch((error) => {throw error})
+
+                //Get Events from Institution
+                
+                const loggedIn = {
+                    user: {
+                        displayName: result.user.displayName,
+                        email: result.user.email,
+                        ...userData.data,
+                    },
+                    token: result.user.accessToken,
+                    userData,
+                }
+
+                return loggedIn
+            })
+            .catch((error) => {
+                //This is expensive
+                console.log("Error Catched from Sign In", error)
+                return error
+            })
+
+        return account
+    }
+
+    async registerSignIn(credential) {
+        console.log("Signing In")
+
+        const account = await signInWithEmailAndPassword(auth, credential.emailUserName, credential.password)
+            .then(async (result) => {
+                console.log(credential)
 
                 //Get User data
                 const userData = await this.get(result.user.email)
-                    .then((res) => res)
-                    .catch((error) => {throw error})
-
-                //Get User Role
-                const userRole = await EncoredRoleService.getRoles(result.user.email)
-                    .then((res) => res)
-                    .catch((error) => {throw error})
-
-                //Get User Institution
-                const userInstitution = await EncoredInstitutionService.viewInstitution(userData.data.institution)
                     .then((res) => res)
                     .catch((error) => {throw error})
 
@@ -40,10 +82,7 @@ class EncorEdAuthService {
                     user: {
                         displayName: result.user.displayName,
                         email: result.user.email,
-                        role: userRole.data,
                         ...userData.data,
-                        institution: userInstitution.data,
-                        //role
                     },
                     token: result.user.accessToken,
                     userData,
@@ -72,15 +111,19 @@ class EncorEdAuthService {
             })
     }
 
+    assignInstitution(data) {
+        console.log(data)
+        return http.patch(`/user/institution/assign`, data)
+    }
+
     //For User only
     addUser(data) {
         return http.post("/user/add", data)
     }
 
     updateUser(data) {
-        const {id, userData} = data
-        
-        return http.put(`/user/update/${id}`, userData)
+        const {id, firstName, lastName, email, password} = data
+        return http.put(`/user/update/${id}`, {firstName, lastName, email, password})
     }
 
     deleteUser(data) {

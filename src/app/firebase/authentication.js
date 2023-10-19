@@ -11,11 +11,12 @@ import {
 
 const auth = getAuth(app)
 
+
 export {
     auth,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signInWithCustomToken,
     signOut,
-    onAuthStateChanged
+    onAuthStateChanged,
 }
