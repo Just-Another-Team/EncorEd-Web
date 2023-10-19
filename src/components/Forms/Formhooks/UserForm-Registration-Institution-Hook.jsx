@@ -23,37 +23,39 @@ const RegistrationInstitutionForm = () => {
 
     const onSubmit = (data) => {
 
+        //WILL FIX THIS REAL QUICK
+
         //Add insitution
-        institutionDispatch(addInstitution(data)).unwrap()
-            .then((res) => {
-                console.log(res.data)
+        // institutionDispatch(addInstitution(data)).unwrap()
+        //     .then((res) => {
+        //         console.log(res.data)
 
-                //Assign institution
-                institutionDispatch(assignInstitution({userId: user.email, institution: res.data.id})).unwrap()
-                    .then(() => {
+        //         //Assign institution
+        //         institutionDispatch(assignInstitution({userId: user.email, institution: res.data.id})).unwrap()
+        //             .then(() => {
 
-                        //Add Admin role based on institution
-                        institutionDispatch(addRole({institution: res.data.id})).unwrap()
-                            .then(() => {
-                                //Assign admin role
-                                institutionDispatch(assignRole())
+        //                 //Add Admin role based on institution
+        //                 institutionDispatch(addRole({institution: res.data.id})).unwrap()
+        //                     .then(() => {
+        //                         //Assign admin role
+        //                         //institutionDispatch(assignRole())
 
-                                reset();
-                            })
-                            .catch((error) => {
-                                console.log("Add Role", error)
-                            })
-                    })
-                    .catch((error) => {
-                        console.log("Assign Institution", error)
-                    })
+        //                         reset();
+        //                     })
+        //                     .catch((error) => {
+        //                         console.log("Add Role", error)
+        //                     })
+        //             })
+        //             .catch((error) => {
+        //                 console.log("Assign Institution", error)
+        //             })
 
-                //window.location.href = "/dashboard/home" //To Dashboard or Add User/Role or something
+        //         //window.location.href = "/dashboard/home" //To Dashboard or Add User/Role or something
                 
-            })
-            .catch((error) => {
-                console.log("Add Institution", error)
-            })
+        //     })
+        //     .catch((error) => {
+        //         console.log("Add Institution", error)
+        //     })
     }
 
     return <UserForm loading={false} title="Create Institution" control={control} onSubmit={onSubmit} type="institution" inputs={inputs} handleSubmit={handleSubmit}/>
