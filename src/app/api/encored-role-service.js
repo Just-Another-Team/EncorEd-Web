@@ -6,6 +6,7 @@ class EncorEdRoleService {
     }
 
     assignRole(data) {
+        //Requires User Id and Role Id
         return http.post(`/role/assign`, data)
     }
 
