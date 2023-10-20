@@ -149,6 +149,21 @@ const viewAllUser = async (req, res) => {
     }
 }
 
+const viewAllUserByInstitution = async (req, res) => {
+    
+    try {
+        const getUserDocs = await userCollection.where('institution', '==', req.body.institution).get(); 
+
+        const docRef = getUserDocs.docs.map(doc => doc.data())
+        console.log(docRef)
+
+        res.status(200).json(docRef);    
+    }
+    catch (e) {
+        res.status(400).json({error: true, message: e.message})
+    }
+}
+
 const viewUser = async (req, res) => {
     const id = req.params.id;
 
@@ -326,6 +341,7 @@ module.exports = {
     deleteUser,
     viewUser,
     viewAllUser,
+    viewAllUserByInstitution,
     //Institutional Admin
     signUp,
     assignInstitution,

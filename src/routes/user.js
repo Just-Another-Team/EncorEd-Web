@@ -6,6 +6,7 @@ const {
     updateUser,
     deleteUser,
     viewAllUser,
+    viewAllUserByInstitution,
     viewUser,
     signIn,
     signUp,
@@ -30,6 +31,7 @@ router.delete("/delete/:id", deleteUser)
 
 //View
 router.get("/list", viewAllUser)
+router.get("/list/institution", viewAllUserByInstitution)
 router.get("/list/:id", viewUser)
 
 module.exports = router
