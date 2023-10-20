@@ -57,6 +57,18 @@ export const getUser = createAsyncThunk(
     }
 )
 
+// export const getAllUser = createAsyncThunk(
+//     "user/list/institution",
+//     async (credential, {rejectWithValue}) => {
+//         console.log(credential.user.institution)
+//         return await EncorEdAuthService.get(credential.user.institution)
+//             .then((res) => {
+//                 return res.data
+//             })
+//             .catch((error) => rejectWithValue(error))
+//     }
+// )
+
 export const updateUser = createAsyncThunk(
     "user/updateUser",
     async (data, {rejectWithValue}) => {

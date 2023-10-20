@@ -4,6 +4,8 @@ import {
 } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid'
 import { AddUserFormHook } from '../../../../components/Forms/Formhooks/AddUserForm-Hooks'
+import { useSelector } from "react-redux";
+
 
 // Must be changed
 const columns = [
@@ -68,6 +70,7 @@ const rows = [
 
 
 const UserList = () => {
+    const loggedIn = useSelector(state => state.authentication.user)
     //Modal stuffs
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);

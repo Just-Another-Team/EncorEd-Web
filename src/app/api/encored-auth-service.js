@@ -135,6 +135,11 @@ class EncorEdAuthService {
         return http.get("/user/list")
     }
 
+    getAllByInstitution(data) {
+        const institution = data.institution
+        return http.get(`/user/list/institution/${institution}`, {institution})
+    }
+
     get(data) {
         return http.get(`/user/list/${data}`)
     }
