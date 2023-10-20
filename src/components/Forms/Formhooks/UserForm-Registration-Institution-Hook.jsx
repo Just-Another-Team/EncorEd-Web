@@ -3,7 +3,7 @@ import UserForm from "../UserForm"
 import { useForm } from "react-hook-form";
 import { addInstitution } from "../../../features/institution/institutionSlice";
 import { assignInstitution } from "../../../features/auth/authSlice";
-import { addRole } from "../../../features/role/roleSlice";
+import { addRole, assignRole, viewAssignedRoles } from "../../../features/role/roleSlice";
 
 const RegistrationInstitutionForm = () => {
     const user = useSelector(state => state.authentication.user)
@@ -22,6 +22,28 @@ const RegistrationInstitutionForm = () => {
     ]
 
     const onSubmit = (data) => {
+
+        institutionDispatch(addInstitution(data)).unwrap()
+            .then((res) => {//Assign institution
+                institutionDispatch(assignInstitution({userId: user.email, institution: res.data.id}))
+                return res; 
+            })
+            .catch((error) => Promise.reject(error))
+            .then(async (res) => {//Add role
+                const roleAdded = await institutionDispatch(addRole({institution: res.data.id}))
+                return roleAdded.payload.data
+            })
+            .catch((error) => Promise.reject(error))
+            .then((res) => { //Assign role
+                institutionDispatch(assignRole({userId: user.email, roleId: res.id}))
+            })
+            .catch((error) => Promise.reject(error))
+            .then(() => { //VIEW ROLE
+                institutionDispatch(viewAssignedRoles(user.email))
+                window.location.reload();
+                reset()
+            })
+            .catch((error) => Promise.reject(error))
 
         //WILL FIX THIS REAL QUICK
 

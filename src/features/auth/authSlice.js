@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import EncorEdAuthService from "../../app/api/encored-auth-service"
-import storage from 'redux-persist/lib/storage'
+import { viewAssignedRoles } from "../role/roleSlice"
 
 const initialState = {
     loading: false,
@@ -11,11 +11,47 @@ const initialState = {
 
 export const signIn = createAsyncThunk(
     "user/signIn",
-    async (userData, {rejectWithValue}) => {
+    async (userData, {dispatch, rejectWithValue}) => {
         try {
             const signedIn = await EncorEdAuthService.signIn(userData) //userData.type !== "register" ? await EncorEdAuthService.signIn(userData) : await EncorEdAuthService.registerSignIn(userData)
+                //Sign In
+                .then((result) => {
+                    const loggedIn = {
+                        user: {
+                            displayName: result.user.displayName,
+                            email: result.user.email,
+                        },
+                        token: result.user.accessToken,
+                    }
 
-            if (signedIn.code !== undefined) throw signedIn
+                    console.log("Logged In", loggedIn)
+
+                    return loggedIn
+                })
+                .catch((error) => Promise.reject(error))
+                //Get User Data from Firestore
+                .then(async (result) => {
+                    //Expect an error will be uncatched in this area
+                    const userData = await dispatch(getUser(result.user.email))
+
+                    const user = Object.assign(result.user, {...userData.payload})
+                    result.user = user
+
+                    return result
+                })
+                .catch((error) => Promise.reject(error))
+                //Get User Role
+                .then(async (result) => {
+                    const userRoles = await dispatch(viewAssignedRoles(result.user.email))
+                    return result
+                })
+                .catch((error) => Promise.reject(error))
+                //Get User Institution
+                .then(async (result) => {
+                    const userInstitution = await dispatch(getUser(result.user.email))
+                    return result
+                })
+                .catch((error) => Promise.reject(error))
             
             return signedIn
         } catch (error) {
@@ -44,12 +80,11 @@ export const assignInstitution = createAsyncThunk(
     }
 )
 
-
 export const getUser = createAsyncThunk(
     "user/viewUser",
-    async (credential, {rejectWithValue}) => {
+    async (email, {rejectWithValue}) => {
         //console.log(credential.user.email)
-        return await EncorEdAuthService.get(credential.user.email)
+        return await EncorEdAuthService.get(email)
             .then((res) => {
                 return res.data
             })

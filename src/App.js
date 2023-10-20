@@ -23,12 +23,12 @@ import Institution from './pages/Authenticated/Institution/Institution';
 import SelectedSubject from './pages/Authenticated/Subject/pages/SelectedSubject';
 
 import {default as AdminHome} from './pages/Admin/Home/Home';
+import AdminDashboard from './pages/Admin/AdminDashboard';
 
 import InstitutionForm from './components/Forms/InstitutionForm';
 import RegistrationUserForm from './components/Forms/Formhooks/UserForm-Registration-User-Hooks';
 import RegistrationInstitutionForm from './components/Forms/Formhooks/UserForm-Registration-Institution-Hook';
 import Profile from './pages/Authenticated/Profile/Profile';
-import AdminDashboard from './pages/Admin/AdminDashboard';
 
 function App() {
   const userAuth = useSelector(state => state.authentication);

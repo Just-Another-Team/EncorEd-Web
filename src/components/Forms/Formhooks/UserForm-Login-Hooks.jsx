@@ -22,35 +22,24 @@ const LoginUserForm = () => {
         {key: 'password', label: "Password", type: "password", error: errors.password}
     ]
 
-    const onSubmit = (data) => {
-        const { emailUserName, password } = data
-
-        const userInput = {
-            emailUserName,
-            password,
-        }
-
-        loginDispatch(signIn(userInput)).unwrap()
+    const onSubmit = (credentials) => {
+        loginDispatch(signIn(credentials)).unwrap()
             .then((res) => {
-                
-                alert("Successfully logged in!")
+                console.log(res)
 
-                //window.location.href = ((res.user.role.find(data => data._systemRole._admin) || res.user.role.find(data => data._systemRole._employee)) && "/dashboard/home") || (res.user.role.find(data => data._systemRole._superAdmin) && "/admin/dashboard/home")
-                
                 window.location.href = "/dashboard/home"
-                
-                reset()
+                reset();
             })
-            .catch((err) => {
-                console.error("User Form Login", err)
+            .catch((error) => {
+                console.error("User Form Login", error)
 
-                if (err.code === "ERR_NETWORK") setError("emailUserName", {message: `${err.message}.`})
+                if (error.code === "ERR_NETWORK") setError("emailUserName", {message: `${error.message}.`})
 
-                if (err.code === "auth/user-invalid-role") setError("emailUserName", {message: "User does not contain the level of authentication needed to use the web"})
+                if (error.code === "auth/user-invalid-role") setError("emailUserName", {message: "User does not contain the level of authentication needed to use the web"})
 
-                if (err.code === "auth/user-not-found" || err.code === "auth/invalid-email") setError("emailUserName", {message: "Invalid email or username"})
+                if (error.code === "auth/user-not-found" || error.code === "auth/invalid-email") setError("emailUserName", {message: "Invalid email or username"})
 
-                if (err.code === "auth/wrong-password") setError("password", {message: "Invalid password"})
+                if (error.code === "auth/wrong-password") setError("password", {message: "Invalid password"})
             })
     }
 
