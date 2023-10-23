@@ -169,62 +169,145 @@ const addEmployeeRole = async (req, res) => {
     }
 }
 
-/* FOR APPLICATION ADMINS ONLY */
+/* FOR INSTITUTIONAL ADMIN */
 const addAdminRole = async (req, res) => {
     try {
-        //console.log(req.body.name)
-        let role = new Role(
-            null,
-            req.body.name,
-            req.body.desc,
-            req.body.canViewMap,
-            req.body.canAddMap,
-            req.body.canEditMap,
-            req.body.canDeleteMap,
-            req.body.canUnlockMap,
-            req.body.canViewSubject,
-            req.body.canAddSubject,
-            req.body.addSubjectRequireVerification,
-            req.body.canEditSubject,
-            req.body.editSubjectRequireVerification,
-            req.body.canDeleteSubject,
-            req.body.canVerifySubject,
-            req.body.canViewEvent,
-            req.body.canAddEvent,
-            req.body.canEditEvent,
-            req.body.canDeleteEvent,
-            req.body.canVerifyEvent,
-            req.body.canViewUser,
-            req.body.canAddUser,
-            req.body.canEditUser,
-            req.body.canDeleteUser,
-            req.body.canBanUser,
-            req.body.canRestoreUser,
-            req.body.canViewGroup,
-            req.body.canAddGroup,
-            req.body.canEditGroup,
-            req.body.canDeletGroup,
-            req.body.canViewRole,
-            req.body.canAddRole,
-            req.body.canEditRole,
-            req.body.canDeleteRole,
-            req.body.canViewInstitution,
-            req.body.canAddInstitution,
-            req.body.canEditInstitution,
-            req.body.canDeleteInstitution,
-            req.body.canBanInstitution,
-            req.body.canRestoreInstitution,
+        const {name = "admin", desc = "Role of institutional admin in [insert school]", institution} = req.body
+
+        let systemRole = new SystemRole(
+            false,
+            true,
+            false,
+            false
         )
 
-        await roleCollection.doc(`applicationadmin-${role.name}`).create(role)
-            .then((result) => {
-                res.status(200).json({message: "Role added successfully"})
-            })
-            .catch((err) => {
-                throw {message: err.message}
-            })
+        let institutionalRole = new InstitutionalRole(
+            name,
+            desc,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+        )
 
-        //res.status(200).json({message: "Role added successfully"})
+        let role = new Role(
+            institution,
+            Object.assign({}, systemRole),
+            Object.assign({}, institutionalRole)
+        )
+
+        const roleId = `${role.institution}-${role.institutionalRole._name}`;
+
+        await roleCollection.doc(roleId).create(role)
+
+        res.status(200).json({id: roleId, message: "Insitutional Role added successfully"})
+    } catch (e) {
+        res.status(400).json({name: "Role", userType: "Institutional Admin", type: "Add", error: e.message})
+    }
+}
+
+/* FOR APPLICATION ADMINS ONLY */
+const addAppAdminRole = async (req, res) => {
+    try {
+        //console.log(req.body.name)
+
+        let systemRole = new SystemRole(
+                true,
+                false,
+                false,
+                false
+            )
+
+        let institutionalRole = new InstitutionalRole(
+                req.body.name,
+                req.body.desc,
+                req.body.canViewMap,
+                req.body.canAddMap,
+                req.body.canEditMap,
+                req.body.canDeleteMap,
+                req.body.canUnlockMap,
+                req.body.canViewSubject,
+                req.body.canAddSubject,
+                req.body.addSubjectRequireVerification,
+                req.body.canEditSubject,
+                req.body.editSubjectRequireVerification,
+                req.body.canDeleteSubject,
+                req.body.canVerifySubject,
+                req.body.canViewEvent,
+                req.body.canAddEvent,
+                req.body.canEditEvent,
+                req.body.canDeleteEvent,
+                req.body.canVerifyEvent,
+                req.body.canViewUser,
+                req.body.canAddUser,
+                req.body.canEditUser,
+                req.body.canDeleteUser,
+                req.body.canBanUser,
+                req.body.canRestoreUser,
+                req.body.canViewGroup,
+                req.body.canAddGroup,
+                req.body.canEditGroup,
+                req.body.canDeletGroup,
+                req.body.canViewRole,
+                req.body.canAddRole,
+                req.body.canEditRole,
+                req.body.canDeleteRole,
+                req.body.canViewInstitution,
+                req.body.canAddInstitution,
+                req.body.canEditInstitution,
+                req.body.canDeleteInstitution,
+                req.body.canBanInstitution,
+                req.body.canRestoreInstitution,
+            )
+
+        let role = new Role(
+                null,
+                Object.assign({}, systemRole),
+                Object.assign({}, institutionalRole),
+            )
+
+        await roleCollection.doc(`applicationadmin-${institutionalRole.name}`).create(role)
+            // .then((result) => {
+                
+            // })
+            // .catch((err) => {
+            //     throw {message: err.message}
+            // })
+
+        res.status(200).json({message: "Role added successfully"})
     } catch (e) {
         res.status(400).json({name: "Role", userType: "Admin", type: "Add", error: e.message})
     }
@@ -256,6 +339,8 @@ module.exports = {
     addEmployeeRole,
 
     addAdminRole,
+
+    addAppAdminRole,
     editAdminRole,
     deleteAdminRole,
     viewAdminRoles,

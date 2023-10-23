@@ -30,7 +30,6 @@ const addUser = async (req, res) => {
             password,
             joinDate: serverTimestamp,
             addedBy,
-            //I got beef with this, but at least it worked
             isAlumni: false,
             status: "Open"
         }
@@ -78,7 +77,6 @@ const addUser = async (req, res) => {
                 throw {type: "Firestore", message: error.message}
             })
 
-        
         //await adminAuth.setCustomUserClaims(user.uid, { role });
         res.status(200).json({type: "User", message: "Account created successfully"});
     }
@@ -93,24 +91,46 @@ const updateUser = async (req, res) => {
     //Update authentication as well
 
     try{
-        const userDoc = db.doc(`/users/${id}`).withConverter(userConverter);
+        const userDoc = userCollection.doc(id);
 
-        //Dayum. It should be complete
-
+        const user = await userDoc.get();
+        //console.log(red.body)
         const userVal = new User(
+            user.data().institution,
             req.body.firstName,
             req.body.lastName,
             req.body.email,
-            req.body.userName,
+            user.data().userName,
             req.body.password,
-            req.body.addedBy,
-            req.body.joinDate,
-            req.body.isadmin,
-            req.body.isalumni,
-            req.body.status   
+            user.data().addedBy,
+            user.data().joinDate,
+            user.data().isalumni,
+            user.data().status
         );
 
+        console.log("Get User", user.data())
+
+        const uid = await adminAuth.getUserByEmail(user.id)
+            .then(userRecord => userRecord.toJSON().uid)
+            .catch(error => {throw error})
+
+        //Update Authentication
+        await adminAuth.updateUser(uid, {
+            email: userVal.getEmail,
+            password: userVal.getPassword,
+            displayName: `${userVal.getFirstName} ${userVal.getLastName}`,
+        })
+            .then(() => {
+                console.log("Successfully Updated Authentication - Firebase Auth")
+            })
+            .catch((error) => {throw error})
+            
+        //Update Firestore
         await userDoc.update(Object.assign({}, userVal))
+            .then(() => {
+                console.log("Successfully Updated Firestore - Firestore")
+            })
+            .catch((error) => {throw error})
 
         res.status(200).json("Data updated successfully")
     }
@@ -153,7 +173,7 @@ const viewAllUserByInstitution = async (req, res) => {
     try {
         const getUserDocs = await userCollection.where('institution', '==', req.params.institution).get(); 
 
-        const docRef = getUserDocs.docs.map(doc => doc.data())
+        const docRef = getUserDocs.docs.map(doc => ({id:doc.id, ...doc.data()}))
         console.log(docRef)
 
         res.status(200).json(docRef);    
@@ -168,10 +188,13 @@ const viewUser = async (req, res) => {
 
     try {
         const userRef = await userCollection.doc(id).get();
+
+        if (!userRef.exists)
+            throw {message: `User with id: ${id} does not exist.`}
         //console.log(userRef.data())
         //const userDoc = await getDoc(userRef);
 
-        res.status(200).json(userRef.data())
+        res.status(200).json({id: userRef.id, ...userRef.data()})
     }
     catch (e) {
         res.status(400).json({error: "Error", message: e.message})
@@ -190,12 +213,10 @@ const signUp = async (req, res) => {
             userName,
             password,
             joinDate: serverTimestamp,
-            addedBy: null,
+            addedBy: "admin",
             isAlumni: false,
             status: "Open"
         }
-
-        let user = {};
 
         /* Middleware shenanigans must be located here */
 
@@ -212,37 +233,41 @@ const signUp = async (req, res) => {
             userInput.status
         )
 
-        console.log(userVal)
-
-        await adminAuth.createUser({
+        const userRec = await adminAuth.createUser({
             email: userVal.getEmail,
             password: userVal.getPassword,
             displayName: `${userVal.getFirstName} ${userVal.getLastName}`,
         })
-            .then(async (userRec) => {
-                console.log("Successfully Added - Authentication")
-            })
-            .catch((error) => {
-                console.log(error)
-                throw {type: "Authentication", message: error.message, code: error.code}
-            })
 
-        // FIRESTORE FUNCTIONS - Possibly separate this one from the inner then... but idk -- It should
-        const userDoc = db.doc(`/users/${email}`).withConverter(userConverter)
-                    
-        await userDoc.create(userVal)
-            .then((result) => {
-                console.log("Successfully Added - Firestore")
-            })
-            .catch((error) => {
-                throw {type: "Firestore", message: error.message}
-            })
+        console.log("Authentication", userRec)
+
+        //const userDoc = await db.doc(`/users/${userRec.email}`).withConverter(userConverter).create(userVal)
+        await userCollection.doc(userRec.email).set(userVal).then((result) => {console.log(result)})
+
+        const userDoc = await userCollection.doc(userRec.email).get()
+    
+        console.log("Firestore", userDoc.data())
+
+        const user = {
+            displayName: userRec.displayName,
+            email: userRec.email,
+            ...userDoc.data()
+        }
 
         //What does this do?
         //await adminAuth.setCustomUserClaims(user.uid, { role });
-        res.status(200).json({type: "Admin", message: "Account created successfully"});
+        res.status(200).json({type: "Admin", user, message: "Account created successfully"});
     }
     catch(e) {
+        res.status(400).json({name: "User", error: "Controller Error", type: "Sign Up", message: e.message, code: e.code})
+    }
+}
+
+// Must generate a custom token
+const logIn = async (req, res) => {
+    try {
+
+    } catch (error) {
         res.status(400).json({name: "User", error: "Controller Error", type: e.type, message: e.message, code: e.code})
     }
 }
@@ -254,15 +279,15 @@ const assignInstitution = async (req, res) => {
         const userVal = new User()
         userVal.setInstitution = institution
 
-        const userRef = userCollection.doc(`${userId}`)
+        await userCollection.doc(`${userId}`).update({institution: userVal.getInstitution})
+            // .then(() => {
+            //     res.status(200).json({message: "Assign institution success"})
+            // })
+            // .catch((error) => {
+            //     throw {message: error.message}
+            // })
 
-        await userRef.update({institution: userVal.getInstitution})
-            .then(() => {
-                res.status(200).json({message: "Debug success"})
-            })
-            .catch((error) => {
-                throw {message: error.message}
-            })
+        res.status(200).json({message: "Assign institution success"})
     } catch (error) {
         res.status(400).json({name: "Institution", error: "Controller Error", message: error.message})
     }
@@ -324,8 +349,8 @@ const addAppAdmin = async (req, res) => {
                 throw {type: "Firestore", message: error.message}
             })
 
-        //What does this do?
-        //await adminAuth.setCustomUserClaims(user.uid, { role });
+        //Assign role as superadmin
+        
         res.status(200).json({type: "App Admin", message: "Account created successfully"});
     }
     catch(e) {
@@ -335,6 +360,7 @@ const addAppAdmin = async (req, res) => {
 
 
 module.exports = {
+    userCollection,
     addUser,
     updateUser,
     deleteUser,

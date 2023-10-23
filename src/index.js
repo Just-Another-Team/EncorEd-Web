@@ -1,5 +1,5 @@
 const express = require('express')
-const session = require('express-session')
+//const session = require('express-session')
 const cors = require('cors');
 
 const app = express();
@@ -15,7 +15,6 @@ app.use(express.json())
 //     next()
 // })
 
-// Fix these to admin
 const userRouter = require("./routes/user")
 const participantRouter = require("./routes/participant")
 const subjectRouter = require("./routes/subject")

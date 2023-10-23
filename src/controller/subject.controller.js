@@ -1,3 +1,4 @@
+const dayjs = require('dayjs');
 const {
     db,
     Timestamp
@@ -5,7 +6,8 @@ const {
 const {
     Subject,
     subjectConverter
-} = require("../models/subject.model")
+} = require("../models/subject.model");
+const { viewUser, userCollection } = require('./user.controller');
 
 const subjectCollection = db.collection(`/subjects/`).withConverter(subjectConverter)
 
@@ -39,7 +41,7 @@ const addSubject = async (req, res) => {
 
 const viewAllSubject = async (req, res) => {
     
-    const subjects = []
+    //const subjects = []
 
     try {
         const getSubjectDocs = await subjectCollection.get();
@@ -47,21 +49,20 @@ const viewAllSubject = async (req, res) => {
         if (getSubjectDocs.empty)
             throw new Error("Subject collection is empty");
 
-        getSubjectDocs.forEach((subject) => {
-            const {name, edpCode, type, units, creationDate, createdBy, verifiedBy, status} = subject.data();
+        const subjects = await Promise.all(getSubjectDocs.docs.map(async (subject) => {
+            const {creationDate, createdBy} = subject.data()
 
-            subjects.push({
+            const user = await userCollection.doc(createdBy).get()
+                .then(res => res.data())
+                .catch((error) => {throw error}) // "Throw is expensive"
+
+            return ({
                 id: subject.id, //This should have been an edp code
-                name,
-                edpCode,
-                type,
-                units,
-                creationDate: new Timestamp(creationDate.seconds, creationDate.nanoseconds).toDate(),
-                createdBy,
-                verifiedBy,
-                status
+                ...subject.data(),
+                createdBy: user,
+                creationDate: dayjs(new Timestamp(creationDate.seconds, creationDate.nanoseconds).toDate()).format("MMMM DD, YYYY"),
             })
-        })
+        }))
 
         res.status(200).json(subjects)
     }

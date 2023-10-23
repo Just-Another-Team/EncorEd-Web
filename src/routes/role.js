@@ -19,7 +19,8 @@ const {
 
 /* CRUD Role */
 router.post("/add", addClientRole)
-router.post("/admin/add", addAdminRole)
+router.post("/admin/signUp", addAdminRole)
+//router.post("/admin/add", addAdminRole)
 //Update
 //Delete
 

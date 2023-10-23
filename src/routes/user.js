@@ -24,7 +24,7 @@ router.post("/admin/add", addAppAdmin)
 
 //Update
 router.put("/update/:id", updateUser)
-router.patch("/assignInstitution", assignInstitution)
+router.patch("/institution/assign", assignInstitution)
 
 //Delete
 router.delete("/delete/:id", deleteUser)
@@ -33,5 +33,6 @@ router.delete("/delete/:id", deleteUser)
 router.get("/list", viewAllUser)
 router.get("/list/u/:institution", viewAllUserByInstitution)
 router.get("/list/:id", viewUser)
+//router.get("/list/:institution", <method for users based on institution>)
 
 module.exports = router
