@@ -13,6 +13,7 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 const ConnectedSideBar = ({selected}) => {
     const select = useDispatch()
     const userRole = useSelector(state => state.authentication)
+    const userInstitution = useSelector(state => state.institution.data)
     const selectedPage = useSelector(state => state.pageSelect)
 
     const navigations = [

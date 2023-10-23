@@ -8,9 +8,9 @@ const initialState = {
 }
 
 export const getUsers = createAsyncThunk(
-    "users/list",
+    "users/list/u/",
     async () => {
-        return await EncorEdAuthService.getAll()
+        return await EncorEdAuthService.getAllByInstitution()
     }
 )
 
