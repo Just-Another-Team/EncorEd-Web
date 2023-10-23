@@ -139,7 +139,7 @@ const viewAllUser = async (req, res) => {
     try {
         const getUserDocs = await userCollection.get();
 
-        const docRef = getUserDocs.docs.map(doc => doc.data())
+        const docRef = getUserDocs.docs.map(doc => ({id:doc.id, ...doc.data()}))
         console.log(docRef)
 
         res.status(200).json(docRef);    
@@ -150,9 +150,8 @@ const viewAllUser = async (req, res) => {
 }
 
 const viewAllUserByInstitution = async (req, res) => {
-    
     try {
-        const getUserDocs = await userCollection.where('institution', '==', req.body.institution).get(); 
+        const getUserDocs = await userCollection.where('institution', '==', req.params.institution).get(); 
 
         const docRef = getUserDocs.docs.map(doc => doc.data())
         console.log(docRef)
