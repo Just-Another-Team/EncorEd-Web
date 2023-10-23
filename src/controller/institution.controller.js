@@ -134,7 +134,7 @@ const viewInstitution = async (req, res) => {
 
         res.status(200).json({
             id: institutionDoc.id,
-            ...institutionRef.data()
+            ...institutionDoc.data()
         })
     }
     catch (e) {
