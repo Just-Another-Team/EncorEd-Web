@@ -10,20 +10,27 @@ import {
 } from "@mui/material";
 import { auth, signOut } from "../../app/firebase/authentication";
 import { useDispatch, useSelector } from "react-redux";
-import { logOut, logOutUser } from "../../features/auth/authSlice";
 import { Link } from "react-router-dom";
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import { reset } from "../../features/navigation/navigationSlice";
+import { logOut } from "../../features/user/userSlice";
+import { logOutUser } from "../../features/auth/authSlice";
+import { logOutInstitution } from "../../features/institution/institutionSlice";
+import { logOutRoles } from "../../features/role/roleSlice";
 
 const Navbar = () => {
-    const loggedIn = useSelector(state => state.authentication.user)
+    const user = useSelector(state => state.user)
     const logoutDispatch = useDispatch()
 
     const handleSignOut = (e) => {
         logoutDispatch(logOutUser()).unwrap()
-            .then((res) => {
+            .then(() => {
                 console.log("Signing Out Success")
                 window.location.href = "/login"
+
+                logoutDispatch(logOut())
+                logoutDispatch(logOutInstitution())
+                logoutDispatch(logOutRoles())
             })
             .catch((error) => {
                 console.log("Signing Out Failed")
@@ -76,7 +83,7 @@ const Navbar = () => {
                         textDecoration: 'none',
                         color: '#FFFFFF'
                     }}>
-                        {loggedIn ? loggedIn.displayName : "User Full name"}
+                        {user.data ? user.data.displayName : "User Full name"}
                     </Typography>
 
                     <Button variant="contained" size="small" onClick={handleSignOut}>

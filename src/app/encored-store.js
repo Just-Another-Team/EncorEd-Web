@@ -9,21 +9,64 @@ import usersSlice from "../features/users/usersSlice";
 import storage from 'redux-persist/lib/storage'
 import { persistReducer, persistStore } from 'redux-persist'
 import roleSlice from "../features/role/roleSlice";
+import userSlice from "../features/user/userSlice";
+import authInstitution from "../features/institution/authInstitution";
+import authRoleSlice from "../features/role/authRoleSlice";
 
-const persistConfig = {
-    key: "root",
+const userPersistConfig = {
+    key: "user",
     storage,
 }
 
-const authPersistedReducer = persistReducer(persistConfig, authSlice)
-const pagePersistedReducer = persistReducer(persistConfig, navigationSlice)
+const pagePersistConfig = {
+    key: "page",
+    storage,
+}
+
+const institutionPersistConfig = {
+    key: "institution",
+    storage,
+}
+
+const rolePersistConfig = {
+    key: "role",
+    storage,
+}
+
+const userPersistedReducer = persistReducer(userPersistConfig, userSlice)
+const pagePersistedReducer = persistReducer(pagePersistConfig, navigationSlice)
+const institutionPersistedReducer = persistReducer(institutionPersistConfig, institutionSlice)
+const rolePersistReducer = persistReducer(rolePersistConfig, roleSlice)
+
+/*
+    Plan:
+        Persist the following data:
+            - LoggedIn user (No loading, no error)
+            - Role based on LoggedIn User
+            - Institution based on LoggedIn User
+            - Page
+        
+        The following data must not persist on every reload (Blacklist them)
+            - Authentication (User, but with loading and error)
+            - Authentication (Role, but with loading and error)
+            - Authentication (Institution, but with loading and error)
+            - Subject
+            - Event
+            - Users
+            - Employees
+*/
 
 const store = configureStore({
     reducer: {
+        //Persisted Data
+        user: userPersistedReducer,
         pageSelect: pagePersistedReducer, 
-        authentication: authPersistedReducer,
-        role: roleSlice,
-        institution: institutionSlice,
+        roles: rolePersistReducer, //Gets roles assign to user
+        institution: institutionPersistedReducer, //Gets institution assigned to user
+        //
+        authentication: authSlice,//authUser
+        authRole: authRoleSlice,
+        authInstitution: authInstitution,
         subjects: subjectSlice,
         events: eventSlice,
         users: usersSlice

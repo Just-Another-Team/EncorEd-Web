@@ -2,6 +2,7 @@ import http from "./http-common"
 
 class EncorEdRoleService {
     addRole(data) {
+        console.log("Role Service", data)
         return http.post(`/role/admin/signUp`, data)
     }
 

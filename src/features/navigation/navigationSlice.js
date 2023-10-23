@@ -9,15 +9,16 @@ const navigationSlice = createSlice({
     initialState,
     reducers: {
         nextPage: (state, action) => {
+            console.log("Navigation", action.payload)
             state.page = action.payload
         },
-        reset: () => ({
+        resetPage: () => ({
             ...initialState
         })
     },
 })
 
-export const { nextPage, reset } = navigationSlice.actions
+export const { nextPage, resetPage } = navigationSlice.actions
 export default navigationSlice.reducer
 
 // export const selectCurrentUser = (state) => state.auth.user
