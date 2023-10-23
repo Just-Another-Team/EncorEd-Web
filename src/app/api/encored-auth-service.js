@@ -5,8 +5,6 @@ import {
     signInWithEmailAndPassword,
     signOut 
 } from "../firebase/authentication"
-import EncoredRoleService from "./encored-role-service"
-import EncoredInstitutionService from "./encored-institution-service"
 
 class EncorEdAuthService {
     signUp(data) {
@@ -67,6 +65,7 @@ class EncorEdAuthService {
     // }
 
     signIn(credential) {
+        //Sign in with token
         return signInWithEmailAndPassword(auth, credential.emailUserName, credential.password)
     }
 
@@ -105,8 +104,6 @@ class EncorEdAuthService {
     }
 
     signOut() {
-        console.log("Signing Out")
-
         return signOut(auth)
     }
 

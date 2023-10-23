@@ -2,7 +2,8 @@ import {useForm} from 'react-hook-form'
 import UserForm from '../UserForm';
 import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux';
-import { signIn, signUp } from '../../../features/auth/authSlice';
+import { getUser, signIn, signUp } from '../../../features/auth/authSlice';
+import { setUser } from '../../../features/user/userSlice';
 
 const RegistrationUserForm = () => {
     const user = useSelector(state => state.authentication);
@@ -29,26 +30,28 @@ const RegistrationUserForm = () => {
         {key: 'confirmPassword', label: "Confirm Password", type: "password", rows: 0, error: errors.confirmPassword},
     ]
 
-    const onSubmit = (data) => {
-        const {email, password} = data
+    const onSubmit = async (data) => {
+        const {firstName, lastName, email, userName, password} = data
+        
+        //Step 1 - Add User to Database and Authentication
+        //Step 2 - Login User to the Web
+        await registrationDispatch(signUp(data)).unwrap()
+            .then(() => {
 
-        registrationDispatch(signUp(data)).unwrap()
-            .then((signUpRes) => {
-                alert("Sign Up Successful!")
-
-                //Sign in
-                registrationDispatch(signIn({emailUserName: email, password: password, type: "register"})).unwrap()
-                    .then((signInRes) => {
-                        //reset()
-                        //if (!userSelector.loading) window.location.href = "/register/institution"
+                //Get User
+                return registrationDispatch(getUser(email)).unwrap()
+                    .then((userData) => {
+                        return registrationDispatch(signIn({emailUserName: userData.id, password: password})).unwrap()
+                            .then((userAuth) => Object.assign(userAuth, {...userData}))
+                            .catch((error) => Promise.reject(error))
                     })
-                    .catch((error) => {
-                        console.log(error)
+                    .then((userResult) => {
+                        registrationDispatch(setUser(userResult))
+                        window.location.href = "/register/institution"
+                        reset();
                     })
 
-                
-                //window.location.href = "/register/institution"
-                //reset()
+                    .catch((error) => Promise.reject(error))
             })
             .catch((error) => {
                 const err = error.response.data.code

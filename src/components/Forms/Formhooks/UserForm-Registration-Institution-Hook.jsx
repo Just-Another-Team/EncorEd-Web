@@ -1,12 +1,18 @@
 import { useDispatch, useSelector } from "react-redux";
 import UserForm from "../UserForm"
 import { useForm } from "react-hook-form";
-import { addInstitution } from "../../../features/institution/institutionSlice";
+import { addInstitution } from "../../../features/institution/authInstitution";
 import { assignInstitution } from "../../../features/auth/authSlice";
-import { addRole, assignRole, viewAssignedRoles } from "../../../features/role/roleSlice";
+import { addRole, assignRole, viewAssignedRoles } from "../../../features/role/authRoleSlice";
+import { setInstitution } from "../../../features/institution/institutionSlice";
+import { setRoles } from "../../../features/role/roleSlice";
 
 const RegistrationInstitutionForm = () => {
-    const user = useSelector(state => state.authentication.user)
+    const user = useSelector(state => state.user)
+    const authUser = useSelector(state => state.authentication)
+    const authInstitution = useSelector(state => state.authInstitution)
+    const authRoles = useSelector(state => state.authRole)
+
     const institutionDispatch = useDispatch();
 
     const {handleSubmit, reset, control, setError, formState: {errors}} = useForm({
@@ -21,66 +27,48 @@ const RegistrationInstitutionForm = () => {
         {key: 'desc', label: "Description", type: "text", rows: 4, error: errors.desc},
     ]
 
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
 
         institutionDispatch(addInstitution(data)).unwrap()
-            .then((res) => {//Assign institution
-                institutionDispatch(assignInstitution({userId: user.email, institution: res.data.id}))
-                return res; 
+            .then((addInstitutionRes) => {//Assign institution
+                return institutionDispatch(assignInstitution({userId: user.data.email, institution: addInstitutionRes.data.id})).unwrap()
+                    .then(() => {
+                        institutionDispatch(setInstitution(addInstitutionRes.data)) //Set Institution
+                        return addInstitutionRes 
+                    })
+                    .catch((error) => Promise.resolve(error)); 
             })
-            .catch((error) => Promise.reject(error))
-            .then(async (res) => {//Add role
-                const roleAdded = await institutionDispatch(addRole({institution: res.data.id}))
-                return roleAdded.payload.data
+            //Get Institution
+            .then( (assignInstitutionRes) => {//Add role
+                return institutionDispatch(addRole({institution: assignInstitutionRes.data.id})).unwrap()
+                    .then((addRoleRes) => addRoleRes)
+                    .catch((error) => Promise.reject(error))
             })
-            .catch((error) => Promise.reject(error))
             .then((res) => { //Assign role
-                institutionDispatch(assignRole({userId: user.email, roleId: res.id}))
+                return institutionDispatch(assignRole({userId: user.data.email, roleId: res.data.id})).unwrap()
+                    .then(() => user.data)
+                    .catch((error) => Promise.reject(error))
             })
-            .catch((error) => Promise.reject(error))
-            .then(() => { //VIEW ROLE
-                institutionDispatch(viewAssignedRoles(user.email))
-                window.location.reload();
-                reset()
+            .then((userData) => { //Get roles
+                return institutionDispatch(viewAssignedRoles(userData.id)).unwrap()
+                    .then((assignedRoles) => {
+                        institutionDispatch(setRoles(assignedRoles.data)) //Set Role
+                        window.location.href = "/dashboard/home"
+                        reset();
+                    })
+                    .catch((error) => Promise.reject(error))
             })
-            .catch((error) => Promise.reject(error))
+            .catch((error) => {
+                console.error(error)
 
-        //WILL FIX THIS REAL QUICK
+                const code = error.response.data.code
 
-        //Add insitution
-        // institutionDispatch(addInstitution(data)).unwrap()
-        //     .then((res) => {
-        //         console.log(res.data)
-
-        //         //Assign institution
-        //         institutionDispatch(assignInstitution({userId: user.email, institution: res.data.id})).unwrap()
-        //             .then(() => {
-
-        //                 //Add Admin role based on institution
-        //                 institutionDispatch(addRole({institution: res.data.id})).unwrap()
-        //                     .then(() => {
-        //                         //Assign admin role
-        //                         //institutionDispatch(assignRole())
-
-        //                         reset();
-        //                     })
-        //                     .catch((error) => {
-        //                         console.log("Add Role", error)
-        //                     })
-        //             })
-        //             .catch((error) => {
-        //                 console.log("Assign Institution", error)
-        //             })
-
-        //         //window.location.href = "/dashboard/home" //To Dashboard or Add User/Role or something
-                
-        //     })
-        //     .catch((error) => {
-        //         console.log("Add Institution", error)
-        //     })
+                if (code === 6)
+                    setError("name", {message: "Institution name already exists"})
+            })
     }
 
-    return <UserForm loading={false} title="Create Institution" control={control} onSubmit={onSubmit} type="institution" inputs={inputs} handleSubmit={handleSubmit}/>
+    return <UserForm loading={authInstitution.loading || authRoles.loading || authUser.loading} title="Create Institution" control={control} onSubmit={onSubmit} type="institution" inputs={inputs} handleSubmit={handleSubmit}/>
 }
 
 export default RegistrationInstitutionForm

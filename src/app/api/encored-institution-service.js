@@ -11,7 +11,6 @@ class Institution {
     // }
 
     viewInstitution(id) {
-        console.log(id)
         return http.get(`/institution/list/${id}`)
     }
 

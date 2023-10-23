@@ -6,7 +6,6 @@ import { useEffect } from 'react';
 import { auth, onAuthStateChanged, signOut } from './app/firebase/authentication';
 import { useDispatch, useSelector } from 'react-redux';
 import { logOut } from './features/auth/authSlice';
-import { reset } from './features/navigation/navigationSlice';
 import { getSubjects } from './features/subject/subjectSlice';
 import { getEvents } from './features/event/eventSlice';
 
@@ -37,12 +36,12 @@ function App() {
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (!user) {
-        dispatch(reset())
-        dispatch(logOut())
+        //dispatch(logOut())
+        console.log("Logged Out")
         return
       }
 
-      console.log("Logged In")
+      console.log("Logged In", user)
     })
   }, [])
 
