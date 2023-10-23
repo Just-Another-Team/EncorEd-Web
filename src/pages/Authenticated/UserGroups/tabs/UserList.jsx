@@ -1,28 +1,24 @@
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import { 
     Box, Button, Grid, TextField, Typography, Modal
 } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid'
 import { AddUserFormHook } from '../../../../components/Forms/Formhooks/AddUserForm-Hooks'
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getUsers } from "../../../../features/users/usersSlice";
 
 
 // Must be changed
 const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'id', headerName: 'ID', width: 130 },
     { field: 'firstName', headerName: 'First name', width: 130 },
     { field: 'lastName', headerName: 'Last name', width: 130 },
-    {
-      field: 'age',
-      headerName: 'Age',
-      width: 90,
-    },
     {
       field: 'fullName',
       headerName: 'Full Name',
       description: 'This column has a value getter and is not sortable.',
       sortable: false,
-      width: 160,
+      width: 200,
       valueGetter: (params) =>
         `${params.row.firstName || ''} ${params.row.lastName || ''}`,
     },
@@ -33,7 +29,7 @@ const columns = [
         sortable: false,
         flex: 1,
         valueGetter: (params) =>
-          `${params.row.dateAdded}`,
+          `${params.row.joinDate}`,
       },
     {
         field: 'update',
@@ -61,6 +57,8 @@ const columns = [
     }
   ];
 
+
+
 const rows = [
   { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 , dateAdded: 'October 15, 2023'},
   { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
@@ -71,10 +69,16 @@ const rows = [
 
 const UserList = () => {
     const loggedIn = useSelector(state => state.authentication.user)
+    const usersArr = useSelector(state => state.users.users)
+    const usersDispatch = useDispatch()
     //Modal stuffs
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    useEffect(()=>{
+        usersDispatch(getUsers())
+    }, [])
+
     return(
         <>            
             <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} marginBottom={2}>
@@ -112,7 +116,7 @@ const UserList = () => {
             <Box marginBottom={2}>
 
                 <DataGrid
-                    rows={rows}
+                    rows={usersArr}
                     columns={columns}
                     initialState={{
                         pagination: {
