@@ -13,7 +13,7 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 const ConnectedSideBar = ({selected}) => {
     const select = useDispatch()
     const userRole = useSelector(state => state.authentication)
-    const userInstitution = useSelector(state => state.institution.data)
+    const userInstitution = useSelector(state => state.user.data.institution)
     const selectedPage = useSelector(state => state.pageSelect)
 
     const navigations = [
@@ -22,13 +22,13 @@ const ConnectedSideBar = ({selected}) => {
         {name: "Subject", icon: <BookOutline />, href: "/dashboard/subject"},
         {name: "Maps", icon: <MapOutline />, href: "/dashboard/map/list"},
         {name: "Events", icon: <EventOutline />, href: "/dashboard/event"},
-        {name: "User and Groups", icon: <GroupsOutline />, href: "/dashboard/users"},
+        {name: "User and Groups", icon: <GroupsOutline />, href: `/dashboard/users/list/u/${userInstitution}`},
         {name: "Institution", icon: <OrganizationOutline />, href: "/dashboard/institution"},
     ]
 
     const adminNavigations = [
         {name: "Home", icon: <HomeOutline />, href: "/admin/dashboard/home"},
-        {name: "Users", icon: <PersonOutlineOutlinedIcon />, href: "/admin/dashboard/users"},
+        {name: "Users", icon: <PersonOutlineOutlinedIcon />, href: `/dashboard/users/list/u/${userInstitution}`},
         {name: "Institutions", icon: <OrganizationOutline />, href: "/admin/dashboard/institutions"},
     ]
 

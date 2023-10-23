@@ -8,9 +8,11 @@ const initialState = {
 }
 
 export const getUsers = createAsyncThunk(
-    "users/list/u/",
-    async () => {
-        return await EncorEdAuthService.getAllByInstitution()
+    "/users/get",
+    async (institutionId, {rejectWithValue}) => {
+        return await EncorEdAuthService.getAllUsersByInstitution(institutionId)
+            .then((res) => res)
+            .catch((error) => rejectWithValue(error))
     }
 )
 

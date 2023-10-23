@@ -19,6 +19,7 @@
     "firebase": "^10.5.0",
     "jsonwebtoken": "^9.0.2",
     "mapbox-gl": "^2.15.0",
+    "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.4",
     "react-calendar": "^4.3.0",

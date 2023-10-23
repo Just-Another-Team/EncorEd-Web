@@ -1,8 +1,9 @@
 import { React, useState, useEffect } from "react";
 import { 
-    Box, Button, Grid, TextField, Typography, Modal
+    Box, Button, Grid, TextField, Modal
 } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid'
+import moment from 'moment'
 import { AddUserFormHook } from '../../../../components/Forms/Formhooks/AddUserForm-Hooks'
 import { useDispatch, useSelector } from "react-redux";
 import { getUsers } from "../../../../features/users/usersSlice";
@@ -28,8 +29,9 @@ const columns = [
         description: 'This column has a value getter and is not sortable.',
         sortable: false,
         flex: 1,
-        valueGetter: (params) =>
-          `${params.row.joinDate}`,
+        valueGetter: (params) => {
+          return moment(params.row.joinDate).format("MMMM-DD-YYYY")
+        },
       },
     {
         field: 'update',
@@ -58,25 +60,18 @@ const columns = [
   ];
 
 
-
-const rows = [
-  { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 , dateAdded: 'October 15, 2023'},
-  { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-  { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-  { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-];
-
-
 const UserList = () => {
-    const loggedIn = useSelector(state => state.authentication.user)
+    const userInstitution = useSelector(state => state.institution.data.id)
     const usersArr = useSelector(state => state.users.users)
     const usersDispatch = useDispatch()
+
     //Modal stuffs
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+
     useEffect(()=>{
-        usersDispatch(getUsers())
+        usersDispatch(getUsers(userInstitution))
     }, [])
 
     return(
@@ -116,6 +111,7 @@ const UserList = () => {
             <Box marginBottom={2}>
 
                 <DataGrid
+                    autoHeight={[true]}
                     rows={usersArr}
                     columns={columns}
                     initialState={{
