@@ -31,7 +31,7 @@ router.delete("/delete/:id", deleteUser)
 
 //View
 router.get("/list", viewAllUser)
-router.get("/list/:institution", viewAllUserByInstitution)
+router.get("/list/u/:institution", viewAllUserByInstitution)
 router.get("/list/:id", viewUser)
 
 module.exports = router
