@@ -3,7 +3,7 @@ import {
     Box, Button, Grid, TextField, Modal
 } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { AddUserFormHook } from '../../../../components/Forms/Formhooks/AddUserForm-Hooks'
 import { useDispatch, useSelector } from "react-redux";
 import { getUsers } from "../../../../features/users/usersSlice";
@@ -30,7 +30,7 @@ const columns = [
         sortable: false,
         flex: 1,
         valueGetter: (params) => {
-          return moment(params.row.joinDate).format("MMMM-DD-YYYY")
+          return dayjs(params.row.joinDate).format("MMMM-DD-YYYY")
         },
       },
     {
