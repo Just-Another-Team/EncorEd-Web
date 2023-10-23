@@ -20,15 +20,23 @@ const assignRole = async (req, res) => {
         )
 
         await userRoleCollection.doc(`${userRole.userId}-${userRole.roleId}`).create(userRole)
-            .then((result) => {
-                res.status(200).json({message: "User Role assigned successfully"})
-            })
-            .catch((err) => {
-                throw {message: err.message}
-            })
+
+        //viewAssignedRoles()
+
+        //const assignedRoleRef = await userRoleCollection.where('userId', '==', userRole.userId).get()
+        
+        //Get the View Assigned Roles Method
+        // const assignedRoles = assignedRoleRef.docs.map(role => role.data())
+        // console.log("Assigned Roles", assignedRoles)
+
+        res.status(200).json({message: "User Role assigned successfully"}) //Returns all assigned roles
     } catch (e) {
         res.status(400).json({name: "User Role", type: "Assign", error: e.message})
     }
+}
+
+const assignAdminRole = async (req, res) => {
+    
 }
 
 const removeRole = async (req, res) => {

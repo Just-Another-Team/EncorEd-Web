@@ -21,21 +21,22 @@ const addInstitution = async (req, res) => {
         )
 
         //If name is same as institution id
-
-        const institutionId = institution.name.toLowerCase().replace(/\s/g,'');
+        const institutionId = institution.name.toLowerCase().replace(/\s/g,'')
 
         await institutionCollection.doc(institutionId).create(institution)
-            .then((result) => {
-                res.status(200).json({message: "Institution added successfully"})
-            })
-            .catch((err) => {
-                throw {message: err.message}
-            })
+            // .then((result) => {
+            //     res.status(200).json({data: result, message: "Institution added successfully"})
+            // })
+            // .catch((err) => {
+            //     throw {message: err.message}
+            // })
 
-        //res.status(200).json({message: "Institution debugged successfully"})
+        const institutionRef = await institutionCollection.doc(institutionId).get()
+
+        res.status(200).json({id: institutionId, message: "Institution added successfully", ...institutionRef.data()})
     } catch (e) {
-        res.status(400).json({name: "Institution", type: "Add", error: e.message})
         console.log(e);
+        res.status(400).json({name: "Institution", type: "Add", type: e.type, message: e.message, code: e.code})
     }
 }
 
@@ -99,6 +100,7 @@ const viewAllInstitutions = async (req, res) => {
         if (getInstitutionDocs.empty)
             throw {message: "Institutions collections is empty"};
 
+
         getInstitutionDocs.forEach((institution) => {
             const {
                 name,
@@ -130,7 +132,10 @@ const viewInstitution = async (req, res) => {
     try {
         const institutionDoc = await institutionCollection.doc(id).get();
 
-        res.status(200).json(institutionDoc.data())
+        res.status(200).json({
+            id: institutionDoc.id,
+            ...institutionRef.data()
+        })
     }
     catch (e) {
         res.status(400).json({error: "Error", message: e.message})

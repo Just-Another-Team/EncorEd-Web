@@ -23,8 +23,6 @@ const addEvent = async (req, res) => {
             status
         )
 
-        // console.log(event);
-
         await db.collection(`/events/`).doc().withConverter(eventConverter).create(event)
             .then((result) => {
                 res.status(200).json({message: "Event added successfully"})
@@ -88,7 +86,6 @@ const deleteEvent = async (req, res) => {
 }
 
 const viewAllEvents = async (req, res) => {
-    const events = []
 
     try {
         const getEventDocs = await eventCollection.get()
@@ -96,7 +93,9 @@ const viewAllEvents = async (req, res) => {
         if (getEventDocs.empty)
             throw {message: "Event collections is empty"};
 
-        getEventDocs.forEach((event) => {
+        const events = getEventDocs.docs.map(data => {
+            const eventArr = []
+
             const {
                 name,
                 desc,
@@ -104,12 +103,10 @@ const viewAllEvents = async (req, res) => {
                 createdBy,
                 verifiedBy,
                 status
-            } = event.data();
-
-            console.log(event.data())
-
-            events.push({
-                id: event.id,
+            } = data.data();
+            
+            eventArr.push({
+                id: data.id,
                 name: name,
                 desc: desc,
                 creationDate: new Timestamp(creationDate.seconds, creationDate.nanoseconds).toDate(),
@@ -117,7 +114,10 @@ const viewAllEvents = async (req, res) => {
                 verifiedBy: verifiedBy,
                 status: status
             })
+
+            return eventArr
         })
+
 
         res.status(200).json(events)
     }
