@@ -31,8 +31,8 @@ router.delete("/delete/:id", deleteUser)
 
 //View
 router.get("/list", viewAllUser)
-router.get("/list/:institution", viewAllUserByInstitution)
 router.get("/list/:id", viewUser)
+//router.get("/list/:institution", viewAllUserByInstitution) //This got problems. Think of a better way to deal with this
 //router.get("/list/:institution", <method for users based on institution>)
 
 module.exports = router
