@@ -182,6 +182,19 @@ const viewAllUsersByInstitution = async (req, res) => {
         res.status(400).json({error: true, message: e.message})
     }
 }
+const viewUserByName = async (req, res) => {
+    try {
+        const getUserDocs = await userCollection.where('userName', '==', req.params.userName).get(); 
+
+        const docRef = getUserDocs.docs.map(doc => ({id:doc.id, ...doc.data()}))
+        console.log(docRef)
+
+        res.status(200).json(docRef);
+    }
+    catch (e) {
+        res.status(400).json({error: true, message: e.message})
+    }
+}
 
 const viewUser = async (req, res) => {
     const id = req.params.id;
@@ -365,6 +378,7 @@ module.exports = {
     updateUser,
     deleteUser,
     viewUser,
+    viewUserByName,
     viewAllUser,
     viewAllUsersByInstitution,
     //Institutional Admin

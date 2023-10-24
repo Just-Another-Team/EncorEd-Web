@@ -8,6 +8,7 @@ const {
     viewAllUser,
     viewAllUsersByInstitution,
     viewUser,
+    viewUserByName,
     signIn,
     signUp,
     addAppAdmin,
@@ -33,6 +34,7 @@ router.delete("/delete/:id", deleteUser)
 router.get("/list", viewAllUser)
 router.get("/list/u/:institution", viewAllUsersByInstitution)
 router.get("/list/:id", viewUser)
+router.get("/profile/:userName", viewUserByName)
 //router.get("/list/:institution", <method for users based on institution>)
 
 module.exports = router
