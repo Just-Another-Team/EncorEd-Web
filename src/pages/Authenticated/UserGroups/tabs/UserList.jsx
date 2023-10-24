@@ -1,26 +1,25 @@
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import { 
-    Box, Button, Grid, TextField, Typography, Modal
+    Box, Button, Grid, TextField, Modal
 } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid'
+import dayjs from 'dayjs'
 import { AddUserFormHook } from '../../../../components/Forms/Formhooks/AddUserForm-Hooks'
+import { useDispatch, useSelector } from "react-redux";
+import { getUsers } from "../../../../features/users/usersSlice";
+
 
 // Must be changed
 const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'id', headerName: 'ID', width: 130 },
     { field: 'firstName', headerName: 'First name', width: 130 },
     { field: 'lastName', headerName: 'Last name', width: 130 },
-    {
-      field: 'age',
-      headerName: 'Age',
-      width: 90,
-    },
     {
       field: 'fullName',
       headerName: 'Full Name',
       description: 'This column has a value getter and is not sortable.',
       sortable: false,
-      width: 160,
+      width: 200,
       valueGetter: (params) =>
         `${params.row.firstName || ''} ${params.row.lastName || ''}`,
     },
@@ -30,8 +29,9 @@ const columns = [
         description: 'This column has a value getter and is not sortable.',
         sortable: false,
         flex: 1,
-        valueGetter: (params) =>
-          `${params.row.dateAdded}`,
+        valueGetter: (params) => {
+          return dayjs(params.row.joinDate).format("MMMM-DD-YYYY")
+        },
       },
     {
         field: 'update',
@@ -59,19 +59,21 @@ const columns = [
     }
   ];
 
-const rows = [
-  { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 , dateAdded: 'October 15, 2023'},
-  { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-  { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-  { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-];
-
 
 const UserList = () => {
+    const userInstitution = useSelector(state => state.institution.data.id)
+    const usersArr = useSelector(state => state.users.users)
+    const usersDispatch = useDispatch()
+
     //Modal stuffs
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+
+    useEffect(()=>{
+        usersDispatch(getUsers(userInstitution))
+    }, [])
+
     return(
         <>            
             <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} marginBottom={2}>
@@ -109,7 +111,8 @@ const UserList = () => {
             <Box marginBottom={2}>
 
                 <DataGrid
-                    rows={rows}
+                    autoHeight={[true]}
+                    rows={usersArr}
                     columns={columns}
                     initialState={{
                         pagination: {

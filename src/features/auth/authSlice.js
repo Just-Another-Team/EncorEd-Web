@@ -85,7 +85,6 @@ export const getUser = createAsyncThunk(
             .catch((error) => rejectWithValue(error))
     }
 )
-
 export const updateUser = createAsyncThunk(
     "user/updateUser",
     async (data, {rejectWithValue}) => {

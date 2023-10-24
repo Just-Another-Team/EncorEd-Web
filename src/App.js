@@ -31,6 +31,7 @@ import Profile from './pages/Authenticated/Profile/Profile';
 
 function App() {
   const userAuth = useSelector(state => state.authentication);
+  const userInstitution = useSelector(state => state.institution.data)
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -69,7 +70,7 @@ function App() {
 
         <Route path='event' element={<Event />} />
 
-        <Route path='users' element={<UserGroups />}/>
+        <Route path='users/list/u/:institution' element={<UserGroups />}/>
 
         <Route path='institution' element={<Institution />} />
 
@@ -83,7 +84,7 @@ function App() {
       <Route path='/admin/dashboard' >
         <Route path='home' />
 
-        <Route path='users' />
+        <Route path='users/list/u/:institution' />
 
         <Route path='institutions' />
 

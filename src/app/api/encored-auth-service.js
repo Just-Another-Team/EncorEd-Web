@@ -130,6 +130,10 @@ class EncorEdAuthService {
     getAll() {
         return http.get("/user/list")
     }
+    
+    getAllUsersByInstitution(institution) {
+        return http.get(`/user/list/u/${institution}`)
+    }
 
     get(email) {
         console.log("Email", email)

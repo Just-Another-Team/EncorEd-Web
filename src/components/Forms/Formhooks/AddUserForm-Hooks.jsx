@@ -1,13 +1,12 @@
 import {useForm} from 'react-hook-form'
 import AddUserForm from '../AddUserForm';
-import axios from 'axios'
 
 const AddUserFormHook = () => {
     
     const {handleSubmit, reset, control, setValue, formState: {errors}} = useForm({
         defaultValues: {
             firstName: "",
-            middleName: "",
+            //middleName: "",
             lastName: "",
             email: "",
             userName: "",
@@ -17,7 +16,7 @@ const AddUserFormHook = () => {
 
     const inputs = [
         {key: 'firstName', label: "First name", type: "text", error: errors.firstName},
-        {key: 'middleName', label: "Middle name", type: "text", error: errors.middleName},
+        //{key: 'middleName', label: "Middle name", type: "text", error: errors.middleName},
         {key: 'lastName', label: "Last name", type: "text", error: errors.lastName},
         {key: 'email', label: "Email", type: "email", error: errors.email},
         {key: 'userName', label: "Username", type: "text", error: errors.userName},
@@ -28,7 +27,7 @@ const AddUserFormHook = () => {
     const onSubmit = async (data) => {
         const {
             firstName,
-            middleName,
+            //middleName,
             lastName,
             email,
             userName,
@@ -37,7 +36,7 @@ const AddUserFormHook = () => {
 
         const userInput = {
             firstName,
-            middleName,
+            //middleName,
             lastName,
             email,
             userName,
