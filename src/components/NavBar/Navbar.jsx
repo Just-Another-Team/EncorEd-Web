@@ -17,6 +17,7 @@ import { logOut } from "../../features/user/userSlice";
 import { logOutUser } from "../../features/auth/authSlice";
 import { logOutInstitution } from "../../features/institution/institutionSlice";
 import { logOutRoles } from "../../features/role/roleSlice";
+import { nextPage } from "../../features/navigation/navigationSlice";
 
 const Navbar = () => {
     const user = useSelector(state => state.user)
@@ -78,12 +79,13 @@ const Navbar = () => {
                     component={Link}
                     //to={(loggedIn.role && "/dashboard/profile") || (loggedIn.role && "/admin/dashboard/profile")}
                     //to={((loggedIn.role.find(data => data._systemRole._admin) || loggedIn.role.find(data => data._systemRole._employee)) && "/dashboard/profile") || (loggedIn.role.find(data => data._systemRole._superAdmin) && "/admin/dashboard/profile")}
-                    to={"/dashboard/profile"}
+                    to={`/dashboard/profile/`}
                     sx={{
                         textDecoration: 'none',
-                        color: '#FFFFFF'
+                        color: '#FFFFFF',
                     }}>
                         {user.data ? user.data.displayName : "User Full name"}
+                    
                     </Typography>
 
                     <Button variant="contained" size="small" onClick={handleSignOut}>

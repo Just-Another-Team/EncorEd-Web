@@ -28,6 +28,7 @@ import InstitutionForm from './components/Forms/InstitutionForm';
 import RegistrationUserForm from './components/Forms/Formhooks/UserForm-Registration-User-Hooks';
 import RegistrationInstitutionForm from './components/Forms/Formhooks/UserForm-Registration-Institution-Hook';
 import Profile from './pages/Authenticated/Profile/Profile';
+import UsersProfile from './pages/Authenticated/Profile/UsersProfile';
 
 function App() {
   const userAuth = useSelector(state => state.authentication);
@@ -74,7 +75,9 @@ function App() {
 
         <Route path='institution' element={<Institution />} />
 
-        <Route path='profile' element={<Profile />}/>
+        <Route path='profile/' element={<Profile />}/>
+
+        <Route path='profile/:userName' element={<UsersProfile />}/>
 
         
       </Route>
@@ -88,7 +91,9 @@ function App() {
 
         <Route path='institutions' />
 
-        <Route path='profile' element={<Profile />}/>
+        <Route path='profile/' element={<Profile />}/>
+
+        <Route path='profile/:userName' element={<UsersProfile />}/>
       </Route>
     </Routes>
   );

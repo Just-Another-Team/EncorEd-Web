@@ -10,7 +10,8 @@ import {
     ListItem,
     List,
     ListItemText,
-    Divider
+    Divider,
+    Tabs,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import dayjs from 'dayjs'
@@ -18,8 +19,15 @@ import { Controller, useForm } from "react-hook-form";
 import { setUser, signIn, updateUser } from "../../../features/auth/authSlice";
 
 const Profile = () => {
+    const [page, setPage] = React.useState(0);
+
+    const handleChange = (event, newValue) => {
+        setPage(newValue);
+    };
+
     const editUserDispatch = useDispatch()
-    const user = useSelector(state => state.authentication.user)
+    const user = useSelector(state => state.user.data)
+    const roles = useSelector(state => state.roles.data)
 
     const [editProfile, setEditProfile] = useState(false)
 
@@ -31,7 +39,7 @@ const Profile = () => {
             password: "",
             confirmPassword: ""
         }
-    });
+    }); 
 
     const handleEditProfile = (e) => {
         e.preventDefault()
@@ -83,8 +91,8 @@ const Profile = () => {
 
     return(
         <>
-
-            <Grid spacing={3} container>
+            
+            <Grid spacing={3} container >
                 <Grid xs={3} item>
                     <Stack gap={1}>
                         <ButtonBase onClick={() => {alert("WIP (Moves to Profile Page)")}} sx={{padding: 1, paddingLeft: 2, border: 1, borderRadius: 2, justifyContent: 'flex-start'}}>
@@ -99,7 +107,7 @@ const Profile = () => {
 
                 <Grid xs={9} item>
                     {/* Banner Cover */}
-                    <Box height={256} sx={{backgroundColor: '#A9C5E1'}} />
+                    <Box height={256} sx={{backgroundColor: '#A9C5E1'}} onchange={setPage}/>
 
                     <Box display={"flex"} flexDirection={"column"} marginTop={-14} marginBottom={2} sx={{justifyContent: 'center', alignItems: 'center'}}>
                         <Box sx={{borderRadius: 360}}>
@@ -127,7 +135,7 @@ const Profile = () => {
                             {user.institution !== null || user.institution.id !== null && (
                                 <Grid item xs={6} marginBottom={2}>
                                     <Typography variant="body1" fontWeight={700}>Institution:</Typography>
-                                    <Typography variant="body1">{user.institution.name}</Typography>
+                                    <Typography variant="body1">{user.institution}</Typography>
                                 </Grid>
                             )}
 
@@ -141,11 +149,11 @@ const Profile = () => {
 
                         <Grid container marginBottom={2} sx={{backgroundColor: '#F6F5FF', borderRadius: 4, padding: 2}}>
                             <Grid item xs={12}>
-                                <Typography variant="h5" fontWeight={700}>Role{user.role.length !== 1 && 's'}</Typography>
+                                <Typography variant="h5" fontWeight={700}>Role{roles.data !== 1 && 's'}</Typography>
                             </Grid>
                             <Grid item xs={12}>
                                 <List>
-                                    {user.role.map((el, ind) => (
+                                    {roles.map((el, ind) => (
                                         <ListItem key={ind}>
                                             <ListItemText
                                             primary={`${el._institutionalRole._name.charAt(0).toUpperCase()}${el._institutionalRole._name.slice(1)}`}

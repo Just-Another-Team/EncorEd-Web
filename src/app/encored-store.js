@@ -5,6 +5,7 @@ import institutionSlice from "../features/institution/institutionSlice";
 import subjectSlice from "../features/subject/subjectSlice";
 import eventSlice from "../features/event/eventSlice";
 import usersSlice from "../features/users/usersSlice";
+import profileSlice from "../features/profile/profileSlice";
 
 import storage from 'redux-persist/lib/storage'
 import { persistReducer, persistStore } from 'redux-persist'
@@ -69,7 +70,8 @@ const store = configureStore({
         authInstitution: authInstitution,
         subjects: subjectSlice,
         events: eventSlice,
-        users: usersSlice
+        users: usersSlice,
+        profile: profileSlice
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false

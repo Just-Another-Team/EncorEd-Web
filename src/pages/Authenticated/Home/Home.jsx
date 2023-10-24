@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import SubjectEventCard from "../../../components/Cards/SubjectEventCard";
+import { useSelector } from "react-redux";
 
 const columns = [
     { field: 'id', headerName: 'ID', width: 70 },
@@ -43,13 +44,15 @@ const rows = [
   { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
 ];
 
+
 const Home = () => {
+    const user = useSelector(state => state.user.data)
     return(
         <>
             <Box
             marginBottom={3}>
                 <Typography variant="h4" fontWeight={700}>
-                    Welcome User Fullname!
+                    {user.data ? user.data.displayName : "User Full name"}
                 </Typography>
             </Box>
             

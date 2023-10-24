@@ -138,6 +138,10 @@ class EncorEdAuthService {
     get(data) {
         return http.get(`/user/list/${data}`)
     }
+
+    viewUser(data) {
+        return http.get(`/user/profile/${data}`)
+    }
 }
 
 export default new EncorEdAuthService()
