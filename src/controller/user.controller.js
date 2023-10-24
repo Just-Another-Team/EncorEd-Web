@@ -169,7 +169,7 @@ const viewAllUser = async (req, res) => {
     }
 }
 
-const viewAllUserByInstitution = async (req, res) => {
+const viewAllUsersByInstitution = async (req, res) => {
     try {
         const getUserDocs = await userCollection.where('institution', '==', req.params.institution).get(); 
 
@@ -366,7 +366,7 @@ module.exports = {
     deleteUser,
     viewUser,
     viewAllUser,
-    viewAllUserByInstitution,
+    viewAllUsersByInstitution,
     //Institutional Admin
     signUp,
     assignInstitution,
