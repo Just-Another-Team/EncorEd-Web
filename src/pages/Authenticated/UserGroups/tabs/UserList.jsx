@@ -11,28 +11,35 @@ import { getUsers } from "../../../../features/users/usersSlice";
 
 // Must be changed
 const columns = [
-    { field: 'id', headerName: 'ID', width: 130 },
-    { field: 'firstName', headerName: 'First name', width: 130 },
-    { field: 'lastName', headerName: 'Last name', width: 130 },
+    
     {
-      field: 'fullName',
-      headerName: 'Full Name',
-      description: 'This column has a value getter and is not sortable.',
-      sortable: false,
-      width: 200,
-      valueGetter: (params) =>
-        `${params.row.firstName || ''} ${params.row.lastName || ''}`,
+        field: 'firstName',
+        headerName: 'First name',
+        width: 130
+    },
+    { 
+        field: 'lastName',
+        headerName: 'Last name',
+        width: 130
+    },
+    {
+        field: 'id',
+        headerName: 'Email',
+        width: 256
+    },
+    {
+        field: 'addedBy',
+        headerName: 'Added By',
+        width: 160,
     },
     {
         field: 'dateAdded',
         headerName: 'Date Added',
-        description: 'This column has a value getter and is not sortable.',
-        sortable: false,
-        flex: 1,
+        width: 160,
         valueGetter: (params) => {
           return dayjs(params.row.joinDate).format("MMMM-DD-YYYY")
         },
-      },
+    },
     {
         field: 'update',
         sortable: false,

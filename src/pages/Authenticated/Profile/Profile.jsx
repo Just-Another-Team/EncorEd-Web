@@ -16,10 +16,14 @@ import { useDispatch, useSelector } from "react-redux";
 import dayjs from 'dayjs'
 import { Controller, useForm } from "react-hook-form";
 import { setUser, signIn, updateUser } from "../../../features/auth/authSlice";
+import { updateLoggedInUser } from "../../../features/user/userSlice";
 
 const Profile = () => {
     const editUserDispatch = useDispatch()
-    const user = useSelector(state => state.authentication.user)
+
+    const role = useSelector(state => state.roles.data)
+    const institution = useSelector(state => state.institution.data)
+    const user = useSelector(state => state.user.data)
 
     const [editProfile, setEditProfile] = useState(false)
 
@@ -28,6 +32,7 @@ const Profile = () => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
+            userName: user.userName,
             password: "",
             confirmPassword: ""
         }
@@ -40,7 +45,7 @@ const Profile = () => {
     }
 
     const submitEdit = (data) => {
-        const {firstName, lastName, email, password} = data
+        const {firstName, lastName, userName, email, password} = data
 
         const input = {
             id: user.email,
@@ -51,14 +56,10 @@ const Profile = () => {
         }
 
         editUserDispatch(updateUser(input)).unwrap()
-            .then((res) => {
-                alert(`${res}\nPlease login again to complete the process.`)
-
-                //editUserDispatch(signIn({emailUserName: input.email, password: input.password}))
-                window.location.reload()
-
-                reset()
+            .then(() => {
+                editUserDispatch(updateLoggedInUser({firstName, lastName, email, password, userName, displayName: `${firstName} ${lastName}`}))
                 setEditProfile(false)
+                reset()
             })
             .catch((error) => {
                 console.log(error)
@@ -77,6 +78,7 @@ const Profile = () => {
         {key: 'firstName', label: "First name", type: "text", rows: 0, error: errors.firstName},
         {key: 'lastName', label: "Last name", type: "text", rows: 0, error: errors.lastName},
         {key: 'email', label: "Email", type: "email", rows: 0, error: errors.email},
+        {key: 'userName', label: "Username", type: "text", rows: 0, error: errors.userName},
         {key: 'password', label: "New Password", type: "password", rows: 0, error: errors.password},
         {key: 'confirmPassword', label: "Confirm New Password", type: "password", rows: 0, error: errors.confirmPassword},
     ]
@@ -99,13 +101,13 @@ const Profile = () => {
 
                 <Grid xs={9} item>
                     {/* Banner Cover */}
-                    <Box height={256} sx={{backgroundColor: '#A9C5E1'}} />
+                    <Box height={160} sx={{backgroundColor: '#A9C5E1'}} />
 
                     <Box display={"flex"} flexDirection={"column"} marginTop={-14} marginBottom={2} sx={{justifyContent: 'center', alignItems: 'center'}}>
                         <Box sx={{borderRadius: 360}}>
                             <img width={160} height={160} src="/assets/profilepic.png"/>
                         </Box>
-                        <Typography variant="h4" fontWeight={700}>{user.displayName}</Typography>
+                        <Typography variant="h4" fontWeight={700}>{`${user?.firstName} ${user?.lastName}`}</Typography>
                     </Box>
 
                     <Box display={editProfile ? 'none' : 'block'}>
@@ -124,28 +126,29 @@ const Profile = () => {
                                 <Typography variant="body1">{dayjs(user.joinDate).format("MMMM D, YYYY")}</Typography>
                             </Grid>
 
-                            {user.institution !== null || user.institution.id !== null && (
-                                <Grid item xs={6} marginBottom={2}>
-                                    <Typography variant="body1" fontWeight={700}>Institution:</Typography>
-                                    <Typography variant="body1">{user.institution.name}</Typography>
-                                </Grid>
-                            )}
+                            <Grid item xs={6} marginBottom={2}>
+                                <Typography variant="body1" fontWeight={700}>Institution:</Typography>
+                                <Typography variant="body1">{institution.name}</Typography>
+                            </Grid>
 
-                            {user.addedBy !== null && (
-                                <Grid marginBottom={2}>
-                                    <Typography variant="body1" fontWeight={700}>Added By:</Typography>
-                                    <Typography variant="body1">{user.addedBy}</Typography>
-                                </Grid>
-                            )}
+                            <Grid item xs={6} marginBottom={2}>
+                                <Typography variant="body1" fontWeight={700}>Added By:</Typography>
+                                <Typography variant="body1">{user.addedBy}</Typography>
+                            </Grid>
+
+                            <Grid item xs={6} marginBottom={2}>
+                                <Typography variant="body1" fontWeight={700}>Username:</Typography>
+                                <Typography variant="body1">{user.userName}</Typography>
+                            </Grid>
                         </Grid>
 
                         <Grid container marginBottom={2} sx={{backgroundColor: '#F6F5FF', borderRadius: 4, padding: 2}}>
                             <Grid item xs={12}>
-                                <Typography variant="h5" fontWeight={700}>Role{user.role.length !== 1 && 's'}</Typography>
+                                <Typography variant="h5" fontWeight={700}>Role{role.length !== 1 && 's'}</Typography>
                             </Grid>
                             <Grid item xs={12}>
                                 <List>
-                                    {user.role.map((el, ind) => (
+                                    {role.map((el, ind) => (
                                         <ListItem key={ind}>
                                             <ListItemText
                                             primary={`${el._institutionalRole._name.charAt(0).toUpperCase()}${el._institutionalRole._name.slice(1)}`}
@@ -176,7 +179,7 @@ const Profile = () => {
                                         name={el.key}
                                         control={control}
                                         rules={{
-                                            required: `${el.label} is required`,
+                                            required: (el.key !== 'password' && el.key !== 'confirmPassword') && `${el.label} is required`,
                                             minLength: el.key === "password" ? {
                                                 value: 8,
                                                 message: "Password must be 8 characters long"

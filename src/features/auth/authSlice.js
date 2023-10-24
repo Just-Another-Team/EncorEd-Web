@@ -77,7 +77,7 @@ export const logOutUser = createAsyncThunk(
 )
 
 export const getUser = createAsyncThunk(
-    "user/viewUser",
+    "user/view",
     async (email, {rejectWithValue}) => {
         //console.log(credential.user.email)
         return await EncorEdAuthService.get(email)
@@ -85,8 +85,9 @@ export const getUser = createAsyncThunk(
             .catch((error) => rejectWithValue(error))
     }
 )
+
 export const updateUser = createAsyncThunk(
-    "user/updateUser",
+    "user/update",
     async (data, {rejectWithValue}) => {
         return await EncorEdAuthService.updateUser(data)
             .then((res) => res.data)

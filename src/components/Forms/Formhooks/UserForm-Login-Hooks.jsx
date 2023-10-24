@@ -36,7 +36,7 @@ const LoginUserForm = () => {
                         return loginDispatch(setUser(Object.assign(userAuth, {...userData}))).payload
                     })
                     .then((setUserRes) => {
-                        // //Get Institution
+                        //Get Institution
                         return loginDispatch(getInstitution(setUserRes.institution)).unwrap()
                             .then((getInstitutionRes) => {
                                 loginDispatch(setInstitution(getInstitutionRes.data))
