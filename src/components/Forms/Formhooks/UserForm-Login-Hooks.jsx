@@ -58,6 +58,10 @@ const LoginUserForm = () => {
             .catch((error) => {
                 console.error(error)
 
+                if (error.code === "ERR_BAD_REQUEST" && error.response.data.code === "firestore/missing-email") setError("emailUserName", {message: "Email not found in the system's database. Please register"})
+
+                if (error.code === 'auth/missing-email') setError("emailUserName", {message: "Email not found in the system's database. Please register"})
+
                 if (error.code === "auth/network-request-failed") setError("emailUserName", {message: "Cannot log in. Please check your internet connection."})
 
                 if (error.code === "ERR_NETWORK") setError("emailUserName", {message: `${error.message}.`})

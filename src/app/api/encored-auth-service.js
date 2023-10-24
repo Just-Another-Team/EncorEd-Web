@@ -131,8 +131,9 @@ class EncorEdAuthService {
         return http.get("/user/list")
     }
 
-    get(data) {
-        return http.get(`/user/list/${data}`)
+    get(email) {
+        console.log("Email", email)
+        return http.get(`/user/list/${email}`)
     }
 }
 

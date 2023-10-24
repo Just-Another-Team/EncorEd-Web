@@ -41,6 +41,8 @@ const RegistrationUserForm = () => {
                 //Get User
                 return registrationDispatch(getUser(email)).unwrap()
                     .then((userData) => {
+                        console.log("userData", userData)
+
                         return registrationDispatch(signIn({emailUserName: userData.id, password: password})).unwrap()
                             .then((userAuth) => Object.assign(userAuth, {...userData}))
                             .catch((error) => Promise.reject(error))
@@ -54,6 +56,8 @@ const RegistrationUserForm = () => {
                     .catch((error) => Promise.reject(error))
             })
             .catch((error) => {
+                console.log(error)
+
                 const err = error.response.data.code
                 
                 if (err === "auth/email-already-exists" || err === "auth/invalid-email")
