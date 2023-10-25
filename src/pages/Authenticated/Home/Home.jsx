@@ -52,7 +52,7 @@ const Home = () => {
             <Box
             marginBottom={3}>
                 <Typography variant="h4" fontWeight={700}>
-                    {user.data ? user.data.displayName : "User Full name"}
+                    {user ? user.displayName : "User Full name"}
                 </Typography>
             </Box>
             

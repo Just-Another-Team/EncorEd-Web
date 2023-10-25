@@ -20,6 +20,7 @@ import MapList from './pages/Authenticated/Maps/MapList';
 import UserGroups from './pages/Authenticated/UserGroups/UserGroups';
 import Institution from './pages/Authenticated/Institution/Institution';
 import SelectedSubject from './pages/Authenticated/Subject/pages/SelectedSubject';
+import Request from './pages/Authenticated/Request/Request';
 
 import {default as AdminHome} from './pages/Admin/Home/Home';
 import AdminDashboard from './pages/Admin/AdminDashboard';
@@ -78,6 +79,8 @@ function App() {
         <Route path='profile/' element={<Profile />}/>
 
         <Route path='profile/:userName' element={<UsersProfile />}/>
+
+        <Route path='request' element={<Request />}/>
 
         
       </Route>
