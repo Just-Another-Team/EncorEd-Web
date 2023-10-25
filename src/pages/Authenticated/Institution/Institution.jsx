@@ -1,28 +1,44 @@
-import React from "react"
-import {
-    Typography
-} from '@mui/material'
+import React from "react";
+import { 
+    Box,
+    Tabs,
+    Typography,
+    Tab,
+    Button,
+    TextField,
+    Grid
+} from "@mui/material";
+import InstitutionTabPanel from "./InstitutionPanelTab";
+import { useSelector } from "react-redux";
 
 const Institution = () => {
+    const userInstitution = useSelector(state => state.institution.data)
+    const [page, setPage] = React.useState(0);
+
+    const handleChange = (event, newValue) => {
+        setPage(newValue);
+    };
+
     return(
         <>
-            <Typography variant="h4" fontWeight={700}>
-                Institution
+            <Typography variant="h4" fontWeight={700} marginBottom={1}>
+                {userInstitution ? userInstitution.name : "Institution"}
             </Typography>
             
-            <Typography paragraph>
-                Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper
-                eget nulla facilisi etiam dignissim diam. Pulvinar elementum integer enim
-                neque volutpat ac tincidunt. Ornare suspendisse sed nisi lacus sed viverra
-                tellus. Purus sit amet volutpat consequat mauris. Elementum eu facilisis
-                sed odio morbi. Euismod lacinia at quis risus sed vulputate odio. Morbi
-                tincidunt ornare massa eget egestas purus viverra accumsan in. In hendrerit
-                gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem
-                et tortor. Habitant morbi tristique senectus et. Adipiscing elit duis
-                tristique sollicitudin nibh sit. Ornare aenean euismod elementum nisi quis
-                eleifend. Commodo viverra maecenas accumsan lacus vel facilisis. Nulla
-                posuere sollicitudin aliquam ultrices sagittis orci a.
-            </Typography>
+            {/* Add and Search Subject */}
+            <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} marginBottom={1}>
+                <Button variant="contained" size="large">CREATE INSTITUTION</Button>
+                <Grid container xs={4}>
+                    <TextField label="Search Institution" fullWidth/>
+                </Grid>
+            </Box>
+
+            {/* Tabs */}
+            <Box marginBottom={2} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Tabs value={page} onChange={handleChange} aria-label="basic tabs example">
+                    <Tab label="Summary" />
+                </Tabs>
+            </Box>
         </>
     )
 }
