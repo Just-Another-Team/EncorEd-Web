@@ -5,10 +5,14 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/index.js"
+    "start": "nodemon src/index.js",
+    "deploy": "firebase deploy --only functions"
   },
   "author": "Gabriel Alpha Aguilar",
   "license": "ISC",
+  "engines": {
+    "node": "18"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dayjs": "^1.11.10",
@@ -17,6 +21,7 @@
     "express-session": "^1.17.3",
     "firebase": "^10.3.0",
     "firebase-admin": "^11.10.1",
+    "firebase-functions": "^4.3.1",
     "nodemon": "^3.0.1"
   }
 }

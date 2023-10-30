@@ -61,10 +61,12 @@ const viewAssignedRoles = async (req, res) => {
 
         const roles = roleRef.docs.map(role => role.data())
 
+        console.log("Assigned Roles", roles)
+
         res.status(200).json(roles)
     } catch(e) {
         res.status(400).json({name: "User Role", type: "View", error: e.message})
     }
 }
 
-module.exports = {assignRole, removeRole, viewAssignedRoles}
+module.exports = {assignRole, removeRole, viewAssignedRoles, userRoleCollection}

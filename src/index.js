@@ -2,6 +2,8 @@ const express = require('express')
 //const session = require('express-session')
 const cors = require('cors');
 
+const functions = require("firebase-functions")
+
 const app = express();
 const port = 4000;
 
@@ -34,3 +36,5 @@ app.use("/role", roleRouter)
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
 });
+
+exports.encored_api = functions.https.onRequest(app)

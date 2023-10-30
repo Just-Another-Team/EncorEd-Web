@@ -13,6 +13,8 @@ const {
     signInWithEmailAndPassword,
     signOut, 
 } = require('../authentication');
+const { userRoleCollection } = require('./userRole.controller');
+const { UserRole } = require('../models/userRole.model');
 
 const userCollection = db.collection("/users/").withConverter(userConverter)
 
@@ -67,7 +69,7 @@ const addUser = async (req, res) => {
             })
 
         // FIRESTORE FUNCTIONS - Possibly separate this one from the inner then... but idk
-        const userDoc = db.doc(`/users/${email}`).withConverter(userConverter)
+        const userDoc = userCollection.doc(email).withConverter(userConverter)
             
         await userDoc.create(userVal)
             .then((result) => {
@@ -108,34 +110,61 @@ const updateUser = async (req, res) => {
             user.data().status
         );
 
-        console.log("Get User", user.data())
-
         const uid = await adminAuth.getUserByEmail(user.id)
             .then(userRecord => userRecord.toJSON().uid)
             .catch(error => {throw error})
 
         //Update Authentication
         await adminAuth.updateUser(uid, {
-            email: userVal.getEmail,
-            password: userVal.getPassword,
+            email: req.body.email !== id ? userVal.getEmail : undefined,
+            password: userVal.getPassword.length > 0 ? userVal.getPassword : undefined,
             displayName: `${userVal.getFirstName} ${userVal.getLastName}`,
         })
             .then(() => {
                 console.log("Successfully Updated Authentication - Firebase Auth")
             })
-            .catch((error) => {throw error})
+            .catch((error) => {throw {type: "Authentication", error: error}})
             
         //Update Firestore
-        await userDoc.update(Object.assign({}, userVal))
-            .then(() => {
-                console.log("Successfully Updated Firestore - Firestore")
-            })
-            .catch((error) => {throw error})
+        await userCollection.doc(userVal.getEmail).set(userVal)
+
+        if (id !== req.body.email)
+            await userDoc.delete()
+
+        const assignedRoleDocs = await userRoleCollection.where('userId', '==', id).get();
+
+        if (assignedRoleDocs.empty)
+            throw {message: "User Id not found"}
+
+        //Get Roles 
+        const assignedRoles = assignedRoleDocs.docs.map((userRole) => {
+            return userRole.data()
+        })
+
+        //Delete old user role and assign new
+        assignedRoles.forEach(async (userRole) => {
+            let newUserRole = new UserRole(
+                userVal.getEmail,
+                userRole._roleId
+            )
+            
+            const newId = `${newUserRole._userId}-${newUserRole._roleId}`
+            const oldId = `${id}-${userRole._roleId}`
+
+            await userRoleCollection.doc(newId).set(newUserRole)
+            if (newId !== oldId)
+                await userRoleCollection.doc(oldId).delete()
+        })
+
+        //Assign New
+
+        //Update User Role
+        //await userRoleCollection.doc(`${id}-${userRole.roleId}`).update()
 
         res.status(200).json("Data updated successfully")
     }
     catch(e) {
-        res.status(400).json({error: e.message})
+        res.status(400).json({name: "User", error: "Controller Error", control: "Update", type: e.type, message: e.message, ...e})
     }
 }
 
@@ -190,14 +219,14 @@ const viewUser = async (req, res) => {
         const userRef = await userCollection.doc(id).get();
 
         if (!userRef.exists)
-            throw {message: `User with id: ${id} does not exist.`}
+            throw {code: 'firestore/missing-email', message: `User with id: ${id} does not exist.`}
         //console.log(userRef.data())
         //const userDoc = await getDoc(userRef);
 
         res.status(200).json({id: userRef.id, ...userRef.data()})
     }
     catch (e) {
-        res.status(400).json({error: "Error", message: e.message})
+        res.status(400).json({error: "Error", code: e.code, message: e.message})
     }
 }
 
@@ -239,16 +268,13 @@ const signUp = async (req, res) => {
             displayName: `${userVal.getFirstName} ${userVal.getLastName}`,
         })
 
-        console.log("Authentication", userRec)
-
         //const userDoc = await db.doc(`/users/${userRec.email}`).withConverter(userConverter).create(userVal)
         await userCollection.doc(userRec.email).set(userVal).then((result) => {console.log(result)})
 
         const userDoc = await userCollection.doc(userRec.email).get()
-    
-        console.log("Firestore", userDoc.data())
 
         const user = {
+            id: userDoc.id,
             displayName: userRec.displayName,
             email: userRec.email,
             ...userDoc.data()

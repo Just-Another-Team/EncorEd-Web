@@ -1,3 +1,13 @@
+/*
+    Plan after checking
+    role {
+        institutionId,
+        isSuperAdmin: boolean
+        isAdmin boolean
+        isEmployee: Object | undefined
+        isUser: boolean
+    }
+*/
 class Role {
     constructor(_institution, _systemRole, _institutionalRole) {
         this.institution = _institution
