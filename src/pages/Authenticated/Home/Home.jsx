@@ -44,9 +44,9 @@ const rows = [
   { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
 ];
 
+
 const Home = () => {
     const user = useSelector(state => state.user.data)
-
     return(
         <>
             <Box

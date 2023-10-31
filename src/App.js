@@ -17,6 +17,7 @@ import MapList from './pages/Authenticated/Maps/MapList';
 import UserGroups from './pages/Authenticated/UserGroups/UserGroups';
 import Institution from './pages/Authenticated/Institution/Institution';
 import SelectedSubject from './pages/Authenticated/Subject/pages/SelectedSubject';
+import Request from './pages/Authenticated/Request/Request';
 
 import {default as AdminHome} from './pages/Admin/Home/Home';
 import AdminDashboard from './pages/Admin/AdminDashboard';
@@ -25,7 +26,11 @@ import InstitutionForm from './components/Forms/InstitutionForm';
 import RegistrationUserForm from './components/Forms/Formhooks/UserForm-Registration-User-Hooks';
 import RegistrationInstitutionForm from './components/Forms/Formhooks/UserForm-Registration-Institution-Hook';
 import Profile from './pages/Authenticated/Profile/Profile';
+<<<<<<< HEAD
 import UsersLayout from './pages/Admin/Users/UsersLayout';
+=======
+import UsersProfile from './pages/Authenticated/Profile/UsersProfile';
+>>>>>>> 28f2748b8b5c9139da3dd57c7505a9b10a52c6ff
 
 function App() {
   const role = useSelector(state => state.roles);
@@ -75,7 +80,17 @@ function App() {
 
         <Route path='institution' element={<Institution />} />
 
+<<<<<<< HEAD
         <Route path='profile' element={<Profile />}/>
+=======
+        <Route path='profile/' element={<Profile />}/>
+
+        <Route path='profile/:userName' element={<UsersProfile />}/>
+
+        <Route path='request' element={<Request />}/>
+
+        
+>>>>>>> 28f2748b8b5c9139da3dd57c7505a9b10a52c6ff
       </Route>
 
       {/* Admin Pages*/}
@@ -86,7 +101,9 @@ function App() {
 
         <Route path='institutions' />
 
-        <Route path='profile' element={<Profile />}/>
+        <Route path='profile/' element={<Profile />}/>
+
+        <Route path='profile/:userName' element={<UsersProfile />}/>
       </Route>
     </Routes>
   );

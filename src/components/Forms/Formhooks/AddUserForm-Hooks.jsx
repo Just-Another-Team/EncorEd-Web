@@ -1,22 +1,27 @@
 import {useForm} from 'react-hook-form'
+import { useSelector, useDispatch } from 'react-redux';
 import AddUserForm from '../AddUserForm';
+import { addUsers } from '../../../features/users/usersSlice';
 
 const AddUserFormHook = ({ title = "Add Institutional User"}) => {
-    
+    const addBy = useSelector(state => state.user.data.displayName)
+    const addInstitution = useSelector(state => state.user.data.institution)
+    const addUserDispatch = useDispatch();
+
     const {handleSubmit, reset, control, setValue, formState: {errors}} = useForm({
         defaultValues: {
             firstName: "",
-            //middleName: "",
             lastName: "",
             email: "",
             userName: "",
             password: "",
+            addedBy: addBy,
+            institution: addInstitution,
         }
     });
 
     const inputs = [
         {key: 'firstName', label: "First name", type: "text", error: errors.firstName},
-        //{key: 'middleName', label: "Middle name", type: "text", error: errors.middleName},
         {key: 'lastName', label: "Last name", type: "text", error: errors.lastName},
         {key: 'email', label: "Email", type: "email", error: errors.email},
         {key: 'userName', label: "Username", type: "text", error: errors.userName},
@@ -27,24 +32,28 @@ const AddUserFormHook = ({ title = "Add Institutional User"}) => {
     const onSubmit = async (data) => {
         const {
             firstName,
-            //middleName,
             lastName,
             email,
             userName,
             password,
+            addBy,
+            addInstitution
         } = data
-
-        const userInput = {
-            firstName,
-            //middleName,
-            lastName,
-            email,
-            userName,
-            password,
-        }
 
         let valid = false;
 
+        await addUserDispatch(addUsers(data)).unwrap()
+            .then((res) => {
+                console.log(res.data)
+                valid = true;
+                reset();
+            })
+            .catch((err) => {
+                console.log(err.response.data)
+                return
+            })
+
+        
         // await axios.post("http://localhost:4000/user/add", userInput)
         //     .then((res) => {
         //         console.log(res.data)

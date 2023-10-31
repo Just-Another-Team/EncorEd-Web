@@ -139,6 +139,10 @@ class EncorEdAuthService {
         console.log("Email", email)
         return http.get(`/user/list/${email}`)
     }
+
+    viewUser(data) {
+        return http.get(`/user/profile/${data}`)
+    }
 }
 
 export default new EncorEdAuthService()

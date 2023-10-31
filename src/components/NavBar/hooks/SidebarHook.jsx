@@ -9,6 +9,7 @@ import GroupsOutline from '@mui/icons-material/GroupsOutlined'
 import OrganizationOutline from '@mui/icons-material/PieChartOutlined'
 import ReportOutline from '@mui/icons-material/AssessmentOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import PostAddIcon from '@mui/icons-material/PostAdd';
 import { useLocation } from "react-router-dom"
 
 const ConnectedSideBar = ({selected}) => {
@@ -29,6 +30,7 @@ const ConnectedSideBar = ({selected}) => {
         {name: "Events", icon: <EventOutline />, href: "/dashboard/event"},
         {name: "User and Groups", icon: <GroupsOutline />, href: `/dashboard/users/list/u/${userInstitution}`},
         {name: "Institution", icon: <OrganizationOutline />, href: "/dashboard/institution"},
+        {name: "Request", icon: <PostAddIcon />, href: "/dashboard/request"},
     ]
 
     const adminNavigations = [

@@ -10,6 +10,8 @@ import {
     ListItem,
     List,
     ListItemText,
+    Divider,
+    Tabs,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import dayjs from 'dayjs'
@@ -19,6 +21,12 @@ import { updateLoggedInUser } from "../../../features/user/userSlice";
 import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
+    const [page, setPage] = React.useState(0);
+
+    const handleChange = (event, newValue) => {
+        setPage(newValue);
+    };
+
     const editUserDispatch = useDispatch()
 
     const navigate = useNavigate()
@@ -38,7 +46,7 @@ const Profile = () => {
             password: "",
             confirmPassword: ""
         }
-    });
+    }); 
 
     const handleEditProfile = (e) => {
         e.preventDefault()
@@ -104,7 +112,7 @@ const Profile = () => {
 
                 <Grid xs={9} item>
                     {/* Banner Cover */}
-                    <Box height={256} sx={{backgroundColor: '#A9C5E1'}} />
+                    <Box height={256} sx={{backgroundColor: '#A9C5E1'}} onchange={setPage}/>
 
                     <Box display={"flex"} flexDirection={"column"} marginTop={-14} marginBottom={2} sx={{justifyContent: 'center', alignItems: 'center'}}>
                         <Box sx={{borderRadius: 360}}>
@@ -128,6 +136,7 @@ const Profile = () => {
                                 <Typography variant="body1" fontWeight={700}>Joined Date:</Typography>
                                 <Typography variant="body1">{dayjs(user.joinDate).format("MMMM D, YYYY")}</Typography>
                             </Grid>
+
 
                             {!role.data.find(data => data._systemRole._superAdmin) && (
                                 <>

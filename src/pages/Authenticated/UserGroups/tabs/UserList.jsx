@@ -7,71 +7,15 @@ import dayjs from 'dayjs'
 import { AddUserFormHook } from '../../../../components/Forms/Formhooks/AddUserForm-Hooks'
 import { useDispatch, useSelector } from "react-redux";
 import { getUsers } from "../../../../features/users/usersSlice";
-
-
-// Must be changed
-const columns = [
-    
-    {
-        field: 'firstName',
-        headerName: 'First name',
-        width: 130
-    },
-    { 
-        field: 'lastName',
-        headerName: 'Last name',
-        width: 130
-    },
-    {
-        field: 'id',
-        headerName: 'Email',
-        width: 256
-    },
-    {
-        field: 'addedBy',
-        headerName: 'Added By',
-        width: 160,
-    },
-    {
-        field: 'dateAdded',
-        headerName: 'Date Added',
-        width: 160,
-        valueGetter: (params) => {
-          return dayjs(params.row.joinDate).format("MMMM-DD-YYYY")
-        },
-    },
-    {
-        field: 'update',
-        sortable: false,
-        renderHeader: () => (
-            <span></span>
-        ),
-        renderCell: (params) => {
-            return (
-                <Button onClick={(e) => {console.log(params.row)}} variant="contained" color="primary" >UPDATE</Button>
-            )
-        }
-    },
-    {
-        field: 'delete',
-        sortable: false,
-        renderHeader: () => (
-            <span></span>
-        ),
-        renderCell: (params) => {
-            return (
-                <Button variant="contained" color="error" >DELETE</Button>
-            )
-        }
-    }
-  ];
-
+import { useNavigate } from "react-router-dom";
 
 const UserList = () => {
+    const navigate = useNavigate()
+
     const userInstitution = useSelector(state => state.institution.data.id)
     const usersArr = useSelector(state => state.users.users)
     const usersDispatch = useDispatch()
-
+    
     //Modal stuffs
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
@@ -80,6 +24,60 @@ const UserList = () => {
     useEffect(()=>{
         usersDispatch(getUsers(userInstitution))
     }, [])
+
+    const columns = [
+        { field: 'id', headerName: 'Email', width: 200 },
+        { field: 'firstName', headerName: 'First name', width: 130 },
+        { field: 'lastName', headerName: 'Last name', width: 130 },
+        { field: 'addedBy', headerName: 'Added by', width: 130 },
+        {
+            field: 'dateAdded',
+            headerName: 'Date added',
+            description: 'This column has a value getter and is not sortable.',
+            sortable: false,
+            flex: 1,
+            valueGetter: (params) => {
+              return dayjs(params.row.joinDate).format("MMMM-DD-YYYY")
+            },
+          },
+          {
+            field: 'profile',
+            sortable: false,
+            renderHeader: () => (
+                <span></span>
+            ),
+            renderCell: (params) => {
+                return (
+                    // <Button onClick={(e) => {window.location.href=`/dashboard/profile/${params.row.userName}`}} variant="contained" color="secondary" >PROFILE</Button>
+                    <Button onClick={(e) => {navigate(`/dashboard/profile/${params.row.userName}`)}} variant="contained" color="secondary" >PROFILE</Button>
+                )
+            }
+        },
+        {
+            field: 'update',
+            sortable: false,
+            renderHeader: () => (
+                <span></span>
+            ),
+            renderCell: (params) => {
+                return (
+                    <Button onClick={(e) => {console.log(params.row.userName)}} variant="contained" color="primary" >UPDATE</Button>
+                )
+            }
+        },
+        {
+            field: 'delete',
+            sortable: false,
+            renderHeader: () => (
+                <span></span>
+            ),
+            renderCell: (params) => {
+                return (
+                    <Button variant="contained" color="error" >DELETE</Button>
+                )
+            }
+        }
+      ];
 
     return(
         <>            
@@ -118,9 +116,10 @@ const UserList = () => {
             <Box marginBottom={2}>
 
                 <DataGrid
-                    autoHeight={[true]}
+                    autoHeight
                     rows={usersArr}
                     columns={columns}
+                    hideFooterSelectedRowCount
                     initialState={{
                         pagination: {
                             paginationModel: { page: 0, pageSize: 25},
