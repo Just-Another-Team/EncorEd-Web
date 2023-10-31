@@ -8,11 +8,9 @@ import {
     IconButton,
     Badge
 } from "@mui/material";
-import { auth, signOut } from "../../app/firebase/authentication";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
-import { reset } from "../../features/navigation/navigationSlice";
 import { logOut } from "../../features/user/userSlice";
 import { logOutUser } from "../../features/auth/authSlice";
 import { logOutInstitution } from "../../features/institution/institutionSlice";
@@ -20,13 +18,19 @@ import { logOutRoles } from "../../features/role/roleSlice";
 
 const Navbar = () => {
     const user = useSelector(state => state.user)
+    const role = useSelector(state => state.roles)
+
     const logoutDispatch = useDispatch()
+
+    let navigate = useNavigate()
 
     const handleSignOut = (e) => {
         logoutDispatch(logOutUser()).unwrap()
             .then(() => {
                 console.log("Signing Out Success")
-                window.location.href = "/login"
+
+                //window.location.href = "/login"
+                navigate("/login")
 
                 logoutDispatch(logOut())
                 logoutDispatch(logOutInstitution())
@@ -78,7 +82,7 @@ const Navbar = () => {
                     component={Link}
                     //to={(loggedIn.role && "/dashboard/profile") || (loggedIn.role && "/admin/dashboard/profile")}
                     //to={((loggedIn.role.find(data => data._systemRole._admin) || loggedIn.role.find(data => data._systemRole._employee)) && "/dashboard/profile") || (loggedIn.role.find(data => data._systemRole._superAdmin) && "/admin/dashboard/profile")}
-                    to={"/dashboard/profile"}
+                    to={((role.data.find(data => data._systemRole._admin) || role.data.find(data => data._systemRole._employee)) && "/dashboard/profile") || (role.data.find(data => data._systemRole._superAdmin) && "/admin/dashboard/profile")}
                     sx={{
                         textDecoration: 'none',
                         color: '#FFFFFF'

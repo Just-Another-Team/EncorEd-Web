@@ -10,24 +10,26 @@ import {
     ListItem,
     List,
     ListItemText,
-    Divider
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import dayjs from 'dayjs'
 import { Controller, useForm } from "react-hook-form";
-import { setUser, signIn, updateUser } from "../../../features/auth/authSlice";
+import { updateUser } from "../../../features/auth/authSlice";
 import { updateLoggedInUser } from "../../../features/user/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
     const editUserDispatch = useDispatch()
 
-    const role = useSelector(state => state.roles.data)
+    const navigate = useNavigate()
+
+    const role = useSelector(state => state.roles)
     const institution = useSelector(state => state.institution.data)
     const user = useSelector(state => state.user.data)
 
     const [editProfile, setEditProfile] = useState(false)
 
-    const {handleSubmit, reset, control, setError, formState: {errors}} = useForm({
+    const {handleSubmit, reset, control, getValues, setError, formState: {errors}} = useForm({
         defaultValues: {
             firstName: user.firstName,
             lastName: user.lastName,
@@ -55,9 +57,11 @@ const Profile = () => {
             password
         }
 
+        // WHAT IF SAME EMAIL?
         editUserDispatch(updateUser(input)).unwrap()
             .then(() => {
                 editUserDispatch(updateLoggedInUser({firstName, lastName, email, password, userName, displayName: `${firstName} ${lastName}`}))
+                navigate(0)
                 setEditProfile(false)
                 reset()
             })
@@ -75,17 +79,16 @@ const Profile = () => {
     }
 
     const inputs = [
-        {key: 'firstName', label: "First name", type: "text", rows: 0, error: errors.firstName},
-        {key: 'lastName', label: "Last name", type: "text", rows: 0, error: errors.lastName},
-        {key: 'email', label: "Email", type: "email", rows: 0, error: errors.email},
-        {key: 'userName', label: "Username", type: "text", rows: 0, error: errors.userName},
+        {key: 'firstName', label: "First name", type: "text", rows: 0, error: errors.firstName, rules: {required: "First name is required"}},
+        {key: 'lastName', label: "Last name", type: "text", rows: 0, error: errors.lastName, rules: {required: "Last name is required"}},
+        {key: 'email', label: "Email", type: "email", rows: 0, error: errors.email, rules: {required: "Email is required"}},
+        {key: 'userName', label: "Username", type: "text", rows: 0, error: errors.userName, rules: {required: "Username is required"}},
         {key: 'password', label: "New Password", type: "password", rows: 0, error: errors.password},
-        {key: 'confirmPassword', label: "Confirm New Password", type: "password", rows: 0, error: errors.confirmPassword},
+        {key: 'confirmPassword', label: "Confirm New Password", type: "password", rows: 0, error: errors.confirmPassword, rules: { validate: (value) => value === getValues('password') || "Passwords does not match." }}, 
     ]
 
     return(
         <>
-
             <Grid spacing={3} container>
                 <Grid xs={3} item>
                     <Stack gap={1}>
@@ -101,7 +104,7 @@ const Profile = () => {
 
                 <Grid xs={9} item>
                     {/* Banner Cover */}
-                    <Box height={160} sx={{backgroundColor: '#A9C5E1'}} />
+                    <Box height={256} sx={{backgroundColor: '#A9C5E1'}} />
 
                     <Box display={"flex"} flexDirection={"column"} marginTop={-14} marginBottom={2} sx={{justifyContent: 'center', alignItems: 'center'}}>
                         <Box sx={{borderRadius: 360}}>
@@ -126,15 +129,19 @@ const Profile = () => {
                                 <Typography variant="body1">{dayjs(user.joinDate).format("MMMM D, YYYY")}</Typography>
                             </Grid>
 
-                            <Grid item xs={6} marginBottom={2}>
-                                <Typography variant="body1" fontWeight={700}>Institution:</Typography>
-                                <Typography variant="body1">{institution.name}</Typography>
-                            </Grid>
+                            {!role.data.find(data => data._systemRole._superAdmin) && (
+                                <>
+                                    <Grid item xs={6} marginBottom={2}>
+                                        <Typography variant="body1" fontWeight={700}>Institution:</Typography>
+                                        <Typography variant="body1">{institution.name}</Typography>
+                                    </Grid>
 
-                            <Grid item xs={6} marginBottom={2}>
-                                <Typography variant="body1" fontWeight={700}>Added By:</Typography>
-                                <Typography variant="body1">{user.addedBy}</Typography>
-                            </Grid>
+                                    <Grid item xs={6} marginBottom={2}>
+                                        <Typography variant="body1" fontWeight={700}>Added By:</Typography>
+                                        <Typography variant="body1">{user.addedBy}</Typography>
+                                    </Grid>
+                                </>
+                            )}
 
                             <Grid item xs={6} marginBottom={2}>
                                 <Typography variant="body1" fontWeight={700}>Username:</Typography>
@@ -144,11 +151,11 @@ const Profile = () => {
 
                         <Grid container marginBottom={2} sx={{backgroundColor: '#F6F5FF', borderRadius: 4, padding: 2}}>
                             <Grid item xs={12}>
-                                <Typography variant="h5" fontWeight={700}>Role{role.length !== 1 && 's'}</Typography>
+                                <Typography variant="h5" fontWeight={700}>Role{role.data.length !== 1 && 's'}</Typography>
                             </Grid>
                             <Grid item xs={12}>
                                 <List>
-                                    {role.map((el, ind) => (
+                                    {role.data.map((el, ind) => (
                                         <ListItem key={ind}>
                                             <ListItemText
                                             primary={`${el._institutionalRole._name.charAt(0).toUpperCase()}${el._institutionalRole._name.slice(1)}`}

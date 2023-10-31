@@ -1,7 +1,7 @@
 import {useForm} from 'react-hook-form'
 import AddUserForm from '../AddUserForm';
 
-const AddUserFormHook = () => {
+const AddUserFormHook = ({ title = "Add Institutional User"}) => {
     
     const {handleSubmit, reset, control, setValue, formState: {errors}} = useForm({
         defaultValues: {
@@ -59,7 +59,7 @@ const AddUserFormHook = () => {
     }
 
     return <AddUserForm 
-                title='Add Institution User' 
+                title={title}
                 type={"usercreation"} 
                 inputs={inputs} 
                 control={control} 

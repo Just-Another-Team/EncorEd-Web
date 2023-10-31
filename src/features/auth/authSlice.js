@@ -135,7 +135,6 @@ const authSlice = createSlice({
                 state.loading = true
                 state.error = null
             })
-    
             builder.addCase(logOutUser.fulfilled, (state, actions) => {
                 state.loading = false
                 state.user = null

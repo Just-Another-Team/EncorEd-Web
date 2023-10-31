@@ -1,13 +1,10 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js";
-import {Routes, Route, Navigate} from 'react-router-dom';
-import { useEffect } from 'react';
+import {Routes, Route, Navigate, useLocation, useNavigate} from 'react-router-dom';
+import { useEffect, useRef } from 'react';
 import { auth, onAuthStateChanged, signOut } from './app/firebase/authentication';
 import { useDispatch, useSelector } from 'react-redux';
-import { logOut } from './features/auth/authSlice';
-import { getSubjects } from './features/subject/subjectSlice';
-import { getEvents } from './features/event/eventSlice';
 
 import Login from './pages/Login/Login';
 import LandingPage from './pages/LandingPage';
@@ -28,10 +25,14 @@ import InstitutionForm from './components/Forms/InstitutionForm';
 import RegistrationUserForm from './components/Forms/Formhooks/UserForm-Registration-User-Hooks';
 import RegistrationInstitutionForm from './components/Forms/Formhooks/UserForm-Registration-Institution-Hook';
 import Profile from './pages/Authenticated/Profile/Profile';
+import UsersLayout from './pages/Admin/Users/UsersLayout';
 
 function App() {
-  const userAuth = useSelector(state => state.authentication);
-  const userInstitution = useSelector(state => state.institution.data)
+  const role = useSelector(state => state.roles);
+  const user = useSelector(state => state.user.data)
+
+  const navigate = useNavigate()
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -42,7 +43,8 @@ function App() {
         return
       }
 
-      console.log("Logged In", user)
+      console.log("Logged In")
+      console.log("Roles", role)
     })
   }, [])
 
@@ -54,13 +56,12 @@ function App() {
       <Route path='/login' element={<Login />}/>
       <Route path='/register' element={<UserInput />}>
         <Route path='user' element={<RegistrationUserForm />} />
-        <Route path='institution' element={<RegistrationInstitutionForm />} /> {/* userLoggedIn.user  ? <RegistrationInstitutionForm /> : <Navigate replace to="/register/user" /> */}
+        <Route path='institution' element={Object.keys(user).length !== 0 ? <RegistrationInstitutionForm /> : <Navigate replace to={'/register/user'} />}/> {/* userLoggedIn.user  ? <RegistrationInstitutionForm /> : <Navigate replace to="/register/user" /> */}
 
       </Route>
 
       {/* Authenticated Pages */}
-      {/* element={userLoggedIn.user && userLoggedIn.user.role && (userLoggedIn.user.role.find(data => data._systemRole._employee) || userLoggedIn.user.role.find(data => data._systemRole._admin)) ? <Dashboard /> : <Navigate replace to="/login" />} */}
-      <Route path='/dashboard' element={<Dashboard />}> 
+      <Route path='/dashboard' element={role.data.find(data => data._systemRole._admin) || role.data.find(data => data._systemRole._employee) ? <Dashboard /> : <Navigate replace to={'/login'} />}> 
         <Route path='home' element={<InstitutionalHome />} />
 
         <Route path='subject' element={<Subject />} />
@@ -75,16 +76,13 @@ function App() {
         <Route path='institution' element={<Institution />} />
 
         <Route path='profile' element={<Profile />}/>
-
-        
       </Route>
 
-      {/* userLoggedIn.user.isadmin ? <Navigate replace to="/admin/dashboard/home" /> : */}
-      {/* element={userLoggedIn.user && userLoggedIn.user.role && userLoggedIn.user.role.find(data => data._systemRole._superAdmin) ? <AdminDashboard /> : <Navigate replace to="/login" />} */}
-      <Route path='/admin/dashboard' >
+      {/* Admin Pages*/}
+      <Route path='/admin/dashboard' element={role.data.find(data => data._systemRole._superAdmin) ? <AdminDashboard /> : <Navigate replace to="/login" />}>
         <Route path='home' />
 
-        <Route path='users/list/u/:institution' />
+        <Route path='users' element={<UsersLayout />} />
 
         <Route path='institutions' />
 

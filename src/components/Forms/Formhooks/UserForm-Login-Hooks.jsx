@@ -1,20 +1,25 @@
 import {useForm} from 'react-hook-form'
 import UserForm from '../UserForm';
-import { getUser, setCredentials, signIn } from '../../../features/auth/authSlice';
+import { getUser, signIn } from '../../../features/auth/authSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { viewAssignedRoles } from '../../../features/role/authRoleSlice';
 import { setUser } from '../../../features/user/userSlice';
 import { setInstitution } from '../../../features/institution/institutionSlice';
 import { getInstitution } from '../../../features/institution/authInstitution';
 import { setRoles } from '../../../features/role/roleSlice';
+import { useNavigate } from 'react-router-dom'
 
 // Firebase Client Side SDK should be here
 
 const LoginUserForm = () => {
     const loginDispatch = useDispatch();
+
     const user = useSelector(state => state.authentication)
     const institution = useSelector(state => state.authInstitution)
     const roles = useSelector(state => state.authRole)
+    const assignedRole = useSelector(state => state.roles);
+
+    let navigate = useNavigate()
 
     const {handleSubmit, reset, control, setValue, setError, formState: {errors}} = useForm({
         defaultValues: {
@@ -47,8 +52,10 @@ const LoginUserForm = () => {
                     .then((setUserRes) => { //Get Role
                         return loginDispatch(viewAssignedRoles(setUserRes.id)).unwrap()
                             .then((assignedRoles) => {
+                                console.log(assignedRoles)
                                 loginDispatch(setRoles(assignedRoles.data))
-                                window.location.href = "/dashboard/home"
+
+                                navigate((assignedRoles.data.find(data => data._systemRole._admin) || assignedRoles.data.find(data => data._systemRole._employee) && "/dashboard/home") || (assignedRoles.data.find(data => data._systemRole._superAdmin) && "/admin/dashboard/home"))
                                 reset();
                             })
                             .catch((error) => Promise.reject(error))

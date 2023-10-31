@@ -4,12 +4,16 @@ import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux';
 import { getUser, signIn, signUp } from '../../../features/auth/authSlice';
 import { setUser } from '../../../features/user/userSlice';
+import { useNavigate } from 'react-router-dom';
 
 const RegistrationUserForm = () => {
+    const navigate = useNavigate()
+    
     const user = useSelector(state => state.authentication);
+
     const registrationDispatch = useDispatch();
 
-    const {handleSubmit, reset, control, setError, formState: {errors}} = useForm({
+    const {handleSubmit, reset, control, getValues, setError, formState: {errors}} = useForm({
         defaultValues: {
             firstName: "",
             lastName: "",
@@ -22,12 +26,12 @@ const RegistrationUserForm = () => {
     });
 
     const inputs = [
-        {key: 'firstName', label: "First name", type: "text", rows: 0, error: errors.firstName},
-        {key: 'lastName', label: "Last name", type: "text", rows: 0, error: errors.lastName},
-        {key: 'email', label: "Email", type: "email", rows: 0, error: errors.email},
-        {key: 'userName', label: "Username", type: "text", rows: 0, error: errors.userName},
-        {key: 'password', label: "Password", type: "password", rows: 0, error: errors.password},
-        {key: 'confirmPassword', label: "Confirm Password", type: "password", rows: 0, error: errors.confirmPassword},
+        {key: 'firstName', label: "First name", type: "text", rows: 0, error: errors.firstName, rules: {required: "First name  is required"}},
+        {key: 'lastName', label: "Last name", type: "text", rows: 0, error: errors.lastName, rules: {required: `Last name is required`}},
+        {key: 'email', label: "Email", type: "email", rows: 0, error: errors.email, rules: {required: `Email is required`}},
+        {key: 'userName', label: "Username", type: "text", rows: 0, error: errors.userName, rules: {required: `Username is required`}},
+        {key: 'password', label: "Password", type: "password", rows: 0, error: errors.password, rules: {required: `Password is required`, minLength: { value: 8, message: "Password must be 8 characters long" }}},
+        {key: 'confirmPassword', label: "Confirm Password", type: "password", rows: 0, error: errors.confirmPassword, rules: { validate: (value) => value === getValues('password') || "Passwords does not match." }},
     ]
 
     const onSubmit = async (data) => {
@@ -37,7 +41,6 @@ const RegistrationUserForm = () => {
         //Step 2 - Login User to the Web
         await registrationDispatch(signUp(data)).unwrap()
             .then(() => {
-
                 //Get User
                 return registrationDispatch(getUser(email)).unwrap()
                     .then((userData) => {
@@ -49,10 +52,9 @@ const RegistrationUserForm = () => {
                     })
                     .then((userResult) => {
                         registrationDispatch(setUser(userResult))
-                        window.location.href = "/register/institution"
+                        navigate("/register/institution")
                         reset();
                     })
-
                     .catch((error) => Promise.reject(error))
             })
             .catch((error) => {
@@ -67,7 +69,16 @@ const RegistrationUserForm = () => {
         //if (!userSelector.loading) window.location.href = "/register/institution"
     }
 
-    return <UserForm loading={user.loading} title='Create Account' type={"register"} inputs={inputs} control={control} onSubmit={onSubmit} handleSubmit={handleSubmit} />
+    return (
+        <UserForm
+        loading={user.loading}
+        title='Create Account'
+        type={"register"}
+        inputs={inputs}
+        control={control}
+        onSubmit={onSubmit}
+        handleSubmit={handleSubmit} />
+    )
 }
 
 export default RegistrationUserForm

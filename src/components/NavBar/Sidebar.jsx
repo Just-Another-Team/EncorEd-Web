@@ -16,7 +16,6 @@ const drawerWidth = 240;
 
 const Sidebar = ({navigations, select, selectedPage}) => {
 
-
     return(
         <Drawer
             variant="permanent"
@@ -34,7 +33,7 @@ const Sidebar = ({navigations, select, selectedPage}) => {
             <Toolbar/>
             <Box sx={{ overflow: 'auto'}}>
                 <List disablePadding>
-                    {navigations.map((navigation, index) => (
+                    {navigations?.map((navigation, index) => (
                         <ListItem key={navigation.name} disablePadding>
                             <ListItemButton
                             LinkComponent={Link}

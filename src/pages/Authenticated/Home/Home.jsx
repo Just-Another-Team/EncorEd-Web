@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import SubjectEventCard from "../../../components/Cards/SubjectEventCard";
+import { useSelector } from "react-redux";
 
 const columns = [
     { field: 'id', headerName: 'ID', width: 70 },
@@ -44,20 +45,24 @@ const rows = [
 ];
 
 const Home = () => {
+    const user = useSelector(state => state.user.data)
+
     return(
         <>
             <Box
             marginBottom={3}>
                 <Typography variant="h4" fontWeight={700}>
-                    Welcome User Fullname!
+                    Welcome {user.displayName}!
                 </Typography>
             </Box>
             
             <Box
             marginBottom={4}>
-                <Typography variant="h5" fontWeight={700} marginBottom={2}>
-                    Upcoming Events
-                </Typography>
+                <Box>
+                    <Typography variant="h5" fontWeight={700} marginBottom={2}>
+                        Upcoming Events
+                    </Typography>
+                </Box>
 
                 <Grid container overflow={'auto'} spacing={2} >
                     {Array.from({length: 4}).map((el, ind) => (

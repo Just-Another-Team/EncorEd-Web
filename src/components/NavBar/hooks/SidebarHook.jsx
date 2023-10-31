@@ -9,12 +9,17 @@ import GroupsOutline from '@mui/icons-material/GroupsOutlined'
 import OrganizationOutline from '@mui/icons-material/PieChartOutlined'
 import ReportOutline from '@mui/icons-material/AssessmentOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import { useLocation } from "react-router-dom"
 
 const ConnectedSideBar = ({selected}) => {
     const select = useDispatch()
-    const userRole = useSelector(state => state.authentication)
+
+    const role = useSelector(state => state.roles)
     const userInstitution = useSelector(state => state.user.data.institution)
     const selectedPage = useSelector(state => state.pageSelect)
+
+    let location = useLocation()
+    console.log(location)
 
     const navigations = [
         {name: "Home", icon: <HomeOutline />, href: "/dashboard/home"},
@@ -28,14 +33,14 @@ const ConnectedSideBar = ({selected}) => {
 
     const adminNavigations = [
         {name: "Home", icon: <HomeOutline />, href: "/admin/dashboard/home"},
-        {name: "Users", icon: <PersonOutlineOutlinedIcon />, href: `/dashboard/users/list/u/${userInstitution}`},
+        {name: "Users", icon: <PersonOutlineOutlinedIcon />, href: `/admin/dashboard/users/`},
         {name: "Institutions", icon: <OrganizationOutline />, href: "/admin/dashboard/institutions"},
     ]
 
     return (
         <Sidebar 
         //navigations={(userRole.find(data => data._systemRole._employee) && navigations) || (userRole.find(data => data._systemRole._superAdmin) && adminNavigations)}
-        navigations={navigations}
+        navigations={((role.data.find(data => data._systemRole._admin) || role.data.find(data => data._systemRole._employee)) && navigations) || (role.data.find(data => data._systemRole._superAdmin) && adminNavigations)}
         select={select}
         selectedPage={selectedPage}/>
     )

@@ -38,13 +38,7 @@ const UserForm = ({title, type, submitName = "SUBMIT", inputs, errors, control, 
                     <Controller
                     name={el.key}
                     control={control}
-                    rules={{
-                        required: `${el.label} is required`,
-                        minLength: type === "register" && el.key === "password" ? {
-                            value: 8,
-                            message: "Password must be 8 characters long"
-                        } : null
-                    }} //-Give each controller the error
+                    rules={el.rules} //-Give each controller the error
                     render={({field}) => (
                         <TextField
                         fullWidth
