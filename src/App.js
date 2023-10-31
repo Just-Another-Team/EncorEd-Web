@@ -26,11 +26,8 @@ import InstitutionForm from './components/Forms/InstitutionForm';
 import RegistrationUserForm from './components/Forms/Formhooks/UserForm-Registration-User-Hooks';
 import RegistrationInstitutionForm from './components/Forms/Formhooks/UserForm-Registration-Institution-Hook';
 import Profile from './pages/Authenticated/Profile/Profile';
-<<<<<<< HEAD
 import UsersLayout from './pages/Admin/Users/UsersLayout';
-=======
 import UsersProfile from './pages/Authenticated/Profile/UsersProfile';
->>>>>>> 28f2748b8b5c9139da3dd57c7505a9b10a52c6ff
 
 function App() {
   const role = useSelector(state => state.roles);
@@ -80,9 +77,6 @@ function App() {
 
         <Route path='institution' element={<Institution />} />
 
-<<<<<<< HEAD
-        <Route path='profile' element={<Profile />}/>
-=======
         <Route path='profile/' element={<Profile />}/>
 
         <Route path='profile/:userName' element={<UsersProfile />}/>
@@ -90,7 +84,6 @@ function App() {
         <Route path='request' element={<Request />}/>
 
         
->>>>>>> 28f2748b8b5c9139da3dd57c7505a9b10a52c6ff
       </Route>
 
       {/* Admin Pages*/}

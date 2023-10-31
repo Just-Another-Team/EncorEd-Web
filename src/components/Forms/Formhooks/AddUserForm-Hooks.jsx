@@ -4,8 +4,7 @@ import AddUserForm from '../AddUserForm';
 import { addUsers } from '../../../features/users/usersSlice';
 
 const AddUserFormHook = ({ title = "Add Institutional User"}) => {
-    const addBy = useSelector(state => state.user.data.displayName)
-    const addInstitution = useSelector(state => state.user.data.institution)
+    const user = useSelector(state => state.user.data)
     const addUserDispatch = useDispatch();
 
     const {handleSubmit, reset, control, setValue, formState: {errors}} = useForm({
@@ -15,8 +14,8 @@ const AddUserFormHook = ({ title = "Add Institutional User"}) => {
             email: "",
             userName: "",
             password: "",
-            addedBy: addBy,
-            institution: addInstitution,
+            addedBy: user.displayName,
+            institution: user.institution,
         }
     });
 
