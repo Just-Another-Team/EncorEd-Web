@@ -24,6 +24,8 @@ const addUser = async (req, res) => {
     try{
         const { institution, firstName, lastName, email, userName, password, addedBy } = req.body;
     
+        console.log(institution)
+
         const userInput = {
             institution,
             firstName,
