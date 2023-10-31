@@ -22,9 +22,10 @@ const userCollection = db.collection("/users/").withConverter(userConverter)
 // Okay maybe this goes for institutional admins already
 const addUser = async (req, res) => {
     try{
-        const { firstName, lastName, email, userName, password, addedBy } = req.body;
+        const { institution, firstName, lastName, email, userName, password, addedBy } = req.body;
     
         const userInput = {
+            institution,
             firstName,
             lastName,
             email,
@@ -33,7 +34,7 @@ const addUser = async (req, res) => {
             joinDate: serverTimestamp,
             addedBy,
             isAlumni: false,
-            status: "Open"
+            status: "Open",
         }
 
         let user = {};
@@ -41,7 +42,7 @@ const addUser = async (req, res) => {
         /* Middleware shenanigans must be located here */
 
         const userVal = new User(
-            null,
+            userInput.institution,
             userInput.firstName,
             userInput.lastName,
             userInput.email,
@@ -50,7 +51,7 @@ const addUser = async (req, res) => {
             userInput.addedBy,
             userInput.joinDate,
             userInput.isAlumni,
-            userInput.status
+            userInput.status,
         )
 
         await adminAuth.createUser({

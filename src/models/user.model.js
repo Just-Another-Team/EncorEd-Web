@@ -103,7 +103,7 @@ const userConverter = {
             institution: user.institution,
             firstName: user.firstName,
             lastName: user.lastName,
-            //email: user.email,
+            email: user.email,
             userName: user.userName,
            // password: user.password,
             addedBy: user.addedBy,
