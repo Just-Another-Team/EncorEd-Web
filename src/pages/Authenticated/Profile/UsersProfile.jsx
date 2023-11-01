@@ -10,34 +10,24 @@ import { useDispatch, useSelector } from "react-redux";
 import dayjs from 'dayjs'
 import { Controller, useForm } from "react-hook-form";
 import { viewUser } from "../../../features/profile/profileSlice";
+import { useNavigate } from "react-router-dom";
 
 const UsersProfile = () => {
     const usersDispatch = useDispatch()
+    
     const input = window.location.pathname
     const result = input.replace("/dashboard/profile/", "")
     const arr = useSelector(state => state.users.users)
-    var val = arr.filter(data => data.userName === result)
+    const val = arr.filter(data => data.userName === result)
 
     useEffect(()=>{
         usersDispatch(viewUser(...val))
     }, [])
-
-    const user = useSelector(state => (state.profile.data))
+   
+    const user = useSelector(state => state.profile.data)
     return(
         <>
             <Grid spacing={3} container>
-                <Grid xs={3} item>
-                    <Stack gap={1}>
-                        <ButtonBase onClick={() => {alert("WIP (Moves to Profile Page)")}} sx={{padding: 1, paddingLeft: 2, border: 1, borderRadius: 2, justifyContent: 'flex-start'}}>
-                            <Typography variant="h6" component='h6'>Profile</Typography>
-                        </ButtonBase>
-
-                        <ButtonBase onClick={() => {alert("WIP (Moves to Notification Page)")}} sx={{padding: 1, paddingLeft: 2, border: 1, borderRadius: 2, justifyContent: 'flex-start'}}>
-                            <Typography variant="h6" component='h6'>Notifications</Typography>
-                        </ButtonBase>
-                    </Stack>
-                </Grid>
-
                 <Grid xs={9} item>
                     {/* Banner Cover */}
                     <Box height={256} sx={{backgroundColor: '#A9C5E1'}} />

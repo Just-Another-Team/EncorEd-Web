@@ -34,10 +34,22 @@ const rolePersistConfig = {
     storage,
 }
 
+const usersPersistConfig = {
+    key: "users",
+    storage
+}
+
+// const profilePersistConfig = {
+//     key: "profile",
+//     storage
+// }
+
 const userPersistedReducer = persistReducer(userPersistConfig, userSlice)
 const pagePersistedReducer = persistReducer(pagePersistConfig, navigationSlice)
 const institutionPersistedReducer = persistReducer(institutionPersistConfig, institutionSlice)
 const rolePersistReducer = persistReducer(rolePersistConfig, roleSlice)
+const usersPersistReducer = persistReducer(usersPersistConfig, usersSlice)
+// const profilePersistReducer = persistReducer(profilePersistConfig, profileSlice)
 
 /*
     Plan:
@@ -70,8 +82,10 @@ const store = configureStore({
         authInstitution: authInstitution,
         subjects: subjectSlice,
         events: eventSlice,
-        users: usersSlice,
-        profile: profileSlice
+        users: usersPersistReducer,
+        // profile: profilePersistReducer,
+        // users: usersSlice,
+        profile: profileSlice,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false
