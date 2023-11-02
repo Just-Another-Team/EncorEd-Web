@@ -124,7 +124,7 @@ class EncorEdAuthService {
 
     deleteUser(data) {
         const {id} = data
-        return http.put(`/user/update/${id}`)
+        return http.put(`/user/delete/${id}`)
     }
 
     getAll() {
@@ -142,6 +142,11 @@ class EncorEdAuthService {
 
     viewUser(data) {
         return http.get(`/user/profile/${data}`)
+    }
+
+    verifyPassword(data){
+        const {email, password} = data
+        return http.put("/user/verify", {email, password})
     }
 }
 
