@@ -6,6 +6,7 @@ import subjectSlice from "../features/subject/subjectSlice";
 import eventSlice from "../features/event/eventSlice";
 import usersSlice from "../features/users/usersSlice";
 import profileSlice from "../features/profile/profileSlice";
+import targetSlice from "../features/users/targetSlice";
 
 import storage from 'redux-persist/lib/storage'
 import { persistReducer, persistStore } from 'redux-persist'
@@ -38,6 +39,7 @@ const usersPersistConfig = {
     key: "users",
     storage
 }
+
 
 // const profilePersistConfig = {
 //     key: "profile",
@@ -86,6 +88,7 @@ const store = configureStore({
         // profile: profilePersistReducer,
         // users: usersSlice,
         profile: profileSlice,
+        targetUser: targetSlice,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false

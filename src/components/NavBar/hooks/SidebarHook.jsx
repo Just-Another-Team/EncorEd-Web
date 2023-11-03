@@ -20,7 +20,6 @@ const ConnectedSideBar = ({selected}) => {
     const selectedPage = useSelector(state => state.pageSelect)
 
     let location = useLocation()
-    console.log(location)
 
     const navigations = [
         {name: "Home", icon: <HomeOutline />, href: "/dashboard/home"},

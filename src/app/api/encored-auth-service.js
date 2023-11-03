@@ -3,7 +3,9 @@ import {
     auth,
     signInWithCustomToken,
     signInWithEmailAndPassword,
-    signOut 
+    signOut,
+    reauthenticateWithCredential,
+    EmailAuthProvider,
 } from "../firebase/authentication"
 
 class EncorEdAuthService {
@@ -122,8 +124,7 @@ class EncorEdAuthService {
         return http.put(`/user/update/${id}`, {firstName, lastName, email, password})
     }
 
-    deleteUser(data) {
-        const {id} = data
+    deleteUser(id) {
         return http.put(`/user/delete/${id}`)
     }
 
@@ -144,10 +145,29 @@ class EncorEdAuthService {
         return http.get(`/user/profile/${data}`)
     }
 
-    verifyPassword(data){
-        const {email, password} = data
-        return http.put("/user/verify", {email, password})
-    }
+    //password verification before action
+    async verifyPassword(data){
+        const { password } = data
+        try{
+            const credentials = EmailAuthProvider.credential(
+                auth.currentUser.email,
+                password
+            )
+
+            const result = await reauthenticateWithCredential(auth.currentUser, credentials)
+                .then(() => {
+                    console.log("Verified")
+                })
+                .catch((e) => {
+                    console.log(e)
+                })
+            
+            return result
+        }
+        catch(e) {
+            console.log(e)
+        }
+    }   
 }
 
 export default new EncorEdAuthService()

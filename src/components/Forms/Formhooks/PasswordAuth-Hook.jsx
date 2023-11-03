@@ -2,14 +2,15 @@ import {useForm} from 'react-hook-form'
 import { useSelector, useDispatch } from 'react-redux';
 import PasswordAuthForm from '../PasswordAuthForm';
 import { verifyPassword } from '../../../features/auth/authSlice';
+import { deleteUser } from '../../../features/users/usersSlice';
 
-const PasswordAuthHook = ({ title = "Password Verification"}) => {
-    const user = useSelector(state => state.user.data)
+const PasswordAuthHook = ({ title = "Password Verification" }) => {
     const passwordAuthDispatch = useDispatch();
+    const deleteUserDispatch = useDispatch();
+    const target = useSelector(state => state.targetUser.target)
 
     const {handleSubmit, reset, control, setValue, formState: {errors}} = useForm({
         defaultValues: {
-            email: user.email,
             password: ""
         }
     });
@@ -18,23 +19,17 @@ const PasswordAuthHook = ({ title = "Password Verification"}) => {
         {key: 'password', label: "Confirm Password", type: "password", error: errors.password},
     ]
 
-
     const onSubmit = async (data) => {
-        const {
-            email, 
-            password
-        } = data
-
-        await passwordAuthDispatch(verifyPassword({data})).unwrap()
+        await passwordAuthDispatch(verifyPassword(data))
             .then((res) => {
-                console.log(res.data)
-                reset();
+                deleteUserDispatch(deleteUser(target))
+                reset()
+                
             })
             .catch((err) => {
-                console.log(err.response.data)
+                console.log(err.response.data)  
                 return
             })
-
     }
 
     return <PasswordAuthForm

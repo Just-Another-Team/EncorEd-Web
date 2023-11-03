@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUsers } from "../../../../features/users/usersSlice";
 import { useNavigate } from "react-router-dom";
 import { PasswordAuthHook } from "../../../../components/Forms/Formhooks/PasswordAuth-Hook";
+import { deleteUser } from "../../../../features/users/usersSlice";
+import { targetUser } from "../../../../features/users/targetSlice";
 
 const UserList = () => {
     const navigate = useNavigate()
@@ -16,6 +18,7 @@ const UserList = () => {
     const userInstitution = useSelector(state => state.institution.data.id)
     const usersArr = useSelector(state => state.users.users)
     const usersDispatch = useDispatch()
+    const deleteDispatch = useDispatch()
     
     //Modal stuffs
     //add user form
@@ -25,8 +28,13 @@ const UserList = () => {
 
     //verify password form
     const [openVerif, setOpenVerif] = useState(false);
-    const handleOpenVerif = () => setOpenVerif(true);
     const handleCloseVerif = () => setOpenVerif(false);
+    const handleOpenVerif = () => setOpenVerif(true);
+
+    const handleDelete = (data) => {
+        handleOpenVerif()
+        deleteDispatch(targetUser(data))
+    }
 
     useEffect(()=>{
         usersDispatch(getUsers(userInstitution))
@@ -80,7 +88,7 @@ const UserList = () => {
             ),
             renderCell: (params) => {
                 return (
-                    <Button onClick={(e) => {handleOpenVerif()}} variant="contained" color="error" >DELETE</Button>
+                    <Button onClick={(e) => {handleDelete(params.row.id)}} variant="contained" color="error" >DELETE</Button>
                 )
             }
         }
