@@ -9,8 +9,8 @@ const initialState = {
 
 export const getUsers = createAsyncThunk(
     "/users/get/institution",
-    async (institutionId, {rejectWithValue}) => {
-        return await EncorEdAuthService.getAllUsersByInstitution(institutionId)
+    async (userList, {rejectWithValue}) => {
+        return await EncorEdAuthService.getAllUsersByInstitution(userList)
             .then((res) => res)
             .catch((error) => rejectWithValue(error))
     }

@@ -132,8 +132,9 @@ class EncorEdAuthService {
         return http.get("/user/list")
     }
     
-    getAllUsersByInstitution(institution) {
-        return http.get(`/user/list/u/${institution}`)
+    getAllUsersByInstitution(userList) {
+        const {userInstitution, currUser} = userList
+        return http.get(`/user/list/u/${userInstitution}/${currUser}` )
     }
 
     get(email) {
@@ -153,16 +154,24 @@ class EncorEdAuthService {
                 auth.currentUser.email,
                 password
             )
-
-            const result = await reauthenticateWithCredential(auth.currentUser, credentials)
-                .then(() => {
-                    console.log("Verified")
+            try{
+                let verified = false
+                const result = await reauthenticateWithCredential(auth.currentUser, credentials)
+                .then(()=>{
+                    verified = true
                 })
-                .catch((e) => {
+                .catch((e)=>{
                     console.log(e)
+                    verified = false
                 })
             
-            return result
+                if(verified == true){
+                    return result
+                }
+
+            } catch(e) {
+                console.log(e)
+            }
         }
         catch(e) {
             console.log(e)

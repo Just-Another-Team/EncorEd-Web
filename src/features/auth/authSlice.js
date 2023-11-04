@@ -99,7 +99,7 @@ export const verifyPassword = createAsyncThunk(
     "user/verify",
     async (data, {rejectWithValue}) => {
         return await EncorEdAuthService.verifyPassword(data)
-        .then((res) => res.data)
+        .then((res) => res.state)
         .catch((error) => rejectWithValue(error))
     }
 )

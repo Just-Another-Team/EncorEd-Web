@@ -18,18 +18,14 @@ const PasswordAuthHook = ({ title = "Password Verification" }) => {
     const inputs = [
         {key: 'password', label: "Confirm Password", type: "password", error: errors.password},
     ]
-
+    //deleteUserDispatch(deleteUser(target))
     const onSubmit = async (data) => {
-        await passwordAuthDispatch(verifyPassword(data))
-            .then((res) => {
-                deleteUserDispatch(deleteUser(target))
-                reset()
-                
-            })
-            .catch((err) => {
-                console.log(err.response.data)  
-                return
-            })
+        try{
+            await passwordAuthDispatch(verifyPassword(data))
+            
+        } catch(e) {
+            console.log(e)
+        }
     }
 
     return <PasswordAuthForm
