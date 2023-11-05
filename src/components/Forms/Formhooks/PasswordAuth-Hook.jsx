@@ -20,11 +20,36 @@ const PasswordAuthHook = ({ title = "Password Verification" }) => {
     ]
     //deleteUserDispatch(deleteUser(target))
     const onSubmit = async (data) => {
+        reset()
+        let verify = false;
         try{
             await passwordAuthDispatch(verifyPassword(data))
-            
+            .then((res)=>{
+                console.log(res)
+                if(res.type ===  "user/verify/fulfilled"){
+                    verify = true
+                }
+                else{
+                    verify = false
+                }
+            })
         } catch(e) {
             console.log(e)
+        }
+        console.log(verify)
+        if(verify === true) {
+            try{
+                deleteUserDispatch(deleteUser(target))
+                reset()
+                window.location.reload()
+                
+            } catch(e) {
+                console.log(e)
+            }
+        }
+        else{
+            reset()
+            alert("Wrong password")
         }
     }
 

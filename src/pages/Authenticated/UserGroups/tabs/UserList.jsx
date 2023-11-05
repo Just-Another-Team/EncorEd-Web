@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUsers } from "../../../../features/users/usersSlice";
 import { useNavigate } from "react-router-dom";
 import { PasswordAuthHook } from "../../../../components/Forms/Formhooks/PasswordAuth-Hook";
+import { targetUser } from "../../../../features/users/targetSlice";
 
 const UserList = () => {
     const navigate = useNavigate()
@@ -17,6 +18,7 @@ const UserList = () => {
     const usersArr = useSelector(state => state.users.users)
     const currUser = useSelector(state => state.user.data.email)
     const usersDispatch = useDispatch()
+    const targetDispatch = useDispatch()
     
     const userList = {userInstitution, currUser}
     //Modal stuffs
@@ -29,6 +31,11 @@ const UserList = () => {
     const [openVerif, setOpenVerif] = useState(false);
     const handleOpenVerif = () => setOpenVerif(true);
     const handleCloseVerif = () => setOpenVerif(false);
+
+    const handleVerification = (data) => {
+        targetDispatch(targetUser(data))
+        handleOpenVerif()
+    } 
 
     useEffect(()=>{
         usersDispatch(getUsers(userList))
@@ -82,7 +89,7 @@ const UserList = () => {
             ),
             renderCell: (params) => {
                 return (
-                    <Button onClick={(e) => {handleOpenVerif()}} variant="contained" color="error" >DELETE</Button>
+                    <Button onClick={(e) => {handleVerification(params.row.id)}} variant="contained" color="error" >DELETE</Button>
                 )
             }
         }

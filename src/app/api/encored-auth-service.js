@@ -155,19 +155,7 @@ class EncorEdAuthService {
                 password
             )
             try{
-                let verified = false
-                const result = await reauthenticateWithCredential(auth.currentUser, credentials)
-                .then(()=>{
-                    verified = true
-                })
-                .catch((e)=>{
-                    console.log(e)
-                    verified = false
-                })
-            
-                if(verified == true){
-                    return result
-                }
+                return await reauthenticateWithCredential(auth.currentUser, credentials)
 
             } catch(e) {
                 console.log(e)
