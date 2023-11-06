@@ -8,6 +8,7 @@ const PasswordAuthHook = ({ title = "Password Verification" }) => {
     const passwordAuthDispatch = useDispatch();
     const deleteUserDispatch = useDispatch();
     const target = useSelector(state => state.targetUser.target)
+    const action = useSelector(state => state.targetUser.action)
 
     const {handleSubmit, reset, control, setValue, formState: {errors}} = useForm({
         defaultValues: {
@@ -36,8 +37,11 @@ const PasswordAuthHook = ({ title = "Password Verification" }) => {
         } catch(e) {
             console.log(e)
         }
-        console.log(verify)
-        if(verify === true) {
+
+        //debugging purposes
+        console.log("Verify status: " + verify)
+
+        if(verify === true && action === "Delete") {
             try{
                 deleteUserDispatch(deleteUser(target))
                 reset()

@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUsers } from "../../../../features/users/usersSlice";
 import { useNavigate } from "react-router-dom";
 import { PasswordAuthHook } from "../../../../components/Forms/Formhooks/PasswordAuth-Hook";
-import { targetUser } from "../../../../features/users/targetSlice";
+import { targetUser, targetAction } from "../../../../features/users/targetSlice";
 
 const UserList = () => {
     const navigate = useNavigate()
@@ -32,11 +32,26 @@ const UserList = () => {
     const handleOpenVerif = () => setOpenVerif(true);
     const handleCloseVerif = () => setOpenVerif(false);
 
+    //roles form
+    const [openRoles, setOpenRoles] = useState(false);
+    const handleOpenRoles = () => setOpenRoles(true);
+    const handleCloseRoles = () => setOpenRoles(false);
+
+    //delete user
     const handleVerification = (data) => {
         targetDispatch(targetUser(data))
+        targetDispatch(targetAction("Delete"))
         handleOpenVerif()
-    } 
+    }
 
+    //user roles
+    const handleRoles = (data) => {
+        targetDispatch(targetUser(data))
+        targetDispatch(targetAction("Roles"))
+        handleOpenRoles()
+    }
+
+    //list of users
     useEffect(()=>{
         usersDispatch(getUsers(userList))
     }, [])
@@ -70,14 +85,14 @@ const UserList = () => {
             }
         },
         {
-            field: 'update',
+            field: 'roles',
             sortable: false,
             renderHeader: () => (
                 <span></span>
             ),
             renderCell: (params) => {
                 return (
-                    <Button onClick={(e) => {console.log(params.row.userName)}} variant="contained" color="primary" >UPDATE</Button>
+                    <Button onClick={(e) => {handleRoles(params.row.id)}} variant="contained" color="primary" >ROLES</Button>
                 )
             }
         },
@@ -102,6 +117,8 @@ const UserList = () => {
                 <Grid container xs={4}>
                     <TextField label="Search User" fullWidth/>
                 </Grid>
+
+                {/* add user modal */}
                 <Modal
                     open={openAdd}
                     // onClose={handleClose} //close on clicking outside modal
@@ -127,12 +144,13 @@ const UserList = () => {
                         </div>
                     </Box>
                 </Modal>
-
+                
+                {/* delete user modal */}
                 <Modal
                     open={openVerif}
                     // onClose={handleClose} //close on clicking outside modal
                     aria-labelledby="Verify Password"
-                    aria-describedby="Form for verifying current user password"
+                    aria-describedby="Form for verifying current user password then deleting target user"
                     >
                     <Box sx={{
                         position: 'absolute',
@@ -140,13 +158,40 @@ const UserList = () => {
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
                         width: 500,
-                        bgcolor: "red",
+                        bgcolor: "#45A1FD",
                         border: '1px solid #000',
                         borderRadius: '20px',
                         boxShadow: 24,
                     }}>
                         <div style={{textAlign: 'right'}}>
                             <Button style={{color:'black', fontWeight: 'bolder', fontSize: '20px', paddingRight:0, borderRadius:'20px'}} onClick={handleCloseVerif}>x</Button>
+                        </div>
+                        <div style={{padding: '15px', paddingTop: '0px'}}>
+                            <PasswordAuthHook/>
+                        </div>
+                    </Box>
+                </Modal>
+
+                {/* user roles modal */}
+                <Modal
+                    open={openRoles}
+                    // onClose={handleClose} //close on clicking outside modal
+                    aria-labelledby="User Roles"
+                    aria-describedby="Modal for viewing target user roles"
+                    >
+                    <Box sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 500,
+                        bgcolor: "#45A1FD",
+                        border: '1px solid #000',
+                        borderRadius: '20px',
+                        boxShadow: 24,
+                    }}>
+                        <div style={{textAlign: 'right'}}>
+                            <Button style={{color:'black', fontWeight: 'bolder', fontSize: '20px', paddingRight:0, borderRadius:'20px'}} onClick={handleCloseRoles}>x</Button>
                         </div>
                         <div style={{padding: '15px', paddingTop: '0px'}}>
                             <PasswordAuthHook/>

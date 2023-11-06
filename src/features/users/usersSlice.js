@@ -35,7 +35,6 @@ export const addUsers = createAsyncThunk(
 export const deleteUser = createAsyncThunk(
     "/users/delete",
     async (id, {rejectWithValue}) => {
-        console.log(id)
         return await EncorEdAuthService.deleteUser(id)
             .then((res) => console.log(res))
             .catch((error) => rejectWithValue(error))
