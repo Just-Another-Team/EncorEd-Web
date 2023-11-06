@@ -3,16 +3,16 @@ import EncoredRoleService from "../../app/api/encored-role-service"
 
 const initialState = {
     loading: false,
-    roles: [],
+    roleAssigned: [],
     error: null,
 }
 
-export const addRole = createAsyncThunk(
-    "role/add",
+export const addAdminRole = createAsyncThunk(
+    "role/admin/add",
     async (data, {rejectWithValue}) => {
         console.log("Add Role Thunk: ", data)
         try {
-            const role = await EncoredRoleService.addRole(data)
+            const role = await EncoredRoleService.addAdminRole(data)
             return role
         } catch (error) {
             return rejectWithValue(error)
@@ -20,8 +20,8 @@ export const addRole = createAsyncThunk(
     }
 )
 
-export const assignRole = createAsyncThunk(
-    "role/assign",
+export const assignAdminRole = createAsyncThunk(
+    "role/admin/assign",
     async (data, {rejectWithValue}) => {
         try {
             //Requires User Id and Role Id
@@ -53,13 +53,13 @@ const authRoleSlice = createSlice({
     extraReducers: builder => {
         //Add Role
         {
-            builder.addCase(addRole.pending, (state, actions) => {
+            builder.addCase(addAdminRole.pending, (state, actions) => {
                 state.loading = true
             })
-            builder.addCase(addRole.fulfilled, (state, actions) => {
+            builder.addCase(addAdminRole.fulfilled, (state, actions) => {
                 state.loading = false
             })
-            builder.addCase(addRole.rejected, (state, actions) => {
+            builder.addCase(addAdminRole.rejected, (state, actions) => {
                 state.loading = false
                 state.error = actions.payload
             })
@@ -67,13 +67,13 @@ const authRoleSlice = createSlice({
 
         //Assign Role
         {
-            builder.addCase(assignRole.pending, (state) => {
+            builder.addCase(assignAdminRole.pending, (state) => {
                 state.loading = true
             })
-            builder.addCase(assignRole.fulfilled, (state) => {
+            builder.addCase(assignAdminRole.fulfilled, (state) => {
                 state.loading = false
             })
-            builder.addCase(assignRole.rejected, (state, actions) => {
+            builder.addCase(assignAdminRole.rejected, (state, actions) => {
                 state.loading = false
                 state.error = actions.payload
             })
@@ -86,7 +86,7 @@ const authRoleSlice = createSlice({
             })
             builder.addCase(viewAssignedRoles.fulfilled, (state, actions) => {
                 state.loading = false
-                state.roles = actions.payload.data
+                state.roleAssigned = actions.payload.data
             })
             builder.addCase(viewAssignedRoles.rejected, (state, actions) => {
                 state.loading = false

@@ -28,6 +28,7 @@ import RegistrationInstitutionForm from './components/Forms/Formhooks/UserForm-R
 import Profile from './pages/Authenticated/Profile/Profile';
 import UsersLayout from './pages/Admin/Users/UsersLayout';
 import UsersProfile from './pages/Authenticated/Profile/UsersProfile';
+import AddRole from './pages/Authenticated/UserGroups/Role/AddRole';
 
 function App() {
   const role = useSelector(state => state.roles);
@@ -74,6 +75,7 @@ function App() {
         <Route path='event' element={<Event />} />
 
         <Route path='users/list/u/:institution' element={<UserGroups />}/>
+        <Route path='role/:institution/add' element={<AddRole />}/>
 
         <Route path='institution' element={<Institution />} />
 
@@ -82,8 +84,6 @@ function App() {
         <Route path='profile/:userName' element={<UsersProfile />}/>
 
         <Route path='request' element={<Request />}/>
-
-        
       </Route>
 
       {/* Admin Pages*/}

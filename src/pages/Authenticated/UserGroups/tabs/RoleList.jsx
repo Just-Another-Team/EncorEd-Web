@@ -3,26 +3,35 @@ import {
     Box, Button, Grid, TextField,
 } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid'
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 // Must be changed
 const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'firstName', headerName: 'First name', width: 130 },
-    { field: 'lastName', headerName: 'Last name', width: 130 },
+    { field: 'id', headerName: 'ID', flex: 0.5 },
+    { field: '_name', headerName: 'Role name', flex: 1 },
+    //{ field: '_desc', headerName: 'Description', width: 130 },
     {
-      field: 'age',
-      headerName: 'Age',
-      type: 'number',
-      width: 90,
+        field: 'groupsAssigned',
+        headerName: 'Groups Assigned',
+        type: 'number',
+        flex: 1,
     },
     {
-      field: 'fullName',
-      headerName: 'Full name',
-      description: 'This column has a value getter and is not sortable.',
-      sortable: false,
-      width: 160,
-      valueGetter: (params) =>
-        `${params.row.firstName || ''} ${params.row.lastName || ''}`,
+        field: 'usersAssigned',
+        headerName: 'Users Assigned',
+        type: 'number',
+        flex: 1,
+    },
+    {
+        field: 'createdBy',
+        headerName: 'Created By',
+        flex: 1,
+    },
+    {
+        field: 'addedIn',
+        headerName: 'Added In',
+        flex: 1,
     },
   ];
 
@@ -55,10 +64,13 @@ const rows = [
 ];
 
 const RoleList = () => {
+
+    const institution = useSelector(state => state.institution.data.id)
+
     return(
         <>            
             <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} marginBottom={2}>
-                <Button variant="contained" size="large">ADD ROLE</Button>
+                <Button component={Link} to={`/dashboard/role/${institution}/add`} variant="contained" size="large">ADD ROLE</Button>
                 <Grid container xs={4}>
                     <TextField label="Search Role" fullWidth/>
                 </Grid>
@@ -71,14 +83,14 @@ const RoleList = () => {
                     columns={columns}
                     initialState={{
                         pagination: {
-                            paginationModel: { page: 0, pageSize: 25},
+                            paginationModel: { page: 0, pageSize: 10},
                         },
                     }}
                     onRowDoubleClick={(e) => {
                         console.log(e.row)
                         window.location.href = '/dashboard/subject/testId'
                     }}
-                    pageSizeOptions={[25]}
+                    pageSizeOptions={[10]}
                     //disableRowSelectionOnClick
                     sx={{
                         '&.MuiDataGrid-root': {

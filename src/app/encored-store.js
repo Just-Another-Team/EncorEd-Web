@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import authSlice from "../features/auth/authSlice";
 import navigationSlice from "../features/navigation/navigationSlice";
 import institutionSlice from "../features/institution/institutionSlice";
@@ -14,24 +14,34 @@ import userSlice from "../features/user/userSlice";
 import authInstitution from "../features/institution/authInstitution";
 import authRoleSlice from "../features/role/authRoleSlice";
 
+const rootPersistConfig = {
+    key: "root",
+    storage,
+    //blacklist: ['users', 'subjects', 'events', 'roles', 'floorPlan', 'reports', 'requests']
+}
+
 const userPersistConfig = {
     key: "user",
     storage,
+    //blacklist: ['loading', 'error']
 }
 
 const pagePersistConfig = {
     key: "page",
     storage,
+    //blacklist: ['loading', 'error']
 }
 
 const institutionPersistConfig = {
     key: "institution",
     storage,
+    //blacklist: ['loading', 'error']
 }
 
 const rolePersistConfig = {
     key: "role",
     storage,
+    //blacklist: ['loading', 'error']
 }
 
 const userPersistedReducer = persistReducer(userPersistConfig, userSlice)
@@ -39,7 +49,26 @@ const pagePersistedReducer = persistReducer(pagePersistConfig, navigationSlice)
 const institutionPersistedReducer = persistReducer(institutionPersistConfig, institutionSlice)
 const rolePersistReducer = persistReducer(rolePersistConfig, roleSlice)
 
+const combinedReducers = combineReducers({
+    // authentication: persistReducer(userConfig, authSlice),
+    // institution: persistReducer(insititutionConfig, institutionSlice),
+    // assignedRole: persistReducer(roleConfig, roleSlice),
+
+    subjects: subjectSlice,
+    events: eventSlice,
+    users: usersSlice,
+
+    //roles: roleSlice
+    //floorPlan: floorplanSlice
+    //reports: reportSlice
+    //requests: requestsSlice
+})
+
+const persistedCombinedReducers = persistReducer(rootPersistConfig, combineReducers)
+
 /*
+    -- THIS IS A VERY VERY BAD PLAN
+ 
     Plan:
         Persist the following data:
             - LoggedIn user (No loading, no error)
@@ -64,14 +93,21 @@ const store = configureStore({
         pageSelect: pagePersistedReducer, 
         roles: rolePersistReducer, //Gets roles assign to user
         institution: institutionPersistedReducer, //Gets institution assigned to user
-        //
-        authentication: authSlice,//authUser
+        
+        /* Unpersisted Data */
+        authentication: authSlice,
         authRole: authRoleSlice,
         authInstitution: authInstitution,
+
         subjects: subjectSlice,
         events: eventSlice,
         users: usersSlice,
         profile: profileSlice
+
+        //roles: roleSlice
+        //floorPlan: floorplanSlice
+        //reports: reportSlice
+        //requests: requestsSlice
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false

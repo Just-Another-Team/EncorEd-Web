@@ -9,6 +9,12 @@ const initialState = {
     error: null
 }
 
+const newInitialState = {
+    loading: false,
+    data: {},
+    error: null
+}
+
 /*
     Things that will be persisted in the page:
     - user (logged in)
@@ -49,16 +55,6 @@ export const signIn = createAsyncThunk(
     }
 )
 
-export const signUp = createAsyncThunk(
-    "user/signUp",
-    async (credential, {rejectWithValue}) => {
-        const {firstName, lastName, email, userName, password} = credential
-
-        return await EncorEdAuthService.signUp({firstName, lastName, email, userName, password})
-            .catch((error) => rejectWithValue(error))
-    }
-)
-
 export const assignInstitution = createAsyncThunk(
     "/user/institution/assign",
     async (data, {rejectWithValue}) => {
@@ -73,6 +69,18 @@ export const logOutUser = createAsyncThunk(
     async (_, {dispatch}) => {
         dispatch(resetPage())
         return await EncorEdAuthService.signOut();
+    }
+)
+
+/* - - - - - CRUD - - - - - */
+
+export const signUp = createAsyncThunk(
+    "user/signUp",
+    async (credential, {rejectWithValue}) => {
+        const {firstName, lastName, email, userName, password} = credential
+
+        return await EncorEdAuthService.signUp({firstName, lastName, email, userName, password})
+            .catch((error) => rejectWithValue(error))
     }
 )
 

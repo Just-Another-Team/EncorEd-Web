@@ -1,8 +1,7 @@
 import http from "./http-common"
 
 class EncorEdRoleService {
-    addRole(data) {
-        console.log("Role Service", data)
+    addAdminRole(data) {
         return http.post(`/role/admin/signUp`, data)
     }
 
@@ -14,6 +13,10 @@ class EncorEdRoleService {
     getRoles(id) {
         //console.log(data)
         return http.get(`/role/assign/${id}`)
+    }
+
+    addRole(data) {
+        return http.post('/role/add', data);
     }
 }
 

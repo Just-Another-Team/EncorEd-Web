@@ -3,7 +3,7 @@ import UserForm from "../UserForm"
 import { useForm } from "react-hook-form";
 import { addInstitution } from "../../../features/institution/authInstitution";
 import { assignInstitution } from "../../../features/auth/authSlice";
-import { addRole, assignRole, viewAssignedRoles } from "../../../features/role/authRoleSlice";
+import { addAdminRole, assignAdminRole, viewAssignedRoles } from "../../../features/role/authRoleSlice";
 import { setInstitution } from "../../../features/institution/institutionSlice";
 import { setRoles } from "../../../features/role/roleSlice";
 
@@ -40,12 +40,12 @@ const RegistrationInstitutionForm = () => {
             })
             //Get Institution
             .then( (assignInstitutionRes) => {//Add role
-                return institutionDispatch(addRole({institution: assignInstitutionRes.data.id})).unwrap()
+                return institutionDispatch(addAdminRole({institution: assignInstitutionRes.data.id})).unwrap()
                     .then((addRoleRes) => addRoleRes)
                     .catch((error) => Promise.reject(error))
             })
             .then((res) => { //Assign role
-                return institutionDispatch(assignRole({userId: user.data.email, roleId: res.data.id})).unwrap()
+                return institutionDispatch(assignAdminRole({userId: user.data.email, roleId: res.data.id})).unwrap()
                     .then(() => user.data)
                     .catch((error) => Promise.reject(error))
             })

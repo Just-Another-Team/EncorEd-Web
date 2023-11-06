@@ -55,7 +55,7 @@ const LoginUserForm = () => {
                                 console.log(assignedRoles)
                                 loginDispatch(setRoles(assignedRoles.data))
 
-                                navigate((assignedRoles.data.find(data => data._systemRole._admin) || assignedRoles.data.find(data => data._systemRole._employee) && "/dashboard/home") || (assignedRoles.data.find(data => data._systemRole._superAdmin) && "/admin/dashboard/home"))
+                                navigate(((assignedRoles.data.find(data => data._systemRole._admin) || assignedRoles.data.find(data => data._systemRole._employee)) && "/dashboard/home") || (assignedRoles.data.find(data => data._systemRole._superAdmin) && "/admin/dashboard/home"))
                                 reset();
                             })
                             .catch((error) => Promise.reject(error))
@@ -77,7 +77,7 @@ const LoginUserForm = () => {
 
                 if (error.code === "auth/user-invalid-role") setError("emailUserName", {message: "User does not contain the level of authentication needed to use the web"})
 
-                if (error.code === "auth/user-not-found" || error.code === "auth/invalid-email") setError("emailUserName", {message: "Invalid email or username"})
+                if (error.code === "auth/user-not-found" || error.code === "auth/invalid-email") setError("emailUserName", {message: "Invalid email"})
 
                 if (error.code === "auth/wrong-password") setError("password", {message: "Invalid password"})
             })
