@@ -9,8 +9,8 @@ const initialState = {
 
 export const getUsers = createAsyncThunk(
     "/users/get/institution",
-    async (institutionId, {rejectWithValue}) => {
-        return await EncorEdAuthService.getAllUsersByInstitution(institutionId)
+    async (userList, {rejectWithValue}) => {
+        return await EncorEdAuthService.getAllUsersByInstitution(userList)
             .then((res) => res)
             .catch((error) => rejectWithValue(error))
     }
@@ -28,6 +28,15 @@ export const addUsers = createAsyncThunk(
     async (userData, {rejectWithValue}) => {
         return await EncorEdAuthService.addUser(userData)
             .then((res) => res)
+            .catch((error) => rejectWithValue(error))
+    }
+)
+
+export const deleteUser = createAsyncThunk(
+    "/users/delete",
+    async (id, {rejectWithValue}) => {
+        return await EncorEdAuthService.deleteUser(id)
+            .then((res) => console.log(res))
             .catch((error) => rejectWithValue(error))
     }
 )

@@ -6,6 +6,7 @@ import subjectSlice from "../features/subject/subjectSlice";
 import eventSlice from "../features/event/eventSlice";
 import usersSlice from "../features/users/usersSlice";
 import profileSlice from "../features/profile/profileSlice";
+import targetSlice from "../features/users/targetSlice";
 
 import storage from 'redux-persist/lib/storage'
 import { persistReducer, persistStore } from 'redux-persist'
@@ -44,31 +45,25 @@ const rolePersistConfig = {
     //blacklist: ['loading', 'error']
 }
 
+const usersPersistConfig = {
+    key: "users",
+    storage
+}
+
+
+// const profilePersistConfig = {
+//     key: "profile",
+//     storage
+// }
+
 const userPersistedReducer = persistReducer(userPersistConfig, userSlice)
 const pagePersistedReducer = persistReducer(pagePersistConfig, navigationSlice)
 const institutionPersistedReducer = persistReducer(institutionPersistConfig, institutionSlice)
 const rolePersistReducer = persistReducer(rolePersistConfig, roleSlice)
-
-const combinedReducers = combineReducers({
-    // authentication: persistReducer(userConfig, authSlice),
-    // institution: persistReducer(insititutionConfig, institutionSlice),
-    // assignedRole: persistReducer(roleConfig, roleSlice),
-
-    subjects: subjectSlice,
-    events: eventSlice,
-    users: usersSlice,
-
-    //roles: roleSlice
-    //floorPlan: floorplanSlice
-    //reports: reportSlice
-    //requests: requestsSlice
-})
-
-const persistedCombinedReducers = persistReducer(rootPersistConfig, combineReducers)
+const usersPersistReducer = persistReducer(usersPersistConfig, usersSlice)
+// const profilePersistReducer = persistReducer(profilePersistConfig, profileSlice)
 
 /*
-    -- THIS IS A VERY VERY BAD PLAN
- 
     Plan:
         Persist the following data:
             - LoggedIn user (No loading, no error)
@@ -101,13 +96,11 @@ const store = configureStore({
 
         subjects: subjectSlice,
         events: eventSlice,
-        users: usersSlice,
-        profile: profileSlice
-
-        //roles: roleSlice
-        //floorPlan: floorplanSlice
-        //reports: reportSlice
-        //requests: requestsSlice
+        users: usersPersistReducer,
+        // profile: profilePersistReducer,
+        // users: usersSlice,
+        profile: profileSlice,
+        targetUser: targetSlice,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: false

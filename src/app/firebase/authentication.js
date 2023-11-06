@@ -6,7 +6,8 @@ import {
     signInWithEmailAndPassword,
     signInWithCustomToken,
     onAuthStateChanged,
-    signOut
+    signOut,
+    reauthenticateWithCredential
 } from "firebase/auth"
 
 const auth = getAuth(app)
@@ -19,4 +20,6 @@ export {
     signInWithCustomToken,
     signOut,
     onAuthStateChanged,
+    reauthenticateWithCredential,
+    EmailAuthProvider,
 }

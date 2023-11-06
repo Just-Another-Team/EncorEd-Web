@@ -103,6 +103,15 @@ export const updateUser = createAsyncThunk(
     }
 )
 
+export const verifyPassword = createAsyncThunk(
+    "user/verify",
+    async (data, {rejectWithValue}) => {
+        return await EncorEdAuthService.verifyPassword(data)
+        .then((res) => res.data)
+        .catch((error) => rejectWithValue(error))
+    }
+)
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -209,6 +218,24 @@ const authSlice = createSlice({
                 state.loading = false
                 state.user = null
                 state.token = null
+                state.error = actions.payload.code
+            })
+        }
+
+        //verify password
+        {
+            builder.addCase(verifyPassword.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            builder.addCase(verifyPassword.fulfilled, (state, actions) => { 
+                state.loading = false
+                state.user = actions.payload
+                state.error = null
+            })
+            builder.addCase(verifyPassword.rejected, (state, actions) => {
+                state.loading = false
+                state.user = null
                 state.error = actions.payload.code
             })
         }
