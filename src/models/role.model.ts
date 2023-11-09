@@ -1,4 +1,4 @@
-import { Permission } from "../types/Permission";
+import { Permission } from "./permission.model.type";
 import { TimestampProps } from "../types/TimestampProps";
 
 export default interface IRole {
@@ -16,11 +16,11 @@ export default interface IRole {
 	student: Permission | boolean, // Permission type
 	visitor: Permission | boolean, // Permission type
 
-	creationDate: TimestampProps,
+	creationDate: TimestampProps | string,
 	createdBy: string,
 
-	updatedDate: TimestampProps,
-	updatedBy: string,
+	updatedDate?: TimestampProps | string,
+	updatedBy?: string,
 
 	status: string
 }

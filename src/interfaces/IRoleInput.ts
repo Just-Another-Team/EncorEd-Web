@@ -1,4 +1,4 @@
-import { Permission } from "../types/Permission";
+import { Permission } from "../models/permission.model.type";
 import { TimestampProps } from "../types/TimestampProps";
 
 export default interface IRoleInput {

@@ -1,151 +1,158 @@
-const {
+import { Request, Response } from 'express';
+import { ParamsDictionary } from 'express-serve-static-core';
+import { ParsedQs } from 'qs';
+import {
     db,
     Timestamp,
-} = require('../database');
-const {
-    Institution,
-    institutionConverter
-} = require("../models/institution.model")
+} from '../database';
+import IBaseService from '../interfaces/IBaseService';
+import { converter } from '../models/converter';
+import IInstitution from "../models/institution.model"
+import ErrorController from '../types/ErrorController';
 
-const institutionCollection = db.collection(`/institutions/`).withConverter(institutionConverter)
+export const institutionCollection = db.collection(`/institutions/`).withConverter(converter<IInstitution>())
 
-const addInstitution = async (req, res) => {
-    try {
-        const { name, desc, status = "Open" } = req.body;
+class Institution implements IBaseService {
+    public async add(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        try {
+            const reqInstitution = req.body as IInstitution;
 
-        let institution = new Institution(
-            name,
-            desc,
-            new Date(),
-            status
-        )
+            const institution: IInstitution = {
+                id: reqInstitution.name.toLowerCase().replace(/\s/g,''),
+                name: reqInstitution.name,
+                desc: reqInstitution.desc,
+                createdBy: reqInstitution.createdBy,
+                creationDate: new Date().toISOString(),
+                status: "Open"
+            }
 
-        //If name is same as institution id
-        const institutionId = institution.name.toLowerCase().replace(/\s/g,'')
+            await institutionCollection.doc(institution.id!).create(institution)
 
-        await institutionCollection.doc(institutionId).create(institution)
-            // .then((result) => {
-            //     res.status(200).json({data: result, message: "Institution added successfully"})
-            // })
-            // .catch((err) => {
-            //     throw {message: err.message}
-            // })
-
-        const institutionRef = await institutionCollection.doc(institutionId).get()
-
-        res.status(200).json({id: institutionId, message: "Institution added successfully", ...institutionRef.data()})
-    } catch (e) {
-        console.log(e);
-        res.status(400).json({name: "Institution", type: "Add", type: e.type, message: e.message, code: e.code})
+            res.status(200).json({message: "Institution added successfully"})
+        } catch (error) {
+            if (error instanceof Error) {
+                const institutionControllerError: ErrorController = {
+                    name: "Institution",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "Add",
+                    message: error.message
+                }
+                
+                res.status(400).json(institutionControllerError) //type: error.type, code: error.code
+            }
+        }
     }
-}
 
-const updateInstitution = async (req, res) => {
-    const id = req.params.id;
+    public async update(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const insitutionId = req.params.id;
 
-    try {
-        const institutionDocRef = db.doc(`/institutions/${id}`).withConverter(institutionConverter);
+        try {
+            //const institutionDocRef = db.doc(`/institutions/${id}`).withConverter(institutionConverter);
+            const institutionDoc = institutionCollection.doc(insitutionId)
 
-        //If ID exist
+            //If ID exist
+            const oldInstitution = await institutionDoc.get().then(institutionRecord => ({id: institutionRecord.id, ...institutionRecord.data()}))
 
-        const { name, desc, status } = req.body;
+            const reqInstitution = req.body as IInstitution;
 
-        let institution = new Institution(
-            name,
-            desc,
-            new Date(),
-            status
-        )
+            const institution: IInstitution = {
+                id: reqInstitution.name.toLowerCase().replace(/\s/g,''), 
+                name: reqInstitution.name,
+                desc: reqInstitution.desc,
+                createdBy: reqInstitution.createdBy,
+                creationDate: oldInstitution.creationDate!,
+                status: "Open"
+            }
 
-        await institutionDocRef.update(Object.assign({}, institution))
-            .then((result) => {
-                res.status(200).json({message: "Institution updated successfully!"})
+            await institutionDoc.set(institution)
+                .then(() => {
+                    console.log("Successfully Updated Institution - Firestore (Set New)")
+                })
+            
+            //Delete Old Id
+            if (oldInstitution.id !== institution.id)
+                await institutionDoc.delete()
+                    .then(() => {
+                        console.log("Successfully Updated Institution - Firestore (Delete Old)")
+                    })
+
+            res.status(200).json({message: "Institution updated successfully!"})
+        } catch (error) {
+            if (error instanceof Error) {
+                const institutionControllerError: ErrorController = {
+                    name: "Institution",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "Update",
+                    message: error.message
+                }
+                
+                res.status(400).json(institutionControllerError) //type: error.type, code: error.code
+            }
+        }
+    }
+    
+    public async delete(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        //Delete institution by status
+    }
+
+    public async view(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        try {
+            const institutionId = req.params.id;
+
+            const institution = await institutionCollection.doc(institutionId).get()
+                .then((institutionRecord) => {
+                    return ({
+                        id: institutionRecord.id,
+                        ...institutionRecord.data(),
+                    })
+                });
+
+            res.status(200).json(institution);   
+        } catch (error) {
+            if (error instanceof Error) {
+                const userControllerError: ErrorController = {
+                    name: "Institution",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "View",
+                    message: error.message
+                }
+                
+                res.status(400).json(userControllerError) //type: error.type, code: error.code
+            }        
+        }
+    }
+
+    public async viewAll(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        try {
+            const institutionDoc = await institutionCollection.get();
+
+            const institutions = institutionDoc.docs.map(institutionRecord => {
+                const institution: IInstitution = {
+                    id: institutionRecord.id,
+                    ...institutionRecord.data()
+                }
+
+                return institution
             })
-            .catch((err) => {
-                throw {message: err.message}
-            })
 
-    } catch (e) {
-        res.status(400).json({name: "Institution", type: "Update", error: e.message})
-    }
+            res.status(200).json(institutions);   
+        } catch (error) {
+            if (error instanceof Error) {
+                const institutionControllerError: ErrorController = {
+                    name: "Institution",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "View",
+                    message: error.message
+                }
+                
+                res.status(400).json(institutionControllerError) //type: error.type, code: error.code
+            }
+        }
+    } 
 }
 
-const deleteInstitution = async (req, res) => {
-    const id = req.params.id;
-
-    try {
-        const institutionSnapshot = db.doc(`/institutions/${id}`).withConverter(institutionConverter);
-
-        //If id exists
-
-        await institutionSnapshot.delete()
-            .then((result) => {
-                res.status(200).json({message: "Institution deleted successfully."})
-            })
-            .catch((err) => {
-                throw {error: err, message: err.message}
-            })
-    } catch (e) {
-        res.status(400).json({error: e.message})
-        console.log(e.error)
-    }
-}
-
-const viewAllInstitutions = async (req, res) => {
-    const institutions = []
-
-    try {
-        const getInstitutionDocs = await institutionCollection.get()
-
-        if (getInstitutionDocs.empty)
-            throw {message: "Institutions collections is empty"};
-
-
-        getInstitutionDocs.forEach((institution) => {
-            const {
-                name,
-                desc,
-                creationDate,
-                status 
-            } = institution.data();
-
-            institutions.push({
-                id: institution.id,
-                name: name,
-                desc: desc,
-                creationDate: new Timestamp(creationDate.seconds, creationDate.nanoseconds).toDate(),
-                status: status
-            })
-        })
-
-        res.status(200).json(institutions)
-    }
-    catch(e) {
-        res.status(400).json({error: e.message})
-        console.log(e)
-    }
-}
-
-const viewInstitution = async (req, res) => {
-    const id = req.params.id;
-
-    try {
-        const institutionDoc = await institutionCollection.doc(id).get();
-
-        res.status(200).json({
-            id: institutionDoc.id,
-            ...institutionDoc.data()
-        })
-    }
-    catch (e) {
-        res.status(400).json({error: "Error", message: e.message})
-    }
-}
-
-module.exports = {
-    addInstitution,
-    updateInstitution,
-    deleteInstitution,
-    viewAllInstitutions,
-    viewInstitution
-}
+export default new Institution

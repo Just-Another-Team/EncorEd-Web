@@ -10,7 +10,7 @@ export default interface IUser {
     userName?: string;
     password?: string;
     addedBy?: string;
-    joinDate?: TimestampProps;
+    joinDate?: Date | string;
     isalumni?: string;
     status?: string;
 }

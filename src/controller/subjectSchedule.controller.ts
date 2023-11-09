@@ -6,7 +6,7 @@ import {
     Timestamp,
     serverTimestamp,
 } from '../database';
-import IService from '../interfaces/IService';
+import IService from '../interfaces/IBaseService';
 import {
     SubjectSchedule,
     subScheduleConverter

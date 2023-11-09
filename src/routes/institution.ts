@@ -1,22 +1,12 @@
 import { Router } from "express";
-const {
-    addInstitution,
-    updateInstitution,
-    deleteInstitution,
-    viewAllInstitutions,
-    viewInstitution
-} = require("../controller/institution.controller")
+import Institution from "../controller/institution.controller"
 
 const institutionRouter = Router();
 
-institutionRouter.post("/add", addInstitution);
-
-institutionRouter.put("/update/:id", updateInstitution)
-
-institutionRouter.delete("/delete/:id", deleteInstitution)
-
-institutionRouter.get("/list/all", viewAllInstitutions);
-
-institutionRouter.get("/list/:id", viewInstitution)
+institutionRouter.post("/add", Institution.add);
+institutionRouter.put("/update/:id", Institution.update)
+institutionRouter.delete("/delete/:id", Institution.delete)
+institutionRouter.get("/list/all", Institution.viewAll);
+institutionRouter.get("/list/:id", Institution.view)
 
 export default institutionRouter

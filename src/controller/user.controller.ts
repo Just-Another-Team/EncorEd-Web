@@ -11,15 +11,19 @@ import {
 import {
     adminAuth,
 } from '../authentication';
-import IService from '../interfaces/IService';
+import IBaseService from '../interfaces/IBaseService';
 import { TimestampProps } from '../types/TimestampProps';
+import ErrorController from '../types/ErrorController';
+import { getAuth } from 'firebase-admin/auth';
+import { userRoleCollection } from './userRole.controller';
+import IUserRole from '../models/userRole.model';
 
 // const { userRoleCollection } = require('./userRole.controller');
 // const { UserRole } = require('../models/userRole.model');
 
 export const userCollection = db.collection("/users/").withConverter(converter<IUser>())
 
-class UserService implements IService {
+class UserService implements IBaseService {
     public async add(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         try {
             const reqUser = req.body as IUser;
@@ -31,7 +35,7 @@ class UserService implements IService {
                 email: reqUser.email,
                 userName: reqUser.userName,
                 addedBy: reqUser.addedBy,
-                joinDate: new Date() as TimestampProps,
+                joinDate: new Date().toISOString(),
                 isalumni: reqUser.isalumni,
                 status: "Open",
             }
@@ -54,82 +58,60 @@ class UserService implements IService {
             const userDoc = userCollection.doc(user.email);
                 
             await userDoc.create(user)
-                .then((result) => {
-                    console.log("Successfully Added - Firestore", result)
-                })
-                .catch((error) => {
-                    throw {type: "Firestore", message: error.message}
+                .then(() => {
+                    console.log("Successfully Added - Firestore")
                 })
 
             res.status(200).json({type: "User", message: "Account created successfully"});
         }
         catch (error) {
-            if (error instanceof Error) res.status(400).json({name: "User", error: "Controller Error", message: error.message,}) //type: error.type, code: error.code
-        }
-    }
-
-    public async view(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        try {
-            const userDoc = await userCollection.get();
-
-            const users = userDoc.docs.map(doc => {
-                const user: IUser = { //...doc.data()
-                    id:doc.id,
-                    institution: doc.data().institution,
-                    firstName: doc.data().firstName,
-                    lastName: doc.data().lastName,
-                    email: doc.data().email,
-                    userName: doc.data().userName,
-                    password: doc.data().password,
-                    addedBy: doc.data().addedBy,
-                    joinDate: new Timestamp(doc.data().joinDate!._seconds, doc.data().joinDate!._nanoseconds).toDate() as TimestampProps,
-                    isalumni: doc.data().isalumni,
-                    status: doc.data().status,
+            if (error instanceof Error) {
+                const userControllerError: ErrorController = {
+                    name: "User",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "Add",
+                    message: error.message
                 }
-
-                return user
-            })
-            console.log(users)
-
-            res.status(200).json(users);   
-        }
-        catch (error) {
-            if (error instanceof Error) res.status(400).json({error: true, message: error.message})
+                
+                res.status(400).json(userControllerError) //type: error.type, code: error.code
+            }
         }
     }
 
     public async update(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        const paramId = req.params.id;
+        const userIdparam = req.params.id;
 
         //Update authentication as well
 
         try{
-            const userDoc = userCollection.doc(paramId);
+            const userDoc = userCollection.doc(userIdparam);
 
             const reqUser = req.body as IUser;
 
-            const { data, id } = await userDoc.get();
+            const oldUser = await userDoc.get()
+                .then(user => ({id: user.id, ...user.data()}));
 
             const user: IUser = {
-                institution: data()?.institution,
+                institution: oldUser.institution,
                 firstName: reqUser.firstName,
                 lastName: reqUser.lastName,
                 email: reqUser.email,
                 userName: reqUser.userName,
                 password: reqUser.password,
-                addedBy: data()?.addedBy,
-                joinDate: data()?.joinDate,
-                isalumni: data()?.isalumni,
-                status: data()?.status,
+                addedBy: oldUser.addedBy,
+                joinDate: oldUser.joinDate?.toLocaleString(),
+                isalumni: oldUser.isalumni,
+                status: oldUser.status,
             }
 
-            const uid = await adminAuth.getUserByEmail(id)
+            const uid = await adminAuth.getUserByEmail(oldUser.id)
                 .then(userRecord => userRecord.uid)
                 .catch(error => {throw error})
 
             //Update Authentication
             await adminAuth.updateUser(uid, {
-                email: req.body.email !== id ? user.email : undefined,
+                email: user.email,
                 password: user.password,//user.password?.length > 0 ? user.password : undefined,
                 displayName: `${user.firstName} ${user.lastName}`,
             })
@@ -140,34 +122,41 @@ class UserService implements IService {
                 
             //Update Firestore
             await userCollection.doc(user.email).set(user)
+                .then(() => {
+                    console.log("Successfully Updated Authentication - Firestore (Set)")
+                })
 
-            if (id !== req.body.email)
+            if (oldUser.id !== reqUser.email)
                 await userDoc.delete()
+                    .then(() => {
+                        console.log("Successfully Updated Authentication - Firestore (Delete Old)")
+                    })
 
-            // const assignedRoleDocs = await userRoleCollection.where('userId', '==', id).get();
+            //Update user Role
+            const assignedRoleDocs = await userRoleCollection.where('userId', '==', oldUser.id).get();
 
             // if (assignedRoleDocs.empty)
             //     throw {message: "User Id not found"}
 
-            // //Get Roles 
-            // const assignedRoles = assignedRoleDocs.docs.map((userRole) => {
-            //     return userRole.data()
-            // })
+            //Get Roles 
+            const assignedRoles = assignedRoleDocs.docs.map((userRole) => {
+                return userRole.data()
+            })
 
-            // //Delete old user role and assign new
-            // assignedRoles.forEach(async (userRole) => {
-            //     let newUserRole = new UserRole(
-            //         userVal.getEmail,
-            //         userRole._roleId
-            //     )
+            //Delete old user role and assign new based on new userId
+            assignedRoles.forEach(async (userRole) => {
+                let newUserRole: IUserRole = {
+                    userId: user.email,
+                    roleId: userRole.roleId
+                }
                 
-            //     const newId = `${newUserRole._userId}-${newUserRole._roleId}`
-            //     const oldId = `${id}-${userRole._roleId}`
+                const newId = `${newUserRole.userId}-${newUserRole.roleId}`
+                const oldId = `${oldUser.id}-${userRole.roleId}`
 
-            //     await userRoleCollection.doc(newId).set(newUserRole)
-            //     if (newId !== oldId)
-            //         await userRoleCollection.doc(oldId).delete()
-            // })
+                await userRoleCollection.doc(newId).set(newUserRole)
+                if (newId !== oldId)
+                    await userRoleCollection.doc(oldId).delete()
+            })
 
             //Assign New
 
@@ -177,28 +166,159 @@ class UserService implements IService {
             res.status(200).json("Data updated successfully")
         }
         catch(error) {
-            if (error instanceof Error) res.status(400).json({name: "User", error: "Controller Error", control: "Update", message: error.message}) //type: error.type
+            if (error instanceof Error) {
+                const userControllerError: ErrorController = {
+                    name: "User",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "Update",
+                    message: error.message,
+                    stack: error.stack
+                }
+                
+                res.status(400).json(userControllerError) //type: error.type, code: error.code
+            }
         }
     }
 
     public async delete(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        const id = req.params.id;
+        const userId = req.params.id;
 
         // Instead of deleting the user completely, why not use the status?
 
-        // try{
-        //     const userDoc = db.doc(`/users/${id}`).withConverter(userConverter);
-        //     await userDoc.delete();
+        try{
+            await userCollection.doc(`/users/${userId}`).delete();
 
-        //     res.status(200).json("Data delete successfully")
-        // }
-        // catch(e) {
-        //     res.status(400).json(`Error Occured: ${e}`)
-        // }
+            //Delete UserRole assigned
+
+            res.status(200).json("User delete successfully")
+        }
+        catch(error) {
+            if (error instanceof Error) {
+                const userControllerError: ErrorController = {
+                    name: "User",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "Delete",
+                    message: error.message
+                }
+                
+                res.status(400).json(userControllerError) //type: error.type, code: error.code
+            }
+        }
+    }
+
+    public async view(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        try {
+            const userId = req.params.id;
+
+            const user = await userCollection.doc(userId).get()
+                .then((userRecord) => {
+                    return ({
+                        id: userRecord.id,
+                        ...userRecord.data(),
+                    })
+                });
+
+
+            res.status(200).json(user);   
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                const userControllerError: ErrorController = {
+                    name: "User",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "View",
+                    message: error.message
+                }
+                
+                res.status(400).json(userControllerError) //type: error.type, code: error.code
+            }        
+        }
+    }
+
+    public async viewAll(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        try {
+            const userRef = await userCollection.get();
+
+            const users = userRef.docs.map(userRecord => {
+                const user: IUser = {
+                    id: userRecord.id,
+                    ...userRecord.data(),
+                }
+
+                return user
+            })
+
+            res.status(200).json(users);   
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                const userControllerError: ErrorController = {
+                    name: "User",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "View",
+                    message: error.message
+                }
+                
+                res.status(400).json(userControllerError) //type: error.type, code: error.code
+            }
+        }
+    }
+
+    public async viewAllByInstitution(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const institutionId = req.params.id
+        
+        try {
+            const userRef = await userCollection.where('institution', '==', institutionId).get(); 
+
+            const users = userRef.docs.map(userRecord => ({id: userRecord.id, ...userRecord.data()}))
+
+            res.status(200).json(users);   
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                const userControllerError: ErrorController = {
+                    name: "User",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "View",
+                    message: error.message
+                }
+                
+                res.status(400).json(userControllerError) //type: error.type, code: error.code
+            }
+        }
+    }
+
+    public async viewAuth(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        try {
+            const userId = req.params.email;
+
+            const user = await getAuth().getUserByEmail(userId)
+                .then(userRecord => userRecord);
+
+            res.status(200).json(user);   
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                const userControllerError: ErrorController = {
+                    name: "User",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "View",
+                    message: error.message
+                }
+                
+                res.status(400).json(userControllerError) //type: error.type, code: error.code
+            }        
+        }
     }
 }
 
-class AdminService implements IService {
+class AdminService implements IBaseService {
     add(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         throw new Error('Method not implemented.');
     }
@@ -211,9 +331,13 @@ class AdminService implements IService {
     view(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         throw new Error('Method not implemented.');
     }
+    viewAll(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        throw new Error('Method not implemented.');
+    }
+
 }
 
-class AppAdminService implements IService {
+class AppAdminService implements IBaseService {
     add(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         throw new Error('Method not implemented.');
     }
@@ -226,6 +350,10 @@ class AppAdminService implements IService {
     view(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         throw new Error('Method not implemented.');
     }
+    viewAll(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        throw new Error('Method not implemented.');
+    }
+
 
 }
 

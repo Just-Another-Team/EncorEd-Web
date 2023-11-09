@@ -11,15 +11,15 @@ const roleRouter = Router();
 
 /* CRUD Role */
 roleRouter.post("/add", RoleUser.add)
+roleRouter.get("/list/", RoleUser.viewAll)
+roleRouter.get("/list/:id", RoleUser.view)
+roleRouter.put("/update/:id", RoleUser.update)
 //roleRouter.post("/update")
 //roleRouter.post("delete")
-
 // roleRouter.post("/admin/signUp", addAdminRole)
 // //roleRouter.post("/admin/add", addAdminRole)
 // //Update
 // //Delete
-
-// /* Get Roles */
 // roleRouter.get("/list/") //List by App Admin
 // roleRouter.get("/list/:id") //Select role from list
 // roleRouter.get("/list/:institution") //Select role by institution

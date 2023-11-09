@@ -1,5 +1,5 @@
-import { ActivityPermission } from "./ActivityPermission";
-import { VerificationPermission } from "./VerificationPermission";
+import { ActivityPermission } from "./activityPermission.model.type";
+import { VerificationPermission } from "./verificationPermission.model.type";
 
 export type Permission = {
     viewMap: boolean | undefined;

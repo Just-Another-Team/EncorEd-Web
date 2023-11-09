@@ -8,7 +8,7 @@ import {
     Timestamp,
     Query,
     Filter,
-    FieldPath
+    FieldPath,
 } from 'firebase-admin/firestore'
 
 const db = getFirestore(adminApp)
@@ -20,4 +20,3 @@ export {
     Filter,
     FieldPath
 }
-export const serverTimestamp = admin.firestore.FieldValue;
