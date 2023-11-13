@@ -1,3 +1,4 @@
+import { FieldValue } from "firebase-admin/firestore";
 import { TimestampProps } from "../types/TimestampProps";
 
 export default interface IUser {
@@ -10,7 +11,7 @@ export default interface IUser {
     userName?: string;
     password?: string;
     addedBy?: string;
-    joinDate?: Date | string;
+    joinDate?: string;
     isalumni?: string;
     status?: string;
 }

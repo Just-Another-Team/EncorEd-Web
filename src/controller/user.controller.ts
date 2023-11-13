@@ -4,7 +4,7 @@ import { ParsedQs } from 'qs';
 import { Request, Response } from 'express';
 import { converter } from '../models/converter';
 import IUser from '../models/user.model';
-import { db } from '../database';
+import { Timestamp, db } from '../database';
 import {
     adminAuth,
 } from '../authentication';
@@ -14,6 +14,7 @@ import { getAuth } from 'firebase-admin/auth';
 
 import { userRoleCollection } from './userRole.controller';
 import IUserRole from '../models/userRole.model';
+import { serverTimestamp } from 'firebase/firestore';
 
 // const { userRoleCollection } = require('./userRole.controller');
 // const { UserRole } = require('../models/userRole.model');
@@ -32,12 +33,12 @@ class UserService implements IBaseService {
                 email: reqUser.email,
                 userName: reqUser.userName,
                 addedBy: reqUser.addedBy,
-                joinDate: new Date().toISOString(),
+                joinDate: new Date().toString(),
                 isalumni: reqUser.isalumni,
                 status: "Open",
             }
 
-            console.log(reqUser)
+            console.log(user)
 
             //Authentication
             await adminAuth.createUser({
@@ -99,7 +100,7 @@ class UserService implements IBaseService {
                 userName: reqUser.userName,
                 password: reqUser.password,
                 addedBy: oldUser.addedBy,
-                joinDate: oldUser.joinDate?.toLocaleString(),
+                joinDate: oldUser.joinDate,
                 isalumni: oldUser.isalumni,
                 status: oldUser.status,
             }
@@ -286,12 +287,12 @@ class UserService implements IBaseService {
     }
 
     public async viewAllByInstitution(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        const institutionId = req.params.institution
         
         try {
-            console.log()
-
-            const userRef = await userCollection.where('institution', '==', institutionId).get(); 
+            const userRef = await userCollection.where('email', '!=', req.params.user)
+                                                .where('institution', '==', req.params.institution)
+                                                .where('status', '==', 'Open')
+                                                .get()
 
             const users = userRef.docs.map(userRecord => ({id: userRecord.id, ...userRecord.data()}))
 

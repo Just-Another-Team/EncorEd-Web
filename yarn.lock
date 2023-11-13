@@ -3277,6 +3277,11 @@ type-is@~1.6.18:
     media-typer "0.3.0"
     mime-types "~2.1.24"
 
+typescript-toolbox@^0.0.10:
+  version "0.0.10"
+  resolved "https://registry.npmjs.org/typescript-toolbox/-/typescript-toolbox-0.0.10.tgz"
+  integrity sha512-oyyuWHYWl/gMkKCU0l+UQQar0k0nybrfHHtAC7lvUX9NB806RJhgc2NAFqz2u6rv/kBstjYjLXTicF6ktauFzg==
+
 typescript@*, typescript@^5.2.2, "typescript@>=2.1.0 || >=2.1.0-dev || >=2.2.0-dev || >=2.3.0-dev || >=2.4.0-dev || >=2.5.0-dev || >=2.6.0-dev || >=2.7.0-dev || >=2.8.0-dev || >=2.9.0-dev || >= 3.0.0-dev || >= 3.1.0-dev", "typescript@>=2.3.0-dev || >=2.4.0-dev || >=2.5.0-dev || >=2.6.0-dev || >=2.7.0-dev || >=2.8.0-dev || >=2.9.0-dev || >=3.0.0-dev || >= 3.1.0-dev || >= 3.2.0-dev || >= 4.0.0-dev", typescript@>=2.7, typescript@>=4.2.0:
   version "5.2.2"
   resolved "https://registry.npmjs.org/typescript/-/typescript-5.2.2.tgz"

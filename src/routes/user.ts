@@ -26,7 +26,7 @@ userRouter.get("/list/auth/:email", userService.viewAuth)
 // userRouter.delete("/delete/:id", deleteUser)
 
 //View
-userRouter.get("/list/u/:institution", userService.viewAllByInstitution)
+userRouter.get("/list/u/:institution/:user", userService.viewAllByInstitution)
 // userRouter.get("/list/:id", viewUser)
 // userRouter.get("/profile/:userName", viewUserByName)
 //router.get("/list/:institution", <method for users based on institution>)
