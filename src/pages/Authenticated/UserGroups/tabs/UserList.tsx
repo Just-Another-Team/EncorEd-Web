@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { 
     Box, Button, Grid, TextField, Modal
 } from "@mui/material";
-import { DataGrid, GridCellParams, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
+import { DataGrid, GridCellParams, GridColDef, GridValueFormatterParams, GridValueGetterParams } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import { AddUserFormHook } from '../../../../components/Forms/Formhooks/AddUserForm-Hooks'
 import { getUsers } from "../../../../app/features/users/usersSlice";
@@ -12,6 +12,7 @@ import { targetUser, targetAction } from "../../../../app/features/users/targetS
 import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-hooks";
 import { FixMeLater } from "../../../../types/FixMeLater";
 import { userListObj } from "../../../../types/UserListObject";
+import { getValue } from "@testing-library/user-event/dist/utils";
 
 const UserList = () => {
     const navigate = useNavigate()
@@ -20,7 +21,7 @@ const UserList = () => {
     const userInstitution = useAppSelector(state => state.institution.data.id)
     const users = useAppSelector(state => state.users.data)
     const currUser = useAppSelector(state => state.authentication.data.id)
-    
+
     const usersDispatch = useAppDispatch()
     // const targetDispatch = useDispatch()
 
@@ -59,24 +60,34 @@ const UserList = () => {
         handleOpenRoles()
     }
 
-    // //list of users
+    //list of users
     useEffect(()=>{
         usersDispatch(getUsers(userList))
     }, [])
 
+    //searching user
+    const [searchedUsers, setSearchedUsers] = useState(users)
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const searchResult =  users.filter((val) => val.firstName.toUpperCase().includes(e.currentTarget.value.toUpperCase()) || val.lastName.toUpperCase().includes(e.currentTarget.value.toUpperCase()))
+        setSearchedUsers(searchResult)
+    }
+
     const columns: GridColDef[] = [
-        { field: 'id', headerName: 'Email', width: 200 },
-        { field: 'firstName', headerName: 'First name', width: 130 },
-        { field: 'lastName', headerName: 'Last name', width: 130 },
-        { field: 'addedBy', headerName: 'Added by', width: 130 },
+        { field: 'id', headerName: 'Email', width: 200, sortingOrder:['asc', 'desc'], },
+        { field: 'firstName', headerName: 'First name', width: 130, sortingOrder:['asc', 'desc'], },
+        { field: 'lastName', headerName: 'Last name', width: 130, sortingOrder:['asc', 'desc'], },
+        { field: 'addedBy', headerName: 'Added by', width: 130, sortingOrder:['asc', 'desc'], },
         {
             field: 'dateAdded',
             headerName: 'Date added',
-            description: 'This column has a value getter and is not sortable.',
-            sortable: false,
+            sortable: true,
+            sortingOrder:['asc', 'desc'],
             flex: 1,
             valueGetter: (params: GridValueGetterParams) => {
-              return dayjs(params.row.joinDate).format("MMMM-DD-YYYY")
+              return dayjs(params.row.joinDate).format('MM-DD-YYYY')
+            },
+            valueFormatter: (params: GridValueFormatterParams) => {
+                return dayjs(params.value).format('MMMM-DD-YYYY')
             },
           },
           {
@@ -144,7 +155,7 @@ const UserList = () => {
                     ADD USER
                 </Button>
                 <Grid container xs={4}>
-                    <TextField label="Search User" fullWidth/>
+                    <TextField onChange={handleSearch} label="Search User" fullWidth/>
                 </Grid>
 
                 {/* add user modal */}
@@ -247,7 +258,7 @@ const UserList = () => {
 
                 <DataGrid
                     autoHeight
-                    rows={users}
+                    rows={searchedUsers}
                     columns={columns}
                     hideFooterSelectedRowCount
                     initialState={{
