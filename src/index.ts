@@ -16,7 +16,7 @@ app.use(bodyParser.json())
 import userRouter from './routes/user'
 // import participantRouter from "./routes/participant"
 // import subjectRouter from "./routes/subject"
-// import institutionRouter from "./routes/institution"
+import institutionRouter from "./routes/institution"
 // import eventRouter from "./routes/event"
 // import attendeeRouter from "./routes/attendees"
 import roleRouter from "./routes/role"
@@ -24,7 +24,7 @@ import roleRouter from "./routes/role"
 app.use("/user", userRouter)
 // app.use("/participant", participantRouter)
 // app.use("/subject", subjectRouter)
-// app.use("/institution", institutionRouter)
+app.use("/institution", institutionRouter)
 // app.use("/event", eventRouter)
 // app.use("/attendees", attendeeRouter)
 app.use("/role", roleRouter)

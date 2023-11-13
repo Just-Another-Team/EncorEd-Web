@@ -8,9 +8,9 @@ const userRouter = Router();
 userRouter.post("/add", userService.add);
 userRouter.put("/update/:id", userService.update)
 
+userRouter.get("/exist/:id", userService.isExist)
 userRouter.get("/list/", userService.viewAll)
 userRouter.get("/list/:id", userService.view)
-userRouter.get("/list/institution/:id", userService.viewAllByInstitution)
 userRouter.get("/list/auth/:email", userService.viewAuth)
 
 //Add
@@ -26,7 +26,7 @@ userRouter.get("/list/auth/:email", userService.viewAuth)
 // userRouter.delete("/delete/:id", deleteUser)
 
 //View
-// userRouter.get("/list/u/:institution", viewAllUsersByInstitution)
+userRouter.get("/list/u/:institution", userService.viewAllByInstitution)
 // userRouter.get("/list/:id", viewUser)
 // userRouter.get("/profile/:userName", viewUserByName)
 //router.get("/list/:institution", <method for users based on institution>)

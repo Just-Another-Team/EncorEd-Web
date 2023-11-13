@@ -3,6 +3,7 @@ export default interface ErrorController {
     error: boolean,
     errorType: string,
     control: string,
+    code?: string,
     message: string,
     stack?: string
 }

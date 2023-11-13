@@ -4,17 +4,14 @@ import { ParsedQs } from 'qs';
 import { Request, Response } from 'express';
 import { converter } from '../models/converter';
 import IUser from '../models/user.model';
-import {
-    Timestamp,
-    db,
-} from '../database';
+import { db } from '../database';
 import {
     adminAuth,
 } from '../authentication';
 import IBaseService from '../interfaces/IBaseService';
-import { TimestampProps } from '../types/TimestampProps';
 import ErrorController from '../types/ErrorController';
 import { getAuth } from 'firebase-admin/auth';
+
 import { userRoleCollection } from './userRole.controller';
 import IUserRole from '../models/userRole.model';
 
@@ -39,6 +36,8 @@ class UserService implements IBaseService {
                 isalumni: reqUser.isalumni,
                 status: "Open",
             }
+
+            console.log(reqUser)
 
             //Authentication
             await adminAuth.createUser({
@@ -212,22 +211,32 @@ class UserService implements IBaseService {
         try {
             const userId = req.params.id;
 
-            const user = await userCollection.doc(userId).get()
-                .then((userRecord) => {
-                    return ({
-                        id: userRecord.id,
-                        ...userRecord.data(),
-                    })
-                });
+            const userDoc = await userCollection.doc(userId).get()
+
+            if (!userDoc.exists)
+                throw {code: 'firestore/missing-email', message: `User with id: ${userId} does not exist.`}
+//         //console.log(userRef.data())
+//         //const userDoc = await getDoc(userRef);
+
+//         res.status(200).json({id: userRef.id, ...userRef.data()})
+
+            // const user = await userDoc.get()
+            //     .then((userRecord) => {
+            //         return ({
+            //             id: userRecord.id,
+            //             ...userRecord.data(),
+            //         })
+            //     })
 
 
-            res.status(200).json(user);   
+            res.status(200).json({id: userDoc.id, ...userDoc.data()});   
         }
         catch (error) {
             if (error instanceof Error) {
                 const userControllerError: ErrorController = {
                     name: "User",
                     error: true,
+                    code: 'firestore/missing-email',
                     errorType: "Controller Error",
                     control: "View",
                     message: error.message
@@ -236,6 +245,14 @@ class UserService implements IBaseService {
                 res.status(400).json(userControllerError) //type: error.type, code: error.code
             }        
         }
+    }
+
+    public async isExist(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const userId = req.params.id;
+
+        const exist = await (await userCollection.doc(userId).get()).exists
+
+        res.status(200).json(exist); 
     }
 
     public async viewAll(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
@@ -269,9 +286,11 @@ class UserService implements IBaseService {
     }
 
     public async viewAllByInstitution(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        const institutionId = req.params.id
+        const institutionId = req.params.institution
         
         try {
+            console.log()
+
             const userRef = await userCollection.where('institution', '==', institutionId).get(); 
 
             const users = userRef.docs.map(userRecord => ({id: userRecord.id, ...userRecord.data()}))
