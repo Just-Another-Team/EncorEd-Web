@@ -9,6 +9,7 @@ import {
 } from "../firebase/authentication"
 import { RegisterFormCredential } from "../../types/RegisterFormCredential"
 import { FixMeLater } from "../../types/FixMeLater";
+import { userListObj } from "../../types/UserListObject";
 
 export type UserInput = {
     institution?: string,
@@ -47,8 +48,9 @@ class EncorEdUserService {
     //     return http.get("/user/list")
     // }
     
-    getAllUsersByInstitution(institution: string | undefined) {
-        return http.get(`/user/list/u/${institution}` )
+    getAllUsersByInstitution(userList: userListObj) {
+        const {institution, user} = userList
+        return http.get(`/user/list/u/${institution}/${user}` )
     }
 
     addUser(data: FixMeLater) {

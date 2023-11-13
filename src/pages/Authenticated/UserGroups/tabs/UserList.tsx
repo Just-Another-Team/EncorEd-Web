@@ -11,19 +11,24 @@ import { PasswordAuthHook } from "../../../../components/Forms/Formhooks/Passwor
 import { targetUser, targetAction } from "../../../../app/features/users/targetSlice";
 import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-hooks";
 import { FixMeLater } from "../../../../types/FixMeLater";
+import { userListObj } from "../../../../types/UserListObject";
 
 const UserList = () => {
     const navigate = useNavigate()
-    const { institution } = useParams();
+    //const { institution } = useParams();
 
-    // const userInstitution = useSelector(state => state.institution.data.id)
+    const userInstitution = useAppSelector(state => state.institution.data.id)
     const users = useAppSelector(state => state.users.data)
-    // const currUser = useSelector(state => state.user.data.email)
+    const currUser = useAppSelector(state => state.authentication.data.id)
     
     const usersDispatch = useAppDispatch()
     // const targetDispatch = useDispatch()
-    
-    // const userList = {userInstitution, currUser}
+
+    const userList: userListObj = {
+        institution: userInstitution,
+        user: currUser
+    };
+
     //Modal stuffs
     //add user form
     const [openAdd, setOpenAdd] = useState(false);
@@ -56,7 +61,7 @@ const UserList = () => {
 
     // //list of users
     useEffect(()=>{
-        usersDispatch(getUsers(institution?.toLowerCase()))
+        usersDispatch(getUsers(userList))
     }, [])
 
     const columns: GridColDef[] = [
@@ -102,6 +107,7 @@ const UserList = () => {
                 return (
                     <Button
                     //onClick={(e) => {handleRoles(params.row.id)}}
+                    onClick={(e) => {console.log(params.row)}}
                     variant="contained"
                     color="primary">
                         ROLES

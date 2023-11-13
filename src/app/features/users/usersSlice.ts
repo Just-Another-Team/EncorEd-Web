@@ -1,6 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import EncorEdUserService from "../../api/encored-user-service"
 import { FixMeLater } from "../../../types/FixMeLater"
+import { userListObj } from "../../../types/UserListObject"
 
 export type User = {
     id: string
@@ -29,8 +30,8 @@ const initialState: IUserInitialState = {
 
 export const getUsers = createAsyncThunk(
     "/users/get/institution",
-    async (institution: string | undefined, {rejectWithValue}) => {
-        return await EncorEdUserService.getAllUsersByInstitution(institution)
+    async (userList: userListObj , {rejectWithValue}) => {
+        return await EncorEdUserService.getAllUsersByInstitution(userList)
     }
 )
 
