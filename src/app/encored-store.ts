@@ -14,7 +14,7 @@ import usersSlice from "./features/users/usersSlice";
 // import eventSlice from "./features/event/eventSlice";
 // import usersSlice from "./features/users/usersSlice";
 // import profileSlice from "./features/profile/profileSlice";
-// import targetSlice from "./features/users/targetSlice";
+import targetSlice from "./features/users/targetSlice";
 // import roleSlice from "./features/role/roleSlice";
 // import userSlice from "./features/user/userSlice";
 // import authInstitution from "./features/institution/authInstitution";
@@ -59,6 +59,7 @@ const navigationPersistConfig = {
     blacklist: []
 }
 
+
 // const usersPersistConfig = {
 //     key: "users",
 //     storage
@@ -82,11 +83,11 @@ const combinedReducers = combineReducers({
     role: persistReducer(rolePersistConfig, roleSlice),
     institution: persistReducer(institutionPersistConfig, institutionSlice),
     navigation: persistReducer(navigationPersistConfig, navigationSlice),
-    users: persistReducer(usersPersistConfig, usersSlice)
+    users: persistReducer(usersPersistConfig, usersSlice),
+    target: targetSlice,
 });
 
 const persistedCombinedReducers = persistReducer(rootPersistConfig, combinedReducers)
-
 // //Persisted Data
 // user: userPersistedReducer,
 // pageSelect: pagePersistedReducer, 

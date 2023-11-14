@@ -51,14 +51,12 @@ export const addUsers = createAsyncThunk(
     }
 )
 
-// export const deleteUser = createAsyncThunk(
-//     "/users/delete",
-//     async (id, {rejectWithValue}) => {
-//         return await EncorEdAuthService.deleteUser(id)
-//             .then((res) => console.log(res))
-//             .catch((error) => rejectWithValue(error))
-//     }
-// )
+export const deleteUser = createAsyncThunk(
+    "/users/delete",
+    async (id: FixMeLater, {rejectWithValue}) => {
+        return await EncorEdUserService.deleteUser(id)
+    }
+)
 
 const usersSlice = createSlice({
     name: 'users',

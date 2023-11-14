@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit"
 import EncorEdAuthService, { UserInput } from "../../api/encored-auth-service"
+import EncorEdUserService from "../../api/encored-user-service"
 import { resetPage } from "../navigation/navigationSlice"
 import { RegisterFormCredential } from "../../../types/RegisterFormCredential"
 
@@ -144,14 +145,12 @@ export const signIn = createAsyncThunk(
 //     }
 // )
 
-// export const verifyPassword = createAsyncThunk(
-//     "user/verify",
-//     async (data, {rejectWithValue}) => {
-//         return await EncorEdAuthService.verifyPassword(data)
-//             .then((res) => res.data)
-//             .catch((error) => rejectWithValue(error))
-//     }
-// )
+export const verifyPassword = createAsyncThunk(
+    "user/verify",
+    async (data: any, {rejectWithValue}) => {
+        return await EncorEdUserService.verifyPassword(data)
+    }
+)
 
 const authSlice = createSlice({
     name: 'auth',

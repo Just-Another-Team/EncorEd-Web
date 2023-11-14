@@ -40,9 +40,9 @@ class EncorEdUserService {
     //     return http.put(`/user/update/${id}`, {firstName, lastName, email, password})
     // }
 
-    // deleteUser(id) {
-    //     return http.put(`/user/delete/${id}`)
-    // }
+    deleteUser(id: any) {
+        return http.put(`/user/delete/${id}`)
+    }
 
     // getAll() {
     //     return http.get("/user/list")
@@ -77,14 +77,16 @@ class EncorEdUserService {
     //     return http.get(`/user/profile/${data}`)
     // }
 
-    // //password verification before action
-    // verifyPassword(data){
-    //     const { password } = data
+    //password verification before action
+    verifyPassword(data: FixMeLater){
+        const { password } = data
+        const userEmail: FixMeLater = auth.currentUser?.email
+        const currentUser: FixMeLater = auth.currentUser
 
-    //     const credentials = EmailAuthProvider.credential(auth.currentUser.email, password)
+        const credentials = EmailAuthProvider.credential(userEmail, password)
 
-    //     return reauthenticateWithCredential(auth.currentUser, credentials)
-    // }
+        return reauthenticateWithCredential(currentUser, credentials)
+    }
 }
 
 export default new EncorEdUserService()

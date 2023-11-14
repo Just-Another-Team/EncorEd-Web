@@ -8,11 +8,10 @@ import { AddUserFormHook } from '../../../../components/Forms/Formhooks/AddUserF
 import { getUsers } from "../../../../app/features/users/usersSlice";
 import { useNavigate, useParams } from "react-router-dom";
 import { PasswordAuthHook } from "../../../../components/Forms/Formhooks/PasswordAuth-Hook";
-import { targetUser, targetAction } from "../../../../app/features/users/targetSlice";
+import { targetUser } from "../../../../app/features/users/targetSlice";
 import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-hooks";
 import { FixMeLater } from "../../../../types/FixMeLater";
 import { userListObj } from "../../../../types/UserListObject";
-import { getValue } from "@testing-library/user-event/dist/utils";
 
 const UserList = () => {
     const navigate = useNavigate()
@@ -23,7 +22,7 @@ const UserList = () => {
     const currUser = useAppSelector(state => state.authentication.data.id)
 
     const usersDispatch = useAppDispatch()
-    // const targetDispatch = useDispatch()
+    const targetDispatch = useAppDispatch()
 
     const userList: userListObj = {
         institution: userInstitution,
@@ -48,8 +47,7 @@ const UserList = () => {
 
     //delete user
     const handleVerification = (data: FixMeLater) => {
-        // targetDispatch(targetUser(data))
-        // targetDispatch(targetAction("Delete"))
+        targetDispatch(targetUser(data))
         handleOpenVerif()
     }
 
@@ -135,7 +133,7 @@ const UserList = () => {
             renderCell: (params: GridCellParams) => {
                 return (
                     <Button
-                    //onClick={(e) => {handleVerification(params.row.id)}}
+                    onClick={(e) => {handleVerification(params.row.id)}}
                     variant="contained"
                     color="error">
                         DELETE
@@ -192,7 +190,7 @@ const UserList = () => {
                 
                 {/* delete user modal */}
                 <Modal
-                    open={false}
+                    open={openVerif}
                     //onClose={handleClose} //close on clicking outside modal
                     aria-labelledby="Verify Password"
                     aria-describedby="Form for verifying current user password then deleting target user"
@@ -210,14 +208,13 @@ const UserList = () => {
                     }}>
                         <div style={{textAlign: 'right'}}>
                             <Button
-                            //onClick={handleCloseVerif}
-                            sx={{color:'black', fontWeight: 'bolder', fontSize: '20px', paddingRight:0, borderRadius:'20px'}}
-                            >
+                            onClick={handleCloseVerif}
+                            sx={{color:'black', fontWeight: 'bolder', fontSize: '20px', paddingRight:0, borderRadius:'20px'}}>
                                 x
                             </Button>
                         </div>
                         <div style={{padding: '15px', paddingTop: '0px'}}>
-                            {/* <PasswordAuthHook/> */}
+                            <PasswordAuthHook/>
                         </div>
                     </Box>
                 </Modal>
