@@ -215,19 +215,6 @@ class UserService implements IBaseService {
 
             if (!userDoc.exists)
                 throw {code: 'firestore/missing-email', message: `User with id: ${userId} does not exist.`}
-//         //console.log(userRef.data())
-//         //const userDoc = await getDoc(userRef);
-
-//         res.status(200).json({id: userRef.id, ...userRef.data()})
-
-            // const user = await userDoc.get()
-            //     .then((userRecord) => {
-            //         return ({
-            //             id: userRecord.id,
-            //             ...userRecord.data(),
-            //         })
-            //     })
-
 
             res.status(200).json({id: userDoc.id, ...userDoc.data()});   
         }
@@ -289,8 +276,6 @@ class UserService implements IBaseService {
         const institutionId = req.params.institution
         
         try {
-            console.log()
-
             const userRef = await userCollection.where('institution', '==', institutionId).get(); 
 
             const users = userRef.docs.map(userRecord => ({id: userRecord.id, ...userRecord.data()}))

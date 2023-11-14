@@ -14,6 +14,11 @@ import { ActivityPermission } from "../models/activityPermission.model.type";
 import IRoleInput from "../interfaces/IRoleInput";
 import { AttendancePermissions } from "../models/attendancePermission.model.type";
 import { VerificationPermission } from "../models/verificationPermission.model.type";
+import ErrorController from "../types/ErrorController";
+import { userRoleCollection } from "./userRole.controller";
+import { userCollection } from "./user.controller";
+import IUserRole from "../models/userRole.model";
+import IUser from "../models/user.model";
 
 const roleCollection = db.collection(`/role/`).withConverter(converter<IRole>())
 
@@ -173,7 +178,7 @@ class RoleUser implements IBaseService {
                 name: reqRole.name,
                 desc: reqRole.desc,
                 //type: reqRole.type, < For identifying only
-                institution: reqRole.institution,
+                institution: reqRole.institution.toLowerCase().trim().replace(/\s/g, ''),
                 appAdmin: reqRole.type === "appAdmin" ? true : false,
                 admin: reqRole.type === "admin" ? true : false,
                 employee: reqRole.type === "employee" ? permission : false,
@@ -187,7 +192,7 @@ class RoleUser implements IBaseService {
                 status: "Open"
             }
 
-            let institution = role.institution.toLowerCase().trim().replace(/\s/g, '');
+            let institution = role.institution;
             let name = role.name.toLowerCase().trim().replace(/\s/g, '');
 
             await roleCollection.doc(`${institution}-${name}`).create(role)
@@ -200,12 +205,14 @@ class RoleUser implements IBaseService {
     }
 
     public async update(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const roleIdparam = req.params.id;
+        
         try {
-            //Type casting 
-            const roleIdparam = req.params.id;
+            const roleDoc = roleCollection.doc(roleIdparam)
+
             const reqRole = req.body as IRoleInput;
 
-            const roleRef = await roleCollection.doc(roleIdparam).get()
+            const oldRole = await roleDoc.get().then(role => ({id: role.id, ...role.data()}));
 
             //AttendancePermissions
             const submitSubjectAttendanceVerification:VerificationPermission = {
@@ -354,23 +361,38 @@ class RoleUser implements IBaseService {
                 name: reqRole.name,
                 desc: reqRole.desc,
                 //type: reqRole.type, < For identifying only
-                institution: reqRole.institution,
+                institution: reqRole.institution.toLowerCase().trim().replace(/\s/g, ''),
                 appAdmin: reqRole.type === "appAdmin" ? true : false,
                 admin: reqRole.type === "admin" ? true : false,
                 employee: reqRole.type === "employee" ? permission : false,
                 teacher: reqRole.type === "teacher" ? permission : false,
                 student: reqRole.type === "student" ? permission : false,
                 visitor: reqRole.type === "visitor" ? permission : false,
-                creationDate: roleRef.data()!.creationDate,
-                createdBy: roleRef.data()!.createdBy,
+                creationDate: oldRole.creationDate!,
+                createdBy: oldRole.createdBy!,
                 updatedDate: new Date().toISOString(), //new Timestamp(Timestamp.fromDate(new Date).seconds, Timestamp.fromDate(new Date).nanoseconds).toDate() as TimestampProps
                 updatedBy: reqRole.updatedBy,
                 status: "Open"
             }
 
-            await roleCollection.doc(roleIdparam).update(role)
+            let institution = role.institution;
+            let name = role.name.toLowerCase().trim().replace(/\s/g, '');
             
-            res.status(200).json({message: "Role successfully updated!", result: role})
+            const newRoleId = `${institution}-${name}`
+
+            //Update Firestore
+            await roleCollection.doc(newRoleId).set(role)
+                .then(() => {
+                    console.log("Successfully Updated Role - Firestore (Set)")
+                })
+
+            if (oldRole.id !== newRoleId)
+                await roleDoc.delete()
+                    .then(() => {
+                        console.log("Successfully Updated Role - Firestore (Delete Old)")
+                    })
+            
+            res.status(200).json({message: "Role successfully updated!"})
         }
         catch (error) {
             if (error instanceof Error) res.status(400).json({name: "Role", userType: "User", type: "Add", message: error.message})
@@ -378,7 +400,18 @@ class RoleUser implements IBaseService {
     }
 
     public async delete(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const roleIdparam = req.params.id;
+        
         //Delete by status
+        try {
+            await roleCollection.doc(roleIdparam).delete();
+
+            //Delete User Roles based on the role being deleted
+
+            res.status(200).json({messsage: "Role deleted successfully"})
+        } catch (error) {
+            if (error instanceof Error) res.status(400).json({name: "Role", userType: "User", type: "View", message: error.message, stack: error.stack})
+        }
     }
 
     public async view(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
@@ -406,6 +439,7 @@ class RoleUser implements IBaseService {
             if (error instanceof Error) res.status(400).json({name: "Role", userType: "User", type: "View", message: error.message, stack: error.stack})
         }
     }
+
     public async viewAll(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         try {
             //Type casting 
@@ -428,6 +462,53 @@ class RoleUser implements IBaseService {
         }
         catch (error) {
             if (error instanceof Error) res.status(400).json({name: "Role", userType: "User", type: "View", message: error.message, stack: error.stack})
+        }
+    }
+
+    public async viewAllByInsitution(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const institutionId = req.params.institution
+        
+        try {
+            console.log()
+
+            const roleRef = await roleCollection.where('institution', '==', institutionId).get(); 
+            const roles = roleRef.docs.map((roleRecord) => ({id: roleRecord.id, ...roleRecord.data()}))
+
+            const userRolesRef = await userRoleCollection.get()
+            const userRoles = userRolesRef.docs.map((userRoleRecord) => ({id: userRoleRecord.id, ...userRoleRecord.data()}))
+
+            const usersRef = await userCollection.get()
+            const users = usersRef.docs.map((userRecord) => ({id: userRecord.id, ...userRecord.data()}))
+
+            const roleOutput = roles.filter(role => !role.admin && !role.appAdmin).map(role => {
+                let usersOutput: Array<IUser> = []
+                
+                userRoles.filter(userRole => userRole.roleId == role.id).forEach(userRole => {
+                    usersOutput = users.filter(user => user.id == userRole.userId)
+                })
+
+                return ({
+                    ...role,
+                    createdBy: users.find(user => user.id === role.createdBy) as IUser,
+                    groupsAssigned: 0,
+                    usersAssigned: usersOutput
+                })
+            })
+
+            res.status(200).json(roleOutput);   
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                const roleControllerError: ErrorController = {
+                    name: "Role",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "View By Institution",
+                    message: error.message
+                }
+                
+                res.status(400).json(roleControllerError) //type: error.type, code: error.code
+            }
         }
     }
 }
