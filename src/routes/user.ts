@@ -22,11 +22,11 @@ userRouter.get("/list/auth/:email", userService.viewAuth)
 
 // userRouter.patch("/institution/assign", assignInstitution)
 
-// //Delete
-// userRouter.delete("/delete/:id", deleteUser)
+//Delete
+userRouter.put("/delete/:id", userService.delete)
 
 //View
-userRouter.get("/list/u/:institution", userService.viewAllByInstitution)
+userRouter.get("/list/u/:institution/:user", userService.viewAllByInstitution)
 // userRouter.get("/list/:id", viewUser)
 // userRouter.get("/profile/:userName", viewUserByName)
 //router.get("/list/:institution", <method for users based on institution>)
