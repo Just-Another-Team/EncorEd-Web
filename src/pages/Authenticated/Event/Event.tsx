@@ -14,6 +14,9 @@ import EventList from "./tabs/EventList";
 import EventSchedList from "./tabs/EventSchedList";
 import EventRequest from "./tabs/EventRequestList";
 import { FixMeLater } from "../../../types/FixMeLater";
+import { Outlet } from "react-router-dom";
+import CustomTab from "../../../components/Tab/CustomTab";
+import { Link } from "react-router-dom";
 
 const Event = () => {
     const [page, setPage] = React.useState(0);
@@ -39,14 +42,18 @@ const Event = () => {
             {/* Tabs */}
             <Box marginBottom={2} sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={page} onChange={handleChange} aria-label="basic tabs example">
-                    <Tab label="Summary" />
+                    <CustomTab label="Summary" component={Link} to=""/>
+                    <CustomTab label="Event List" component={Link} to="list"/>
+                    <CustomTab label="Scheduled Events" component={Link} to="schedule"/>
+                    <CustomTab label="Awaiting Approval" component={Link} to="request"/>
+                    {/* <Tab label="Summary" />
                     <Tab label="Event List" />
                     <Tab label="Scheduled Events" />
-                    <Tab label="Awaiting Approval" />
+                    <Tab label="Awaiting Approval" /> */}
                 </Tabs>
             </Box>
 
-            <EventTabPanel value={page} index={0}>
+            {/* <EventTabPanel value={page} index={0}>
                 <EventSummary />
             </EventTabPanel>
             <EventTabPanel value={page} index={1}>
@@ -57,7 +64,9 @@ const Event = () => {
             </EventTabPanel>
             <EventTabPanel value={page} index={3}>
                 <EventRequest />
-            </EventTabPanel>
+            </EventTabPanel> */}
+
+            <Outlet />
         </>
     )
 }

@@ -26,16 +26,26 @@ import RegistrationInstitutionForm from './components/Forms/Formhooks/UserForm-R
 // import Profile from './pages/Authenticated/Profile/Profile';
 // import UsersLayout from './pages/Admin/Users/UsersLayout';
 import UsersProfile from './pages/Authenticated/Profile/UsersProfile';
-// import AddRole from './pages/Authenticated/UserGroups/Role/AddRole';
 import { useAppDispatch, useAppSelector } from './app/encored-store-hooks';
+import UserList from './pages/Authenticated/UserGroups/tabs/UserList';
+import GroupList from './pages/Authenticated/UserGroups/tabs/GroupList';
+import RoleList from './pages/Authenticated/UserGroups/tabs/RoleList';
+import SubSummary from './pages/Authenticated/Subject/pages/Summary';
+import SubList from './pages/Authenticated/Subject/pages/SubjectList';
+import SchedSubList from './pages/Authenticated/Subject/pages/ScheduledSubject';
+import SubRequest from './pages/Authenticated/Subject/pages/Request';
+import EventSummary from './pages/Authenticated/Event/tabs/Summary';
+import EventList from './pages/Authenticated/Event/tabs/EventList';
+import EventSchedList from './pages/Authenticated/Event/tabs/EventSchedList';
+import EventRequest from './pages/Authenticated/Event/tabs/EventRequestList';
+import AddRole from './pages/Authenticated/UserGroups/Role/AddRole';
+import SelectedRole from './pages/Authenticated/UserGroups/Role/SelectedRole';
+import UpdateRole from './pages/Authenticated/UserGroups/Role/UpdateRole';
 
 function App() {
   //const role = useAppSelector(state => state.roles);
   const user = useAppSelector(state => state.authentication.data)
-
-  const dispatch = useAppDispatch();
-
-  const navigate = useNavigate()
+  const roles = useAppSelector(state => state.assignRole.data)
 
   useEffect(() => {
     // onAuthStateChanged(auth, (user) => {
@@ -61,25 +71,37 @@ function App() {
         <Route path='institution' element={Object.keys(user).length != 0 ? <RegistrationInstitutionForm /> : <Navigate replace to='/login' />}/> {/*  */}
       </Route>
 
-      {/* element={role.data.find(data => data._systemRole._admin) || role.data.find(data => data._systemRole._employee) ? <Dashboard /> : <Navigate replace to={'/login'} /> */}
-      {/* users/list/u/:institution */}
-      {/* groups/list/u/:institution */}
-      {/* role/list/u/:institution */}
-
       {/* Authenticated Pages */}
       <Route path='/dashboard' element={ Object.keys(user).length != 0 ? <Dashboard /> : <Navigate replace to='/login' />}>
-        <Route path='home' element={<InstitutionalHome />} />
-
-        <Route path='subject' element={<Subject />} />
-        {/* <Route path='subject/:id' element={<SelectedSubject />} />  */}
+        <Route index path='home' element={<InstitutionalHome />} />
 
         <Route path='map/list' element={<MapList />} />
 
-        <Route path='event' element={<Event />} />
+        <Route path='subject/:institution' element={<Subject />}>
+          <Route index path='' element={<SubSummary />}/>
+          <Route path='list' element={<SubList />}/>
+          <Route path='schedule' element={<SchedSubList />}/>
+          <Route path='request' element={<SubRequest />}/>
+        </Route>
+        <Route path='subject/:institution/add' /> {/* Add Subject */}
+        <Route path='subject/:institution/:id' /> {/* Selected Subject */}
+        <Route path='subject/:institution/:id/update' /> {/* Update Subject */}
 
-        <Route path='users/list/u/:institution' element={<UserGroups />} />
-        <Route path='users/list/u/:institution/:email' element={<UsersProfile />}/>
-        {/* <Route path='role/:institution/add' element={<AddRole />}/> */}
+        <Route path='event/:institution' element={<Event />}>
+          <Route index path='' element={<EventSummary />}/>
+          <Route path='list' element={<EventList />}/>
+          <Route path='schedule' element={<EventSchedList />}/>
+          <Route path='request' element={<EventRequest />}/>
+        </Route>
+
+        <Route path='list' element={<UserGroups />}>
+          <Route index path='users/u/:institution' element={<UserList />}/>
+          <Route path='groups/u/:institution' element={<GroupList />}/>
+          <Route path='roles/u/:institution' element={<RoleList />}/>
+          <Route path='roles/u/:institution/:roleId' element={<SelectedRole />} /> {/* Selected Role */}
+        </Route>
+        <Route path='role/:institution/add' element={<AddRole />}/> {/* Add Role */}
+        <Route path='role/:institution/:id/update' element={<UpdateRole />}/> {/* Update Role */}
 
         {/* <Route path='institution' element={<Institution />} />
 
@@ -91,7 +113,6 @@ function App() {
       </Route>
 
       {/* Admin Pages*/}
-
       {/* role.data.find(data => data._systemRole._superAdmin) ? <AdminDashboard /> : <Navigate replace to="/login" /> */}
 
       {/* <Route path='/admin/dashboard' element={<AdminDashboard />}>

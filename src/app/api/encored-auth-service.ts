@@ -8,6 +8,7 @@ import {
     EmailAuthProvider,
 } from "../firebase/authentication"
 import { RegisterFormCredential } from "../../types/RegisterFormCredential"
+import { FixMeLater } from "../../types/FixMeLater";
 
 export type UserInput = {
     institution?: string,
@@ -185,10 +186,10 @@ class EncorEdAuthService {
     // }
 
     // //password verification before action
-    // verifyPassword(data){
+    // verifyPassword(data: FixMeLater){
     //     const { password } = data
 
-    //     const credentials = EmailAuthProvider.credential(auth.currentUser.email, password)
+    //     const credentials = EmailAuthProvider.credential(auth.currentUser?.email, password)
 
     //     return reauthenticateWithCredential(auth.currentUser, credentials)
     // }

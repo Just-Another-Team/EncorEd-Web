@@ -7,6 +7,7 @@ import {
     ListItemIcon,
     ListItem,
     ListItemText,
+    ListItemButtonProps,
     Box
 } from '@mui/material'
 import { nextPage } from "../../app/features/navigation/navigationSlice";
@@ -15,8 +16,11 @@ import { FixMeLater } from "../../types/FixMeLater";
 
 const drawerWidth = 240;
 
-const Sidebar = ({navigations, select, selectedPage}: FixMeLater) => {
+const CustomListItemButton = <C extends React.ElementType>(props: ListItemButtonProps<C, { component?: C }>) => {
+    return (<ListItemButton {...props}>{props.children}</ListItemButton>)
+}
 
+const Sidebar = ({navigations, select, selectedPage}: FixMeLater) => {
     return(
         <Drawer
             variant="permanent"
@@ -36,50 +40,19 @@ const Sidebar = ({navigations, select, selectedPage}: FixMeLater) => {
                 <List disablePadding>
                     {navigations?.map((navigation: FixMeLater, index: FixMeLater) => (
                         <ListItem key={navigation.name} disablePadding>
-                            <ListItemButton
-                            LinkComponent={"a"}
-                            href={navigation.href}
+                            <CustomListItemButton
+                            component={Link}
+                            to={navigation.href}
                             onClick={() => {
                                 select(nextPage(navigation.name))
                             }}
                             sx={{
                                 backgroundColor: navigation.name === selectedPage ? '#6DB6FD' : ''
-                            }}
-                            >
-                                <ListItemIcon sx={{ color: '#FFFFFF' }}>
-                                    {navigation.icon}
-                                </ListItemIcon>
-
+                            }}>
+                                <ListItemIcon sx={{ color: '#FFFFFF' }}>{navigation.icon}</ListItemIcon>
                                 <ListItemText primary={navigation.name} />
-                            
-                            </ListItemButton>
+                            </CustomListItemButton>
                         </ListItem>
-
-                        // <ListItem key={navigation.name} disablePadding>
-                        //     <ListItemIcon sx={{ color: '#FFFFFF' }}>
-                        //             {navigation.icon}
-                        //     </ListItemIcon>
-
-                        //     <ListItemText primary={navigation.name} />
-
-                        //     {/* <ListItemButton
-                            
-                            
-                        //     // LinkComponent={Link}
-
-                        //     //to={navigation.href}
-                        //     // onClick={(e: FixMeLater) => {
-                        //     //     select(nextPage(navigation.name))
-                        //     // }}
-                        //     // sx={{
-                        //     //     backgroundColor: navigation.name === selectedPage.page && '#6DB6FD'
-                        //     // }}
-                        //     >
-
-                                
-
-                        //     </ListItemButton> */}
-                        // </ListItem>
                     ))}
                 </List>
             </Box>

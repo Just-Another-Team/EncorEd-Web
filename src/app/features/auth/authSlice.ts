@@ -237,6 +237,22 @@ const authSlice = createSlice({
                 state.error = actions.payload
             })
         }
+
+        //Get Signed In User
+        {
+            builder.addCase(getUser.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            builder.addCase(getUser.fulfilled, (state, actions: PayloadAction<any>) => {    
+                state.loading = false
+                state.error = null
+            })
+            builder.addCase(getUser.rejected, (state, actions: PayloadAction<any>) => {
+                state.loading = false
+                state.error = actions.payload
+            })
+        }
     }
 })
 //     extraReducers: builder => {

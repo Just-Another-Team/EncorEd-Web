@@ -6,9 +6,6 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 // import { getInstitution } from '../../../app/features/institution/authInstitution';
 // import { viewAssignedRoles } from '../../../app/features/role/authRoleSlice';
 // import { getUser, signIn } from '../../../app/features/auth/authSlice';
-import { setUser } from '../../../app/features/user/userSlice';
-import { setInstitution } from '../../../app/features/institution/institutionSlice';
-import { setRoles } from '../../../app/features/role/roleSlice';
 
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../../app/encored-store-hooks';
@@ -24,7 +21,7 @@ const LoginUserForm = () => {
 
     const user = useAppSelector(state => state.authentication)
     const institution = useAppSelector(state => state.institution)
-    const roles = useAppSelector(state => state.role)
+    const roles = useAppSelector(state => state.assignRole)
     // const assignedRole = useAppSelector(state => state.roles);
 
     let navigate = useNavigate()

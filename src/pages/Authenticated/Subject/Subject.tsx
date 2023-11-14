@@ -14,6 +14,9 @@ import SubList from "./pages/SubjectList";
 import SchedSubList from "./pages/ScheduledSubject";
 import SubRequest from "./pages/Request";
 import { FixMeLater } from "../../../types/FixMeLater";
+import { Outlet } from "react-router-dom";
+import CustomTab from "../../../components/Tab/CustomTab";
+import { Link } from "react-router-dom";
 
 const Subject = () => {
     const [page, setPage] = React.useState(0);
@@ -39,28 +42,14 @@ const Subject = () => {
             {/* Tabs */}
             <Box marginBottom={2} sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={page} onChange={handleChange} aria-label="basic tabs example">
-                    <Tab label="Summary" />
-                    <Tab label="Subject List" />
-                    <Tab label="Scheduled Subject" />
-                    <Tab label="Request" />
+                    <CustomTab label="Summary" component={Link} to=""/>
+                    <CustomTab label="Subject List" component={Link} to="list"/>
+                    <CustomTab label="Scheduled Subject" component={Link} to="schedule"/>
+                    <CustomTab label="Request" component={Link} to="request"/>
                 </Tabs>
             </Box>
 
-            <SubjectTabPanel value={page} index={0}>
-                <SubSummary />
-            </SubjectTabPanel>
-
-            <SubjectTabPanel value={page} index={1}>
-                <SubList />
-            </SubjectTabPanel>
-
-            <SubjectTabPanel value={page} index={2}>
-                <SchedSubList />
-            </SubjectTabPanel>
-
-            <SubjectTabPanel value={page} index={3}>
-                <SubRequest/>
-            </SubjectTabPanel>
+            <Outlet />
         </>
     )
 }

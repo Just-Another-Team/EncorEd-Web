@@ -16,11 +16,6 @@ import { useAppDispatch, useAppSelector } from "../../../app/encored-store-hooks
 const UsersProfile = () => {
     const { email } = useParams();
 
-    // const usersDispatch = useAppDispatch()
-    
-    // const input = window.location.pathname
-    // const result = input.replace("/dashboard/profile/", "")
-
     const user = useAppSelector(state => state.users.data.find(user => user.id === email))
     // const val: object = arr.filter((data: FixMeLater) => data.userName === result)
 

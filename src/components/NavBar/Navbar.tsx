@@ -23,6 +23,7 @@ import { logOutRoles } from "../../app/features/role/authRoleSlice";
 import { logOutInstitution } from "../../app/features/institution/authInstitutionSlice";
 import { resetPage } from "../../app/features/navigation/navigationSlice";
 import { resetUsers } from "../../app/features/users/usersSlice";
+import { resetRoles } from "../../app/features/role/roleSlice";
 
 
 const Navbar = () => {
@@ -43,6 +44,7 @@ const Navbar = () => {
         logoutDispatch(resetPage())
 
         logoutDispatch(resetUsers())
+        logoutDispatch(resetRoles())
             
         navigate("/login")
     }

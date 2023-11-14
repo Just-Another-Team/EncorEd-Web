@@ -25,11 +25,12 @@ import { FixMeLater } from "../../../../types/FixMeLater"
 import { Permission } from "../../../../types/RoleTypes/Permission"
 import { RegisterFormInput } from "../../../../types/RegisterFormInput"
 import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-hooks"
-import { addRole } from "../../../../app/features/role/roleSlice"
+import { addRole, updateRole } from "../../../../app/features/role/roleSlice"
 import { RoleInput } from "../../../../app/api/encored-role-service"
-import { useNavigate } from "react-router-dom"
-
-
+import { useNavigate, useParams } from "react-router-dom"
+import { Role } from "../../../../app/features/role/authRoleSlice"
+import { VerificationPermission } from "../../../../types/RoleTypes/VerificationPermission"
+import { AttendancePermissions } from "../../../../types/RoleTypes/AttendancePermission"
 
 type SwitchInputs = {
     key: string
@@ -39,178 +40,189 @@ type SwitchInputs = {
 
 {/* NEEDS OPTIMIZATION */}
 
-const AddRole = () => {
+const UpdateRole = () => {
+
+    const { id } = useParams();
 
     const navigate = useNavigate();
 
     const dispatch = useAppDispatch()
     const loading = useAppSelector(state => state.role.loading)
     const user = useAppSelector(state => state.authentication.data.email)
-    const institution = useAppSelector(state => state.institution.data.name)
+    const institutionData = useAppSelector(state => state.institution.data)
+    const role = useAppSelector(state => state.role.data.find(role => role.id === id) as Role)
+
+    const rolePermissions: Permission = typeof role?.employee !== 'boolean' ? role?.employee as Permission : 
+                            typeof role?.teacher !== 'boolean' ? role?.teacher as Permission :
+                            typeof role?.student !== 'boolean' ? role?.student  as Permission: 
+                            role?.visitor as Permission;
 
     const defaultPermission: Permission = {
-        viewMap: true,
-        addMap: false,
-        editMap: false,
-        deleteMap: false,
-        unlockMap: false,
+        viewMap: rolePermissions.viewMap,
+        addMap: rolePermissions.addMap,
+        editMap: rolePermissions.editMap,
+        deleteMap: rolePermissions.deleteMap,
+        unlockMap: rolePermissions.unlockMap,
     
         viewSubject: {
-            value: true,
-            schedule: false,
-            participants: false,
-            attendance: false,
+            value: rolePermissions.viewSubject?.value,
+            schedule: rolePermissions.viewSubject?.schedule,
+            participants: rolePermissions.viewSubject?.participants,
+            attendance: rolePermissions.viewSubject?.attendance,
             verify: {
-                value: false,
-                by: "" 
+                value: (rolePermissions.viewSubject?.verify as VerificationPermission).value,
+                by: (rolePermissions.viewSubject?.verify as VerificationPermission).by 
             },
         },
         addSubject: {
-            value: false,
-            schedule: false,
-            participants: false,
+            value: rolePermissions.addSubject?.value,
+            schedule: rolePermissions.addSubject?.schedule,
+            participants: rolePermissions.addSubject?.participants,
             attendance: {
-                value: false,
+                value: (rolePermissions.addSubject?.attendance as AttendancePermissions).value,
                 verifyAttendance: {
-                    value: false,
-                    by: "" 
+                    value: (rolePermissions.addSubject?.attendance as AttendancePermissions).verifyAttendance?.value,
+                    by: (rolePermissions.addSubject?.attendance as AttendancePermissions).verifyAttendance?.by 
                 },
             },
             verify: {
-                value: false,
-                by: "" 
+                value: (rolePermissions.addSubject?.verify as VerificationPermission).value,
+                by: (rolePermissions.addSubject?.verify as VerificationPermission).by 
             },
         },
         editSubject: {
-            value: false,
-            schedule: false,
-            participants: false,
+            value: rolePermissions.editSubject?.value,
+            schedule: rolePermissions.editSubject?.schedule,
+            participants: rolePermissions.editSubject?.participants,
             attendance: {
-                value: false,
+                value: (rolePermissions.editSubject?.attendance as AttendancePermissions).value,
                 verifyAttendance: {
-                    value: false,
-                    by: "" 
+                    value: (rolePermissions.editSubject?.attendance as AttendancePermissions).verifyAttendance?.value,
+                    by: (rolePermissions.editSubject?.attendance as AttendancePermissions).verifyAttendance?.by 
                 },
             },
             verify: {
-                value: false,
-                by: "" 
+                value: (rolePermissions.editSubject?.verify as VerificationPermission).value,
+                by: (rolePermissions.editSubject?.verify as VerificationPermission).by 
             },
         },
         deleteSubject: {
-            value: false,
-            schedule: false,
-            participants: false,
+            value: rolePermissions.deleteSubject?.value,
+            schedule: rolePermissions.deleteSubject?.schedule,
+            participants: rolePermissions.deleteSubject?.participants,
             attendance: {
-                value: false,
+                value: (rolePermissions.deleteSubject?.attendance as AttendancePermissions).value,
                 verifyAttendance: {
-                    value: false,
-                    by: "" 
+                    value: (rolePermissions.deleteSubject?.attendance as AttendancePermissions).verifyAttendance?.value,
+                    by: (rolePermissions.deleteSubject?.attendance as AttendancePermissions).verifyAttendance?.by 
                 },
             },
             verify: {
-                value: false,
-                by: "" 
+                value: (rolePermissions.deleteSubject?.verify as VerificationPermission).value,
+                by: (rolePermissions.deleteSubject?.verify as VerificationPermission).by 
             },
         },
     
         viewEvent: {
-            value: true,
-            schedule: false,
-            participants: false,
-            attendance: false,
+            value: rolePermissions.viewEvent?.value,
+            schedule: rolePermissions.viewEvent?.schedule,
+            participants: rolePermissions.viewEvent?.participants,
+            attendance: rolePermissions.viewEvent?.attendance,
             verify: {
-                value: false,
-                by: "" 
+                value: (rolePermissions.viewEvent?.verify as VerificationPermission).value,
+                by: (rolePermissions.viewEvent?.verify as VerificationPermission).by 
             },
         },
         addEvent: {
-            value: false,
-            schedule: false,
-            participants: false,
+            value: rolePermissions.addEvent?.value,
+            schedule: rolePermissions.addEvent?.schedule,
+            participants: rolePermissions.addEvent?.participants,
             attendance: {
-                value: false,
+                value: (rolePermissions.addEvent?.attendance as AttendancePermissions).value,
                 verifyAttendance: {
-                    value: false,
-                    by: "" 
+                    value: (rolePermissions.addEvent?.attendance as AttendancePermissions).verifyAttendance?.value,
+                    by: (rolePermissions.addEvent?.attendance as AttendancePermissions).verifyAttendance?.by 
                 },
             },
             verify: {
-                value: false,
-                by: "" 
+                value: (rolePermissions.addEvent?.verify as VerificationPermission).value,
+                by: (rolePermissions.addEvent?.verify as VerificationPermission).by 
             },
         },
         editEvent: {
-            value: false,
-            schedule: false,
-            participants: false,
+            value: rolePermissions.editEvent?.value,
+            schedule: rolePermissions.editEvent?.schedule,
+            participants: rolePermissions.editEvent?.participants,
             attendance: {
-                value: false,
+                value: (rolePermissions.editEvent?.attendance as AttendancePermissions).value,
                 verifyAttendance: {
-                    value: false,
-                    by: "" 
+                    value: (rolePermissions.editEvent?.attendance as AttendancePermissions).verifyAttendance?.value,
+                    by: (rolePermissions.editEvent?.attendance as AttendancePermissions).verifyAttendance?.by 
                 },
             },
             verify: {
-                value: false,
-                by: "" 
+                value: (rolePermissions.editEvent?.verify as VerificationPermission).value,
+                by: (rolePermissions.editEvent?.verify as VerificationPermission).by 
             },
         },
         deleteEvent: {
-            value: false,
-            schedule: false,
-            participants: false,
+            value: rolePermissions.deleteEvent?.value,
+            schedule: rolePermissions.deleteEvent?.schedule,
+            participants: rolePermissions.deleteEvent?.participants,
             attendance: {
-                value: false,
+                value: (rolePermissions.deleteEvent?.attendance as AttendancePermissions).value,
                 verifyAttendance: {
-                    value: false,
-                    by: "" 
+                    value: (rolePermissions.deleteEvent?.attendance as AttendancePermissions).verifyAttendance?.value,
+                    by: (rolePermissions.deleteEvent?.attendance as AttendancePermissions).verifyAttendance?.by 
                 },
             },
             verify: {
-                value: false,
-                by: "" 
+                value: (rolePermissions.deleteEvent?.verify as VerificationPermission).value,
+                by: (rolePermissions.deleteEvent?.verify as VerificationPermission).by 
             },
         },
     
-        viewUser: true,
-        addUser: false,
-        editUser: false,
-        deleteUser: false,
+        viewUser: rolePermissions.viewUser,
+        addUser: rolePermissions.addUser,
+        editUser: rolePermissions.editUser,
+        deleteUser: rolePermissions.deleteUser,
         verifyUser: {
-            value: false,
-            by: "" 
+            value: rolePermissions.verifyUser?.value,
+            by: rolePermissions.verifyUser?.by 
         },
     
-        viewGroup: true,
-        addGroup: false,
-        editGroup: false,
-        deleteGroup: false,
+        viewGroup: rolePermissions.viewGroup,
+        addGroup: rolePermissions.addGroup,
+        editGroup: rolePermissions.editGroup,
+        deleteGroup: rolePermissions.deleteGroup,
         verifyGroup: {
-            value: false,
-            by: "" 
+            value: rolePermissions.verifyGroup?.value,
+            by: rolePermissions.verifyGroup?.by 
         },
     
-        viewRole: true,
-        addRole: false,
-        editRole: false,
-        deleteRole: false,
+        viewRole: rolePermissions.viewGroup,
+        addRole: rolePermissions.addGroup,
+        editRole: rolePermissions.editGroup,
+        deleteRole: rolePermissions.deleteGroup,
         verifyRole: {
-            value: false,
-            by: "" 
+            value: rolePermissions.verifyRole?.value,
+            by: rolePermissions.verifyRole?.by 
         },
     
-        viewInstitution: true,
+        viewInstitution: rolePermissions.viewInstitution,
     }
 
     const {handleSubmit, reset, control, setValue, formState: {errors}} = useForm<RoleInput>({
         defaultValues: {
-            name: "",
-            desc: "",
-            type: "",
+            name: role.name,
+            desc: role.desc,
+            type:   typeof role?.employee !== 'boolean' ? "employee" : 
+                    typeof role?.teacher !== 'boolean' ? "teacher" :
+                    typeof role?.student !== 'boolean' ? "student" : 
+                    "visitor",
             permission: defaultPermission,
-            institution: institution,
-            createdBy: user
+            institution: institutionData.name,
+            updatedBy: user
         }
     })
 
@@ -319,9 +331,9 @@ const AddRole = () => {
     ]
 
     const handleInput = (data: RoleInput) => {
-        dispatch(addRole(data)).unwrap()
+        dispatch(updateRole({roleId: id!, roleInput: data})).unwrap()
             .then(() => {
-                alert("Role added successfully!")
+                alert("Role Updated successfully!")
                 reset();
 
                 navigate("/dashboard/list/roles/u/encored")
@@ -334,7 +346,7 @@ const AddRole = () => {
     return(
         <>
             <Typography variant="h4" color={"#296EB4"} fontWeight={700} className="mb-2">
-                ADD ROLE
+                UPDATE ROLE
             </Typography>
 
             <Box onSubmit={handleSubmit(handleInput)} component="form">
@@ -399,7 +411,7 @@ const AddRole = () => {
                             <Grid flex={1} container>
                                 {subjectInputs.map((el, ind) => (
                                     <>
-                                        <Grid xs={12} item marginTop={ind !== 0 ? 2 : 0}>
+                                        <Grid key={el.key} xs={12} item marginTop={ind !== 0 ? 2 : 0}>
                                             <Typography variant="body2" color="#747474" sx={{textDecoration: "underline"}}>{el.label}</Typography>
                                         </Grid>
                                         {el.inputs.map(el => (
@@ -424,7 +436,7 @@ const AddRole = () => {
                             <Grid flex={1} container>
                                 {eventInputs.map((el, ind) => (
                                     <>
-                                        <Grid xs={12} item marginTop={ind !== 0 ? 2 : 0}>
+                                        <Grid key={el.key} xs={12} item marginTop={ind !== 0 ? 2 : 0}>
                                             <Typography variant="body2" color="#747474" sx={{textDecoration: "underline"}}>{el.label}</Typography>
                                         </Grid>
                                         {el.inputs.map(el => (
@@ -503,4 +515,4 @@ const AddRole = () => {
     )
 }
 
-export default AddRole
+export default UpdateRole
