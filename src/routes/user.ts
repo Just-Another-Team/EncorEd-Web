@@ -22,8 +22,8 @@ userRouter.get("/list/auth/:email", userService.viewAuth)
 
 // userRouter.patch("/institution/assign", assignInstitution)
 
-// //Delete
-// userRouter.delete("/delete/:id", deleteUser)
+//Delete
+userRouter.put("/delete/:id", userService.delete)
 
 //View
 userRouter.get("/list/u/:institution/:user", userService.viewAllByInstitution)

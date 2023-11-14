@@ -182,16 +182,16 @@ class UserService implements IBaseService {
     }
 
     public async delete(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        const userId = req.params.id;
 
         // Instead of deleting the user completely, why not use the status?
+        const status = "Closed"
 
         try{
-            await userCollection.doc(`/users/${userId}`).delete();
+            await userCollection.doc(req.params.id).update({status: status})
 
             //Delete UserRole assigned
 
-            res.status(200).json("User delete successfully")
+            res.status(200).json("User deleted successfully")
         }
         catch(error) {
             if (error instanceof Error) {
