@@ -4,7 +4,7 @@ import { ParsedQs } from 'qs';
 import { Request, Response } from 'express';
 import { converter } from '../models/converter';
 import IUser from '../models/user.model';
-import { Timestamp, db } from '../database';
+import { db } from '../database';
 import {
     adminAuth,
 } from '../authentication';
@@ -14,7 +14,6 @@ import { getAuth } from 'firebase-admin/auth';
 
 import { userRoleCollection } from './userRole.controller';
 import IUserRole from '../models/userRole.model';
-import { serverTimestamp } from 'firebase/firestore';
 
 // const { userRoleCollection } = require('./userRole.controller');
 // const { UserRole } = require('../models/userRole.model');
@@ -81,16 +80,19 @@ class UserService implements IBaseService {
 
     public async update(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         const userIdparam = req.params.id;
+        const reqUser = req.body as IUser;
 
         //Update authentication as well
 
         try{
+            console.log("Id", userIdparam)
+            console.log("Input", reqUser)
+
             const userDoc = userCollection.doc(userIdparam);
 
-            const reqUser = req.body as IUser;
-
             const oldUser = await userDoc.get()
-                .then(user => ({id: user.id, ...user.data()}));
+                .then(user => ({id: user.id, ...user.data()}))
+                .catch(error => { throw new Error(error) })
 
             const user: IUser = {
                 institution: oldUser.institution,
@@ -98,39 +100,43 @@ class UserService implements IBaseService {
                 lastName: reqUser.lastName,
                 email: reqUser.email,
                 userName: reqUser.userName,
-                password: reqUser.password,
+                //password: reqUser.password,
                 addedBy: oldUser.addedBy,
                 joinDate: oldUser.joinDate,
-                isalumni: oldUser.isalumni,
+                isalumni: oldUser.isalumni, //We should update this as well
                 status: oldUser.status,
             }
 
+            console.log("New Password", reqUser.password)
+
             const uid = await adminAuth.getUserByEmail(oldUser.id)
                 .then(userRecord => userRecord.uid)
-                .catch(error => {throw error})
+                .catch(error => {throw new Error(error)})
 
             //Update Authentication
             await adminAuth.updateUser(uid, {
                 email: user.email,
-                password: user.password,//user.password?.length > 0 ? user.password : undefined,
+                password: reqUser.password,//user.password?.length > 0 ? user.password : undefined,
                 displayName: `${user.firstName} ${user.lastName}`,
             })
                 .then(() => {
                     console.log("Successfully Updated Authentication - Firebase Auth")
                 })
-                .catch((error) => {throw {type: "Authentication", error: error}})
+                .catch((error) => {throw new Error(error)})
                 
             //Update Firestore
             await userCollection.doc(user.email).set(user)
                 .then(() => {
                     console.log("Successfully Updated Authentication - Firestore (Set)")
                 })
+                .catch(error => {throw new Error(error)})
 
             if (oldUser.id !== reqUser.email)
                 await userDoc.delete()
                     .then(() => {
                         console.log("Successfully Updated Authentication - Firestore (Delete Old)")
                     })
+                    .catch(error => {throw new Error(error)})
 
             //Update user Role
             const assignedRoleDocs = await userRoleCollection.where('userId', '==', oldUser.id).get();
@@ -162,7 +168,7 @@ class UserService implements IBaseService {
 
             //Update User Role
             //await userRoleCollection.doc(`${id}-${userRole.roleId}`).update()
-
+            console.log("AW HELL YEAH IT UPDATED WOOO")
             res.status(200).json("Data updated successfully")
         }
         catch(error) {
@@ -175,6 +181,7 @@ class UserService implements IBaseService {
                     message: error.message,
                     stack: error.stack
                 }
+                console.error(error)
                 
                 res.status(400).json(userControllerError) //type: error.type, code: error.code
             }
@@ -212,14 +219,19 @@ class UserService implements IBaseService {
         try {
             const userId = req.params.id;
 
+            console.log("OI IS THIS GETTING ANYTHING?!")
+
             const userDoc = await userCollection.doc(userId).get()
 
+            console.log(`User ${userId} exist?`, {...userDoc.data()})
+
             if (!userDoc.exists)
-                throw {code: 'firestore/missing-email', message: `User with id: ${userId} does not exist.`}
+                throw new Error(`User with id: ${userId} does not exist.`)
 
             res.status(200).json({id: userDoc.id, ...userDoc.data()});   
         }
         catch (error) {
+
             if (error instanceof Error) {
                 const userControllerError: ErrorController = {
                     name: "User",

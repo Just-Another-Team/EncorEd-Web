@@ -4,7 +4,8 @@ export default interface ISubject {
     name: string; 
     edpCode: string; 
     type: string; 
-    units: number; 
+    units: number;
+    institution: string;
     creationDate: Date | string; 
     createdBy: string; 
     //updatedDate

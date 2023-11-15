@@ -380,7 +380,7 @@ class RoleUser implements IBaseService {
             
             const newRoleId = `${institution}-${name}`
 
-            //Update Firestore
+            //Update Role Firestore
             await roleCollection.doc(newRoleId).set(role)
                 .then(() => {
                     console.log("Successfully Updated Role - Firestore (Set)")
@@ -391,6 +391,37 @@ class RoleUser implements IBaseService {
                     .then(() => {
                         console.log("Successfully Updated Role - Firestore (Delete Old)")
                     })
+
+            //UPDATE USER ROLE
+            //Update user Role
+            const assignedRoleDocs = await userRoleCollection.where('roleId', '==', oldRole.id).get();
+
+            // if (assignedRoleDocs.empty)
+            //     throw {message: "User Id not found"}
+
+            //Get Roles 
+            const assignedRoles = assignedRoleDocs.docs.map((userRole) => {
+                return userRole.data()
+            })
+
+            //Delete old user role and assign new based on new userId
+            assignedRoles.forEach(async (userRole) => {
+                let newUserRole: IUserRole = {
+                    // userId: user.email,
+                    // roleId: userRole.roleId
+
+                    userId: userRole.userId,
+                    roleId: newRoleId
+                }
+                
+                const newId = `${newUserRole.userId}-${newUserRole.roleId}`
+                // const oldId = `${oldUser.id}-${userRole.roleId}`
+                const oldId = `${userRole.userId}-${oldRole.id}`
+
+                await userRoleCollection.doc(newId).set(newUserRole)
+                if (newId !== oldId)
+                    await userRoleCollection.doc(oldId).delete()
+            })
             
             res.status(200).json({message: "Role successfully updated!"})
         }
