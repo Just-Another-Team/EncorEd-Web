@@ -13,7 +13,6 @@ import { useAppSelector } from "../../../app/encored-store-hooks";
 import { FixMeLater } from "../../../types/FixMeLater";
 
 const Institution = () => {
-    // const userInstitution = useAppSelector(state => state.institution.data)
     const [page, setPage] = React.useState(0);
 
     const handleChange = (event: FixMeLater, newValue: FixMeLater) => {
@@ -23,7 +22,7 @@ const Institution = () => {
     return(
         <>
             <Typography variant="h4" fontWeight={700} marginBottom={1}>
-                {/* {userInstitution ? userInstitution.name : "Institution"} */}
+                Institution
             </Typography>
             
             {/* Add and Search Subject */}

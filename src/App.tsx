@@ -81,13 +81,13 @@ function App() {
         <Route path='users/list/u/:institution/:email' element={<UsersProfile />}/>
         {/* <Route path='role/:institution/add' element={<AddRole />}/> */}
 
-        {/* <Route path='institution' element={<Institution />} />
+        <Route path='institution' element={<Institution />} />
 
-        <Route path='profile/' element={<Profile />}/>
+        {/* <Route path='profile/' element={<Profile />}/>
 
-        <Route path='profile/:userName' element={<UsersProfile />}/>
+        <Route path='profile/:userName' element={<UsersProfile />}/> */}
 
-        <Route path='request' element={<Request />}/> */}
+        <Route path='request' element={<Request />}/>
       </Route>
 
       {/* Admin Pages*/}
