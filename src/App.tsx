@@ -23,7 +23,7 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 import InstitutionForm from './components/Forms/InstitutionForm';
 import RegistrationUserForm from './components/Forms/Formhooks/UserForm-Registration-User-Hooks';
 import RegistrationInstitutionForm from './components/Forms/Formhooks/UserForm-Registration-Institution-Hook';
-// import Profile from './pages/Authenticated/Profile/Profile';
+import Profile from './pages/Authenticated/Profile/Profile';
 // import UsersLayout from './pages/Admin/Users/UsersLayout';
 import UsersProfile from './pages/Authenticated/Profile/UsersProfile';
 // import AddRole from './pages/Authenticated/UserGroups/Role/AddRole';
@@ -83,9 +83,9 @@ function App() {
 
         <Route path='institution' element={<Institution />} />
 
-        {/* <Route path='profile/' element={<Profile />}/>
+        <Route path='profile/' element={<Profile />}/>
 
-        <Route path='profile/:userName' element={<UsersProfile />}/> */}
+        <Route path='profile/:userName' element={<UsersProfile />}/>
 
         <Route path='request' element={<Request />}/>
       </Route>
