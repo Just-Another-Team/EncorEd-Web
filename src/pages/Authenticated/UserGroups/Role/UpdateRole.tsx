@@ -31,6 +31,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { Role } from "../../../../app/features/role/authRoleSlice"
 import { VerificationPermission } from "../../../../types/RoleTypes/VerificationPermission"
 import { AttendancePermissions } from "../../../../types/RoleTypes/AttendancePermission"
+import LoadingDialog from "../../../../components/Dialog/LoadingDialog/LoadingDialog"
 
 type SwitchInputs = {
     key: string
@@ -48,10 +49,12 @@ const UpdateRole = () => {
 
     const dispatch = useAppDispatch()
     const loading = useAppSelector(state => state.role.loading)
+
     const user = useAppSelector(state => state.authentication.data.email)
     const institutionData = useAppSelector(state => state.institution.data)
     const role = useAppSelector(state => state.role.data.find(role => role.id === id) as Role)
 
+    // Can be used for useMemo
     const rolePermissions: Permission = typeof role?.employee !== 'boolean' ? role?.employee as Permission : 
                             typeof role?.teacher !== 'boolean' ? role?.teacher as Permission :
                             typeof role?.student !== 'boolean' ? role?.student  as Permission: 
@@ -511,6 +514,8 @@ const UpdateRole = () => {
                     </Button>
                 </Grid>
             </Box>
+
+            <LoadingDialog open={loading} text={"Please wait until we updated the role. Thank you"}/>
         </>
     )
 }

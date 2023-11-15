@@ -28,6 +28,7 @@ import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-ho
 import { addRole } from "../../../../app/features/role/roleSlice"
 import { RoleInput } from "../../../../app/api/encored-role-service"
 import { useNavigate } from "react-router-dom"
+import LoadingDialog from "../../../../components/Dialog/LoadingDialog/LoadingDialog"
 
 
 
@@ -499,6 +500,8 @@ const AddRole = () => {
                     </Button>
                 </Grid>
             </Box>
+
+            <LoadingDialog open={loading} text={"Please wait until we updated the role. Thank you"}/>
         </>
     )
 }

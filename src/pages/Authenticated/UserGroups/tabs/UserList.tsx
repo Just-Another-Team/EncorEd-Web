@@ -17,6 +17,7 @@ const UserList = () => {
     const { institution } = useParams();
 
     // const userInstitution = useSelector(state => state.institution.data.id)
+    const authenticatedUser = useAppSelector(state => state.authentication.data)
     const users = useAppSelector(state => state.users.data)
     // const currUser = useSelector(state => state.user.data.email)
     
@@ -56,7 +57,7 @@ const UserList = () => {
 
     // //list of users
     useEffect(()=>{
-        usersDispatch(getUsers(institution?.toLowerCase()))
+        usersDispatch(getUsers({institution: institution?.toLowerCase(), user: authenticatedUser.email}))
     }, [])
 
     const columns: GridColDef[] = [

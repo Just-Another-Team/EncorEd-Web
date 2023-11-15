@@ -89,7 +89,7 @@ const Navbar = () => {
                     component={Link}
                     //to={(loggedIn.role && "/dashboard/profile") || (loggedIn.role && "/admin/dashboard/profile")}
                     //to={((loggedIn.role.find(data => data._systemRole._admin) || loggedIn.role.find(data => data._systemRole._employee)) && "/dashboard/profile") || (loggedIn.role.find(data => data._systemRole._superAdmin) && "/admin/dashboard/profile")}
-                    to={"/admin/dashboard/profile"}
+                    to={"/dashboard/profile"}
                     sx={{
                         textDecoration: 'none',
                         color: '#FFFFFF',

@@ -29,8 +29,8 @@ const initialState: IUserInitialState = {
 
 export const getUsers = createAsyncThunk(
     "/users/get/institution",
-    async (institution: string | undefined, {rejectWithValue}) => {
-        return await EncorEdUserService.getAllUsersByInstitution(institution)
+    async ({institution, user}: FixMeLater, {rejectWithValue}) => {
+        return await EncorEdUserService.getAllUsersByInstitution(institution, user)
     }
 )
 

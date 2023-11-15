@@ -9,6 +9,7 @@ import {
 } from "../firebase/authentication"
 import { RegisterFormCredential } from "../../types/RegisterFormCredential"
 import { FixMeLater } from "../../types/FixMeLater";
+import { LoginFormCredential } from "../../types/LoginFormCredential";
 
 export type UserInput = {
     institution?: string,
@@ -48,13 +49,27 @@ class EncorEdAuthService {
         return http.get(`${this.authCommon}/list/auth/${data.email}`)
     }
 
-    signIn(credential: RegisterFormCredential) {
+    signIn(credential: LoginFormCredential) {
         //Sign in with token
         return signInWithEmailAndPassword(auth, credential.email!, credential.password!)
     }
 
-    getUser(credential: RegisterFormCredential) {
-        return http.get(`${this.authCommon}/list/${credential.email}`)
+    getUser(email: string) {
+        return http.get(`${this.authCommon}/list/${email}`)
+    }
+
+    updateUser(data: RegisterFormCredential) {
+        const {id, firstName, lastName, email, userName, newPassword} = data
+
+        const newUserDetail: RegisterFormCredential = {
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            userName: userName,
+            password: newPassword
+        }
+
+        return http.put(`/user/update/${id}`, newUserDetail)
     }
 
     //These functions should be in the backend. Not here

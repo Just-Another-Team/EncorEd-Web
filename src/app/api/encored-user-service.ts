@@ -47,8 +47,8 @@ class EncorEdUserService {
     //     return http.get("/user/list")
     // }
     
-    getAllUsersByInstitution(institution: string | undefined) {
-        return http.get(`/user/list/u/${institution}` )
+    getAllUsersByInstitution(institution: string | undefined, user: string | undefined) {
+        return http.get(`/user/list/u/${institution}/${user}` )
     }
 
     addUser(data: FixMeLater) {

@@ -152,6 +152,7 @@ const RoleList = () => {
             <Box marginBottom={2}>
 
                 <DataGrid
+                    autoHeight
                     rows={roleList}
                     columns={columns}
                     hideFooterSelectedRowCount
@@ -165,7 +166,7 @@ const RoleList = () => {
                     }}
                     onRowDoubleClick={(e) => {
                         console.log(e.row)
-                        navigate(`${e.row.id}`)
+                        navigate(`${e.row.id}/access`)
                         // window.location.href = '/dashboard/subject/testId'
                     }}
                     pageSizeOptions={[10]}

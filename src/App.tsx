@@ -17,13 +17,12 @@ import Institution from './pages/Authenticated/Institution/Institution';
 import SelectedSubject from './pages/Authenticated/Subject/pages/SelectedSubject';
 import Request from './pages/Authenticated/Request/Request';
 
-import {default as AdminHome} from './pages/Admin/Home/Home';
+import Home, {default as AdminHome} from './pages/Admin/Home/Home';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 
 import InstitutionForm from './components/Forms/InstitutionForm';
 import RegistrationUserForm from './components/Forms/Formhooks/UserForm-Registration-User-Hooks';
 import RegistrationInstitutionForm from './components/Forms/Formhooks/UserForm-Registration-Institution-Hook';
-// import Profile from './pages/Authenticated/Profile/Profile';
 // import UsersLayout from './pages/Admin/Users/UsersLayout';
 import UsersProfile from './pages/Authenticated/Profile/UsersProfile';
 import { useAppDispatch, useAppSelector } from './app/encored-store-hooks';
@@ -41,13 +40,23 @@ import EventRequest from './pages/Authenticated/Event/tabs/EventRequestList';
 import AddRole from './pages/Authenticated/UserGroups/Role/AddRole';
 import SelectedRole from './pages/Authenticated/UserGroups/Role/SelectedRole';
 import UpdateRole from './pages/Authenticated/UserGroups/Role/UpdateRole';
+import Profile from './pages/Authenticated/Profile/Profile';
+import RoleUsers from './pages/Authenticated/UserGroups/Role/tabs/RoleUsers';
+import RoleAccess from './pages/Authenticated/UserGroups/Role/tabs/RoleAccess';
+import Report from './pages/Authenticated/Report/Report';
+import UsersLayout from './pages/Admin/Users/UsersLayout';
+import { logOutRoles } from './app/features/role/authRoleSlice';
 
 function App() {
+  const dispatch = useAppDispatch()
+
   //const role = useAppSelector(state => state.roles);
   const user = useAppSelector(state => state.authentication.data)
   const roles = useAppSelector(state => state.assignRole.data)
 
   useEffect(() => {
+    // console.log("Is Admin or Employee", roles.filter(role => role.admin || typeof role.employee === "object").length != 0)
+    // console.log("Is App Admin", roles.filter(role => role.appAdmin).length != 0)
     // onAuthStateChanged(auth, (user) => {
     //   if (!user) {
     //     //dispatch(logOut())
@@ -72,7 +81,7 @@ function App() {
       </Route>
 
       {/* Authenticated Pages */}
-      <Route path='/dashboard' element={ Object.keys(user).length != 0 ? <Dashboard /> : <Navigate replace to='/login' />}>
+      <Route path='/dashboard' element={ Object.keys(user).length != 0 ? roles.filter(role => role.admin || typeof role.employee === "object").length != 0  ? <Dashboard /> : <Navigate replace to='/login' /> : <Navigate replace to='/login' />}> {/* */}
         <Route index path='home' element={<InstitutionalHome />} />
 
         <Route path='map/list' element={<MapList />} />
@@ -98,25 +107,29 @@ function App() {
           <Route index path='users/u/:institution' element={<UserList />}/>
           <Route path='groups/u/:institution' element={<GroupList />}/>
           <Route path='roles/u/:institution' element={<RoleList />}/>
-          <Route path='roles/u/:institution/:roleId' element={<SelectedRole />} /> {/* Selected Role */}
+          <Route path='roles/u/:institution/:roleId' element={<SelectedRole />}> {/* Selected Role */}
+            <Route index path='access' element={<RoleAccess />}/>
+            <Route path='users' element={<RoleUsers />}/>
+            <Route path='groups' />
+          </Route>
         </Route>
         <Route path='role/:institution/add' element={<AddRole />}/> {/* Add Role */}
         <Route path='role/:institution/:id/update' element={<UpdateRole />}/> {/* Update Role */}
 
-        {/* <Route path='institution' element={<Institution />} />
+        <Route path='institution' element={<Institution />} />
 
         <Route path='profile/' element={<Profile />}/>
 
-        <Route path='profile/:userName' element={<UsersProfile />}/>
+        <Route path='report' element={<Report />}/>
 
-        <Route path='request' element={<Request />}/> */}
+        <Route path='request' element={<Request />}/>
       </Route>
 
       {/* Admin Pages*/}
       {/* role.data.find(data => data._systemRole._superAdmin) ? <AdminDashboard /> : <Navigate replace to="/login" /> */}
 
-      {/* <Route path='/admin/dashboard' element={<AdminDashboard />}>
-        <Route path='home' />
+      <Route path='/admin/dashboard' element={Object.keys(user).length != 0 ? roles.filter(role => role.appAdmin).length != 0  ? <AdminDashboard /> : <Navigate replace to='/login'/> : <Navigate replace to='/login'/>}> {/* roles.filter(role => role.appAdmin).length != 0 */}
+        <Route path='home' element={<Home />}/>
 
         <Route path='users' element={<UsersLayout />} />
 
@@ -125,7 +138,7 @@ function App() {
         <Route path='profile/' element={<Profile />}/>
 
         <Route path='profile/:userName' element={<UsersProfile />}/>
-      </Route> */}
+      </Route>
     </Routes>
   );
 }

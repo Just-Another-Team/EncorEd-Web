@@ -93,6 +93,22 @@ const roleSlice = createSlice({
             })
         }
 
+        //Update Role
+        {
+            builder.addCase(updateRole.pending, (state, actions) => {
+                state.loading = true
+                state.error = null
+            })
+            builder.addCase(updateRole.fulfilled, (state, actions: PayloadAction<FixMeLater>) => {
+                state.loading = false
+                state.error = null
+            })
+            builder.addCase(updateRole.rejected, (state, actions: PayloadAction<FixMeLater>) => {
+                state.loading = false
+                state.error = actions.payload
+            })
+        }
+
         //Delete Role
         {
             builder.addCase(deleteRole.pending, (state, actions) => {

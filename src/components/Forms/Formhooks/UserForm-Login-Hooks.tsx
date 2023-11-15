@@ -1,3 +1,4 @@
+import React from 'react'
 import {useForm} from 'react-hook-form'
 import UserForm from '../UserForm';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
@@ -14,7 +15,7 @@ import { LoginFormInput } from '../../../types/LoginFormInput';
 import { InputAdornment } from '@mui/material';
 import { emailExist, getUser, register, signIn } from '../../../app/features/auth/authSlice';
 import { getInstitution } from '../../../app/features/institution/authInstitutionSlice';
-import { getAssignedRoles } from '../../../app/features/role/authRoleSlice';
+import { getAssignedRoles, logOutRoles } from '../../../app/features/role/authRoleSlice';
 
 const LoginUserForm = () => {
     const dispatch = useAppDispatch();
@@ -73,6 +74,7 @@ const LoginUserForm = () => {
     const onSubmit = (credentials: LoginFormCredential) => {
         console.log(credentials)
 
+        // We have to do this in edit profile
         dispatch(getUser(credentials)).unwrap()
             .then((dbResult) => {
                 return dispatch(signIn(credentials)).unwrap()
@@ -94,7 +96,10 @@ const LoginUserForm = () => {
             .then((dbResult) => {
                 dispatch(register(dbResult))
 
-                navigate("/dashboard/home")
+                console.log(roles.data.find(role => role.appAdmin) != undefined)
+                if (roles.data.find(role => role.appAdmin)) navigate("/admin/dashboard/home")
+                else navigate("/dashboard/home")
+                
                 reset();
             })
             .catch((error) => {

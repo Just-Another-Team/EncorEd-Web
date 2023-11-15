@@ -95,7 +95,6 @@ const assignRoleSlice = createSlice({
             })
             builder.addCase(assignAdminRole.fulfilled, (state, actions: PayloadAction<any>) => {
                 state.loading = false
-                state.data = actions.payload.data
                 state.error = null
             })
             builder.addCase(assignAdminRole.rejected, (state, actions: PayloadAction<any>) => {
