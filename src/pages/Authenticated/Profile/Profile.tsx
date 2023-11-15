@@ -10,16 +10,21 @@ import {
     ListItem,
     List,
     ListItemText,
-    Divider,
-    Tabs,
 } from "@mui/material";
 import dayjs from 'dayjs'
-import { Controller, useForm } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 // import { updateUser } from "../../../app/features/auth/authSlice";
-import { updateLoggedInUser } from "../../../app/features/user/userSlice";
+// import { updateLoggedInUser } from "../../../app/features/user/userSlice";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../app/encored-store-hooks";
 import { FixMeLater } from "../../../types/FixMeLater";
+import FormInputTextField from "../../../components/TextField/FormInputTextField";
+import { RegisterFormCredential } from "../../../types/RegisterFormCredential";
+import { getUser, register, signIn, updateUser } from "../../../app/features/auth/authSlice";
+import { getInstitution } from "../../../app/features/institution/authInstitutionSlice";
+import { getAssignedRoles } from "../../../app/features/role/authRoleSlice";
+import { auth } from "../../../app/firebase/authentication";
+import LoadingDialog from "../../../components/Dialog/LoadingDialog/LoadingDialog";
 
 const Profile = () => {
     const [page, setPage] = React.useState(0);
@@ -28,23 +33,24 @@ const Profile = () => {
         setPage(newValue);
     };
 
-    const editUserDispatch = useAppDispatch()
+    const dispatch = useAppDispatch()
 
     const navigate = useNavigate()
 
-    const role = useAppSelector(state => state.role)
-    const institution = useAppSelector(state => state.institution.data)
-    const user = useAppSelector(state => state.authentication.data)
+    const roles = useAppSelector(state => state.assignRole)
+    const institution = useAppSelector(state => state.institution)
+    const user = useAppSelector(state => state.authentication)
 
     const [editProfile, setEditProfile] = useState(false)
 
-    const {handleSubmit, reset, control, getValues, setError, formState: {errors}} = useForm({
+    const {handleSubmit, reset, control, getValues, setError, formState: {errors}} = useForm<FieldValues>({
         defaultValues: {
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            userName: user.userName,
+            firstName: user.data.firstName,
+            lastName: user.data.lastName,
+            email: user.data.email,
+            userName: user.data.userName,
             password: "",
+            newPassword: "",
             confirmPassword: ""
         }
     }); 
@@ -55,28 +61,46 @@ const Profile = () => {
         setEditProfile(true)
     }
 
-    const submitEdit = (data: FixMeLater) => {
+    const submitEdit = (data: RegisterFormCredential) => {
         const {firstName, lastName, userName, email, password} = data
 
-        const input = {
-            id: user.email,
-            firstName,
-            lastName,
-            email,
-            password
-        }
+        dispatch(updateUser({id: user.data.id, ...data, newPassword: data.newPassword?.trim().length !== 0 ? data.newPassword?.trim() : undefined})).unwrap()
+            .then(() => {
+                dispatch(getUser(data)).unwrap()
+                    .then((dbResult) => {
+                        
+                        let email = auth.currentUser?.email !== data.email ? data.email : auth.currentUser?.email
+                        let password = data.newPassword?.trim().length !== 0 ? data.newPassword?.trim() : data.password
 
-        // WHAT IF SAME EMAIL?
-        // editUserDispatch(updateUser(input)).unwrap()
-        //     .then(() => {
-        //         editUserDispatch(updateLoggedInUser({firstName, lastName, email, password, userName, displayName: `${firstName} ${lastName}`}))
-        //         navigate(0)
-        //         setEditProfile(false)
-        //         reset()
-        //     })
-        //     .catch((error) => {
-        //         console.log(error)
-        //     })
+                        return dispatch(signIn({email: email, password: password})).unwrap()
+                            .then(() => Promise.resolve(dbResult))
+                            .catch((error) => Promise.reject(error))
+                    })
+                    .then((dbResult) => {
+                        //get Institution   
+                        return dispatch(getInstitution(dbResult.data.institution)).unwrap()
+                            .then(() => Promise.resolve(dbResult))
+                            .catch(error => Promise.reject(error))
+                    })
+                    .then((dbResult) => {
+                        //get Roles
+                        return dispatch(getAssignedRoles(dbResult.data.id)).unwrap()
+                            .then(() => Promise.resolve(dbResult))
+                            .catch(error => Promise.reject(error))
+                    })
+                    .then((dbResult) => {
+                        dispatch(register(dbResult))
+
+                        navigate(0)
+                        setEditProfile(false)
+                        reset()
+                    })
+                    .catch((error) => Promise.reject(error))
+            })
+            .catch((error) => {
+                console.error(error)
+                alert(`Error Occured:\n${error}`)
+            })
     }
 
     const cancelEdit = (e: FixMeLater) => {
@@ -88,12 +112,13 @@ const Profile = () => {
     }
 
     const inputs = [
-        {key: 'firstName', label: "First name", type: "text", rows: 0, error: errors.firstName, rules: {required: "First name is required"}},
-        {key: 'lastName', label: "Last name", type: "text", rows: 0, error: errors.lastName, rules: {required: "Last name is required"}},
-        {key: 'email', label: "Email", type: "email", rows: 0, error: errors.email, rules: {required: "Email is required"}},
-        {key: 'userName', label: "Username", type: "text", rows: 0, error: errors.userName, rules: {required: "Username is required"}},
-        {key: 'password', label: "New Password", type: "password", rows: 0, error: errors.password},
-        {key: 'confirmPassword', label: "Confirm New Password", type: "password", rows: 0, error: errors.confirmPassword, rules: { validate: (value: FixMeLater) => value === getValues('password') || "Passwords does not match." }}, 
+        {key: 'firstName', label: "First name", type: "text", rows: 0,  rules: {required: "First name is required"}},
+        {key: 'lastName', label: "Last name", type: "text", rows: 0, rules: {required: "Last name is required"}},
+        {key: 'email', label: "Email", type: "email", rows: 0, rules: {required: "Email is required"}},
+        {key: 'userName', label: "Username", type: "text", rows: 0, rules: {required: "Username is required"}},
+        {key: 'password', label: "Old Password", type: "password", rows: 0, rules: {required: "Password is required"}},
+        {key: 'newPassword', label: "New Password", type: "password", rows: 0, rules: {}},
+        {key: 'confirmPassword', label: "Confirm New Password", type: "password", rows: 0, error: errors.confirmPassword, rules: { validate: (value: FixMeLater) => value === getValues('newPassword') || "Passwords does not match." }}, 
     ]
 
     return(
@@ -101,11 +126,15 @@ const Profile = () => {
             <Grid spacing={3} container>
                 <Grid xs={3} item>
                     <Stack gap={1}>
-                        <ButtonBase onClick={() => {alert("WIP (Moves to Profile Page)")}} sx={{padding: 1, paddingLeft: 2, border: 1, borderRadius: 2, justifyContent: 'flex-start'}}>
+                        <ButtonBase
+                        onClick={() => {alert("WIP (Moves to Profile Page)")}}
+                        sx={{padding: 1, paddingLeft: 2, border: 1, borderRadius: 2, justifyContent: 'flex-start'}}>
                             <Typography variant="h6" component='h6'>Profile</Typography>
                         </ButtonBase>
 
-                        <ButtonBase onClick={() => {alert("WIP (Moves to Notification Page)")}} sx={{padding: 1, paddingLeft: 2, border: 1, borderRadius: 2, justifyContent: 'flex-start'}}>
+                        <ButtonBase
+                        onClick={() => {alert("WIP (Moves to Notification Page)")}}
+                        sx={{padding: 1, paddingLeft: 2, border: 1, borderRadius: 2, justifyContent: 'flex-start'}}>
                             <Typography variant="h6" component='h6'>Notifications</Typography>
                         </ButtonBase>
                     </Stack>
@@ -119,7 +148,7 @@ const Profile = () => {
                         <Box sx={{borderRadius: 360}}>
                             <img width={160} height={160} src="/assets/profilepic.png"/>
                         </Box>
-                        <Typography variant="h4" fontWeight={700}>{`${user?.firstName} ${user?.lastName}`}</Typography>
+                        <Typography variant="h4" fontWeight={700}>{`${user.data.firstName} ${user.data.lastName}`}</Typography>
                     </Box>
 
                     <Box display={editProfile ? 'none' : 'block'}>
@@ -128,70 +157,65 @@ const Profile = () => {
                                 <Typography variant="h6" fontWeight={700} marginBottom={1}>Details</Typography>
                             </Grid>
 
-                            <Grid item xs={6} marginBottom={2}>
+                            <Grid item xs={12} marginBottom={2}>
                                 <Typography variant="body1" fontWeight={700}>Email:</Typography>
-                                <Typography variant="body1">{user.email}</Typography>
+                                <Typography variant="body1">{user.data.email}</Typography>
                             </Grid>
                             
-                            <Grid item xs={6} marginBottom={2}>
+                            <Grid item xs={12} marginBottom={2}>
                                 <Typography variant="body1" fontWeight={700}>Joined Date:</Typography>
-                                <Typography variant="body1">{dayjs(user.joinDate).format("MMMM D, YYYY")}</Typography>
+                                <Typography variant="body1">{dayjs(user.data.joinDate).format("MMMM D, YYYY")}</Typography>
                             </Grid>
 
-
-                            {/* {!role.data.find(data => data._systemRole._superAdmin) && (
+                            {roles.data.find(role => role.appAdmin) && (
                                 <>
-                                    <Grid item xs={6} marginBottom={2}>
+                                    <Grid item xs={12} marginBottom={2}>
                                         <Typography variant="body1" fontWeight={700}>Institution:</Typography>
-                                        <Typography variant="body1">{institution.name}</Typography>
+                                        <Typography variant="body1">{institution.data.name}</Typography>
                                     </Grid>
 
-                                    <Grid item xs={6} marginBottom={2}>
+                                    <Grid item xs={12} marginBottom={2}>
                                         <Typography variant="body1" fontWeight={700}>Added By:</Typography>
-                                        <Typography variant="body1">{user.addedBy}</Typography>
+                                        <Typography variant="body1">{user.data.addedBy}</Typography>
                                     </Grid>
                                 </>
-                            )} */}
+                            )}
 
-                            <Grid item xs={6} marginBottom={2}>
+                            <Grid item xs={12} marginBottom={2}>
                                 <Typography variant="body1" fontWeight={700}>Username:</Typography>
-                                <Typography variant="body1">{user.userName}</Typography>
+                                <Typography variant="body1">{user.data.userName}</Typography>
                             </Grid>
                         </Grid>
 
-                        {/* <Grid container marginBottom={2} sx={{backgroundColor: '#F6F5FF', borderRadius: 4, padding: 2}}>
+                        <Grid container marginBottom={2} sx={{backgroundColor: '#F6F5FF', borderRadius: 4, padding: 2}}>
                             <Grid item xs={12}>
-                                <Typography variant="h5" fontWeight={700}>Role: {role.data.status === "Open"}</Typography>
+                                <Typography variant="h5" fontWeight={700}>Role{roles.data.length !== 1 && 's'}</Typography>
                             </Grid>
                             <Grid item xs={12}>
                                 <List>
-                                    {role.data.map((el: FixMeLater, ind: FixMeLater) => (
+                                    {roles.data.map((role, ind) => (
                                         <ListItem key={ind}>
-                                            <ListItemText
-                                            primary={`${el._institutionalRole._name.charAt(0).toUpperCase()}${el._institutionalRole._name.slice(1)}`}
-                                            />
+                                            <ListItemText primary={`${role.name!.charAt(0).toUpperCase()}${role.name!.slice(1)}`} />
                                         </ListItem>
                                     ))}
                                 </List>
                             </Grid>
-                        </Grid> */}
+                        </Grid>
 
                         <Box display={'flex'} flexDirection={"row-reverse"}>
                             <Button onClick={handleEditProfile} variant="contained">EDIT PROFILE</Button>
                         </Box>
                     </Box>
 
-                    {/* And then this is going to another User Form Hook ffs */}
+                    {/* Update Profile */}
+                    {/* TO-DO: Another User Form Hook */}
                     <Box display={editProfile ? 'block' : 'none'} paddingX={12}>
                         <Typography variant="h5"  fontWeight={700} marginBottom={2}>Edit User</Typography>
-                        
-                        {/* <Divider textAlign="left" sx={{marginBottom: 1}}>Details</Divider> */}
-
+                        {/* <Divider textAlign="left" sx={{marginBottom: 2}}>Details</Divider> */}
                         <Grid component={'form'} onSubmit={handleSubmit(submitEdit)} onReset={cancelEdit} container spacing={2}>
-
                             {inputs.map((el, ind) => {
                                 return(
-                                    <Grid item xs={el.key === "firstName" || el.key === "lastName" ? 6 : 12}>
+                                    <Grid key={el.key} item xs={el.key === "firstName" || el.key === "lastName" ? 6 : 12}>
                                         {/* <Controller
                                         name={el.key}
                                         control={control}
@@ -201,7 +225,7 @@ const Profile = () => {
                                                 value: 8,
                                                 message: "Password must be 8 characters long"
                                             } : null
-                                        }} //-Give each controller the error
+                                        }} Give each controller the error
                                         render={({field}) => (
                                             <TextField
                                             fullWidth
@@ -211,6 +235,13 @@ const Profile = () => {
                                             helperText={el.error ? el.error.message : null}
                                             {...field}/>
                                         )}/> */}
+                                        <FormInputTextField
+                                        fullWidth
+                                        name={el.key}
+                                        control={control}
+                                        label={el.label}
+                                        rules={el.rules}
+                                        type={el.type}/>
                                     </Grid>
                                 )
                             })}
@@ -224,11 +255,12 @@ const Profile = () => {
                                 </Stack>
                             </Grid>
                         </Grid>
-
                     </Box>
                 </Grid>
                 
             </Grid>
+
+            <LoadingDialog open={(user.loading || institution.loading || roles.loading)} text={"Please wait until we updated your profile. Thank you"}/>
         </>
     )
 }

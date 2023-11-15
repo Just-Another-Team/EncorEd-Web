@@ -1,8 +1,38 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import EncoredRoleService, { RoleInput } from "../../api/encored-role-service"
 import { RegisterFormCredential } from "../../../types/RegisterFormCredential"
+import { Permission } from "../../../types/RoleTypes/Permission"
+import { User } from "../users/usersSlice"
 
-const initialState = {
+export type Role = {
+    id?: string
+    name?: string
+    desc?: string
+    institution?: string
+    
+    appAdmin?: boolean
+    admin?: boolean
+    employee?: boolean | Permission
+    teacher?: boolean | Permission
+    student?: boolean | Permission
+    visitor?: boolean | Permission
+
+    usersAssigned: Array<User>
+
+    createdBy?: User | string
+    creationDate?: string
+    updatedBy?: string
+    updatedDate?: string
+    status?: string
+}
+
+export interface IAssignedRoleInitialState {
+    loading: boolean
+    data: Array<Role>
+    error: any
+}
+
+const initialState: IAssignedRoleInitialState = {
     loading: false,
     data: [],
     error: null,
@@ -25,25 +55,13 @@ export const assignAdminRole = createAsyncThunk(
 )
 
 export const getAssignedRoles = createAsyncThunk(
-    "role/get/roles/assign",
+    "role/admin/get/assign",
     async (userId: string, {rejectWithValue}) => {
         return await EncoredRoleService.getAssignedRoles(userId).catch((error) => rejectWithValue(error))
     }    
 )
 
-// export const viewAssignedRoles = createAsyncThunk(
-//     "role//assign/:id",
-//     async (userId, {rejectWithValue}) => {
-//         try {
-//             const assignedRoles = await EncoredRoleService.getRoles(userId)
-//             return assignedRoles
-//         } catch (error) {
-//             return rejectWithValue(error)
-//         }
-//     }
-// )
-
-const roleSlice = createSlice({
+const assignRoleSlice = createSlice({
     name: 'role',
     initialState,
     reducers:  {
@@ -58,6 +76,7 @@ const roleSlice = createSlice({
         {
             builder.addCase(addAdminRole.pending, (state, actions) => {
                 state.loading = true
+                state.error = null
             })
             builder.addCase(addAdminRole.fulfilled, (state, actions: PayloadAction<any>) => {
                 state.loading = false
@@ -76,7 +95,6 @@ const roleSlice = createSlice({
             })
             builder.addCase(assignAdminRole.fulfilled, (state, actions: PayloadAction<any>) => {
                 state.loading = false
-                state.data = actions.payload.data
                 state.error = null
             })
             builder.addCase(assignAdminRole.rejected, (state, actions: PayloadAction<any>) => {
@@ -102,5 +120,5 @@ const roleSlice = createSlice({
     }
 })
 
-export const { logOutRoles } = roleSlice.actions
-export default roleSlice.reducer
+export const { logOutRoles } = assignRoleSlice.actions
+export default assignRoleSlice.reducer

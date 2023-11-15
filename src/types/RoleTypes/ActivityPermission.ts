@@ -5,6 +5,6 @@ export type ActivityPermission = {
     value: boolean | undefined;
     schedule: boolean | undefined;
     participants: boolean | undefined;
-    attendance: AttendancePermissions | undefined;
-    verify: VerificationPermission | undefined;
+    attendance: AttendancePermissions | boolean | undefined;
+    verify: VerificationPermission | boolean | undefined;
 }

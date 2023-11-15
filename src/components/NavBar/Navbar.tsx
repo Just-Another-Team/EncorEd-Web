@@ -23,6 +23,7 @@ import { logOutRoles } from "../../app/features/role/authRoleSlice";
 import { logOutInstitution } from "../../app/features/institution/authInstitutionSlice";
 import { resetPage } from "../../app/features/navigation/navigationSlice";
 import { resetUsers } from "../../app/features/users/usersSlice";
+import { resetRoles } from "../../app/features/role/roleSlice";
 
 
 const Navbar = () => {
@@ -43,6 +44,7 @@ const Navbar = () => {
         logoutDispatch(resetPage())
 
         logoutDispatch(resetUsers())
+        logoutDispatch(resetRoles())
             
         navigate("/login")
     }
@@ -87,7 +89,7 @@ const Navbar = () => {
                     component={Link}
                     //to={(loggedIn.role && "/dashboard/profile") || (loggedIn.role && "/admin/dashboard/profile")}
                     //to={((loggedIn.role.find(data => data._systemRole._admin) || loggedIn.role.find(data => data._systemRole._employee)) && "/dashboard/profile") || (loggedIn.role.find(data => data._systemRole._superAdmin) && "/admin/dashboard/profile")}
-                    to={"/admin/dashboard/profile"}
+                    to={"/dashboard/profile"}
                     sx={{
                         textDecoration: 'none',
                         color: '#FFFFFF',

@@ -4,8 +4,8 @@ import { FieldValues, RegisterOptions } from "react-hook-form"
 export type RegisterFormInput = {
     key: string,
     label: string,
-    type: React.HTMLInputTypeAttribute | undefined,
-    rules: Omit<RegisterOptions<FieldValues, any>, "disabled" | "valueAsNumber" | "valueAsDate" | "setValueAs"> | undefined,
+    type?: React.HTMLInputTypeAttribute | undefined,
+    rules?: Omit<RegisterOptions<FieldValues, any>, "disabled" | "valueAsNumber" | "valueAsDate" | "setValueAs"> | undefined,
     icon?: Partial<OutlinedInputProps> | Partial<InputProps> | Partial<FilledInputProps> | undefined,
     rows?: number
 }

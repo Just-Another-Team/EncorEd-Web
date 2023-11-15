@@ -3,6 +3,7 @@ import EncorEdAuthService, { UserInput } from "../../api/encored-auth-service"
 import EncorEdUserService from "../../api/encored-user-service"
 import { resetPage } from "../navigation/navigationSlice"
 import { RegisterFormCredential } from "../../../types/RegisterFormCredential"
+import { LoginFormCredential } from "../../../types/LoginFormCredential"
 
 type UserData = {
     id?: string
@@ -69,24 +70,33 @@ export const emailExist = createAsyncThunk(
 
 export const getUser = createAsyncThunk(
     'user/get',
-    async (credential: RegisterFormCredential, {rejectWithValue}) => {
-        return await EncorEdAuthService.getUser(credential)
+    async (credential: RegisterFormCredential | LoginFormCredential, {rejectWithValue}) => {
+        return await EncorEdAuthService.getUser(credential.email!)
     }
 )
 
 //later
-export const userNameExist = createAsyncThunk(
-    "user/userNameExist",
-    async (credential: RegisterFormCredential, {rejectWithValue}) => {
-        return await EncorEdAuthService.signUpDbExists(credential)
-    }
-)
+// export const userNameExist = createAsyncThunk(
+//     "user/userNameExist",
+//     async (credential: RegisterFormCredential, {rejectWithValue}) => {
+//         return await EncorEdAuthService.signUpDbExists(credential)
+//     }
+// )
 
 export const signIn = createAsyncThunk(
     "user/signIn",
-    async (credential: RegisterFormCredential, {rejectWithValue}) => {
+    async (credential: LoginFormCredential, {rejectWithValue}) => {
         return await EncorEdAuthService.signIn(credential)
             .catch((error) => rejectWithValue(error));
+    }
+)
+
+export const updateUser = createAsyncThunk(
+    "user/update",
+    async (data: RegisterFormCredential, {rejectWithValue}) => {
+        console.log("Auth Slice Data", data)
+        return await EncorEdAuthService.updateUser(data)
+                .catch((error) => rejectWithValue(error))
     }
 )
 
@@ -232,6 +242,38 @@ const authSlice = createSlice({
                 state.error = null
             })
             builder.addCase(signIn.rejected, (state, actions: PayloadAction<any>) => {
+                state.loading = false
+                state.error = actions.payload
+            })
+        }
+
+        //Get Signed In User
+        {
+            builder.addCase(getUser.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            builder.addCase(getUser.fulfilled, (state, actions: PayloadAction<any>) => {    
+                state.loading = false
+                state.error = null
+            })
+            builder.addCase(getUser.rejected, (state, actions: PayloadAction<any>) => {
+                state.loading = false
+                state.error = actions.payload
+            })
+        }
+
+        //Update User
+        {
+            builder.addCase(updateUser.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            builder.addCase(updateUser.fulfilled, (state, actions: PayloadAction<any>) => {    
+                state.loading = false
+                state.error = null
+            })
+            builder.addCase(updateUser.rejected, (state, actions: PayloadAction<any>) => {
                 state.loading = false
                 state.error = actions.payload
             })

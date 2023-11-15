@@ -2,43 +2,39 @@ import { ActivityPermission } from "./ActivityPermission";
 import { VerificationPermission } from "./VerificationPermission";
 
 export type Permission = {
-    viewMap: boolean | undefined;
-    addMap: boolean | undefined;
-    editMap: boolean | undefined;
-    deleteMap: boolean | undefined;
-    unlockMap: boolean | undefined;
+    viewMap?: boolean;
+    addMap?: boolean;
+    editMap?: boolean;
+    deleteMap?: boolean;
+    unlockMap?: boolean;
 
-    viewSubject: ActivityPermission | undefined;
-    addSubject: ActivityPermission | undefined;
-    editSubject: ActivityPermission | undefined;
-    deleteSubject: ActivityPermission | undefined;
+    viewSubject?: ActivityPermission;
+    addSubject?: ActivityPermission;
+    editSubject?: ActivityPermission;
+    deleteSubject?: ActivityPermission;
 
-    viewEvent: ActivityPermission | undefined;
-    addEvent: ActivityPermission | undefined;
-    editEvent: ActivityPermission | undefined;
-    deleteEvent: ActivityPermission | undefined;
+    viewEvent?: ActivityPermission;
+    addEvent?: ActivityPermission;
+    editEvent?: ActivityPermission;
+    deleteEvent?: ActivityPermission;
 
-    viewUser: boolean | undefined;
-    addUser: boolean | undefined;
-    editUser: boolean | undefined;
-    deleteUser: boolean | undefined;
-    verifyUser: VerificationPermission | undefined; //Verify Object
-        // value: | undefined boolean,
-        // by: | undefined userId
+    viewUser?: boolean;
+    addUser?: boolean;
+    editUser?: boolean;
+    deleteUser?: boolean;
+    verifyUser?: VerificationPermission; 
 
-    viewGroup: boolean | undefined;
-    addGroup: boolean | undefined;
-    editGroup: boolean | undefined;
-    deleteGroup: boolean | undefined;
-    verifyGroup: VerificationPermission | undefined;
+    viewGroup?: boolean;
+    addGroup?: boolean;
+    editGroup?: boolean;
+    deleteGroup?: boolean;
+    verifyGroup?: VerificationPermission;
 
-    viewRole: boolean | undefined;
-    addRole: boolean | undefined;
-    editRole: boolean | undefined;
-    deleteRole: boolean | undefined;
-    verifyRole: VerificationPermission | undefined; //Verify Object
-        // value: | undefined boolean,
-        // by: | undefined userId
+    viewRole?: boolean;
+    addRole?: boolean;
+    editRole?: boolean;
+    deleteRole?: boolean;
+    verifyRole?: VerificationPermission;
 
-    viewInstitution: boolean | undefined;
-} | undefined
+    viewInstitution?: boolean;
+}

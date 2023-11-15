@@ -1,91 +1,164 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { 
-    Box, Button, Grid, TextField,
+    Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, TextField,
 } from "@mui/material";
-import { DataGrid } from '@mui/x-data-grid'
-import { Link } from "react-router-dom";
+import { DataGrid, GridCellParams, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useAppSelector } from "../../../../app/encored-store-hooks";
+import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-hooks";
+import { deleteRole, getRolesByInstitution } from "../../../../app/features/role/roleSlice";
+import dayjs from "dayjs";
+import { FixMeLater } from "../../../../types/FixMeLater";
 
-// Must be changed
-const columns = [
-    { field: 'id', headerName: 'ID', flex: 0.5 },
-    { field: '_name', headerName: 'Role name', flex: 1 },
-    //{ field: '_desc', headerName: 'Description', width: 130 },
-    {
-        field: 'groupsAssigned',
-        headerName: 'Groups Assigned',
-        type: 'number',
-        flex: 1,
-    },
-    {
-        field: 'usersAssigned',
-        headerName: 'Users Assigned',
-        type: 'number',
-        flex: 1,
-    },
-    {
-        field: 'createdBy',
-        headerName: 'Created By',
-        flex: 1,
-    },
-    {
-        field: 'addedIn',
-        headerName: 'Added In',
-        flex: 1,
-    },
-  ];
-
-const rows = [
-  { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-  { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-  { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-  { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-  { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-  { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-  { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-  { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-  { id: 10, lastName: 'Harvey', firstName: 'Steve', age: 23 },
-  { id: 11, lastName: 'Snow', firstName: 'Jon', age: 35 },
-  { id: 12, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-  { id: 13, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-  { id: 14, lastName: 'Stark', firstName: 'Arya', age: 16 },
-  { id: 15, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-  { id: 16, lastName: 'Melisandre', firstName: null, age: 150 },
-  { id: 17, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-  { id: 18, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-  { id: 19, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-  { id: 20, lastName: 'Harvey', firstName: 'Steve', age: 23 },
-  { id: 21, lastName: 'Snow', firstName: 'Jon', age: 35 },
-  { id: 22, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-  { id: 23, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-  { id: 24, lastName: 'Stark', firstName: 'Arya', age: 16 },
-  { id: 25, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-];
+const CustomDialog = ({open, handleClose, value}: FixMeLater) => {
+    return(
+        <Dialog
+        open={open}
+        onClose={handleClose}
+        component='form'>
+            {/* Should have been content */}
+            <DialogTitle>Delete {value.name}?</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    To complete the deletion process, please enter your password.
+                </DialogContentText>
+                <TextField
+                    autoComplete="off"
+                    autoFocus
+                    margin="dense"
+                    id="name"
+                    label="Password"
+                    type="password"
+                    fullWidth
+                    variant="standard"
+                />
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleClose}>Cancel</Button>
+                <Button onClick={handleClose} color="error">Delete</Button>
+            </DialogActions>
+        </Dialog>
+    )
+}
 
 const RoleList = () => {
 
-    // const institution = useAppSelector(state => state.institution.data.id)
+    const navigate = useNavigate();
+
+    const dispatch = useAppDispatch();
+
+    const roles = useAppSelector(state => state.role.data)
+    const institution = useAppSelector(state => state.institution.data.id)
+
+    const [open, setOpen] = React.useState(false);
+    const [role, setRole] = React.useState({});
+    const [roleList, setRoleList] = React.useState(roles);
+
+    const handleClickOpen = (params: any) => {
+        dispatch(deleteRole(params.row.id)).unwrap()
+            .then(() => {
+                alert("Role successfully deleted!")
+            })
+            .catch((error) => {
+                alert(`Error on deleted: ${error.response.data}`)
+            })
+        // To Do - Verify Deletion
+        // setRole(params.row)
+        // setOpen(true);
+    };
+    const handleClose = (event: {}, reason: "backdropClick" | "escapeKeyDown") => {
+        if (reason != "backdropClick")
+            setOpen(false)
+    };
+
+    const columns: GridColDef[] = [
+        { field: 'id', headerName: 'ID', flex: 0.5 },
+        { field: 'name', headerName: 'Role name', flex: 1 },
+        {
+            field: 'groupsAssigned',
+            headerName: 'Groups Assigned',
+            type: 'number',
+            flex: 1,
+        },
+        {
+            field: 'usersAssigned',
+            headerName: 'Users Assigned',
+            type: 'number',
+            flex: 1,
+            valueGetter: (params: GridValueGetterParams) => {
+                return params.row.usersAssigned.length
+            },
+        },
+        {
+            field: 'createdBy',
+            headerName: 'Created By',
+            sortable: false,
+            flex: 1,
+            valueGetter: (params: GridValueGetterParams) => {
+                return `${params.row.createdBy.firstName} ${params.row.createdBy.lastName}`
+            },
+        },
+        {
+            field: 'creationDate',
+            headerName: 'Added In',
+            flex: 1,
+            valueGetter: (params: GridValueGetterParams) => {
+                return dayjs(params.row.creationDate).format("MMMM-DD-YYYY")
+            },
+        },
+        {
+            field: 'delete',
+            sortable: false,
+            renderHeader: () => (
+                <span></span>
+            ),
+            renderCell: (params: GridCellParams) => {
+                return (
+                    <Button
+                    onClick={() => {handleClickOpen(params)}}
+                    variant="contained"
+                    color="error">
+                        DELETE
+                    </Button>
+                )
+            }
+        }
+    ];
+    
+    const handleSearchRole = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        let searchedValue = roles.filter(role => role.name?.toLowerCase().includes(e.target.value.toLowerCase()))
+        setRoleList(searchedValue)
+    }
+
+    useEffect(() => {
+        dispatch(getRolesByInstitution(institution?.toLowerCase()))
+    }, [])
 
     return(
         <>            
             <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} marginBottom={2}>
                 <Button
                 component={Link}
-                to={"/"}
-                //to={`/dashboard/role/${institution}/add`}
-                variant="contained" size="large">ADD ROLE</Button>
+                to={`/dashboard/role/${institution}/add`}
+                variant="contained"
+                size="large">
+                    ADD ROLE
+                </Button>
                 <Grid container xs={4}>
-                    <TextField label="Search Role" fullWidth/>
+                    <TextField label="Search Role" onChange={handleSearchRole} fullWidth/>
                 </Grid>
             </Box>
 
             <Box marginBottom={2}>
 
                 <DataGrid
-                    rows={rows}
+                    autoHeight
+                    rows={roleList}
                     columns={columns}
+                    hideFooterSelectedRowCount
+                    columnVisibilityModel={{
+                        id: false,
+                    }}
                     initialState={{
                         pagination: {
                             paginationModel: { page: 0, pageSize: 10},
@@ -93,10 +166,10 @@ const RoleList = () => {
                     }}
                     onRowDoubleClick={(e) => {
                         console.log(e.row)
-                        window.location.href = '/dashboard/subject/testId'
+                        navigate(`${e.row.id}/access`)
+                        // window.location.href = '/dashboard/subject/testId'
                     }}
                     pageSizeOptions={[10]}
-                    //disableRowSelectionOnClick
                     sx={{
                         '&.MuiDataGrid-root': {
                             border: '1px solid #EFEEFB'
@@ -117,6 +190,8 @@ const RoleList = () => {
                     }}
                 />
             </Box>
+
+            <CustomDialog open={open} handleClose={handleClose} value={role}/>
         </>
     )
 }

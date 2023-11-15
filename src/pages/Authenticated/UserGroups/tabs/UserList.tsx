@@ -98,7 +98,7 @@ const UserList = () => {
                 return (
                     // <Button onClick={(e) => {window.location.href=`/dashboard/profile/${params.row.userName}`}} variant="contained" color="secondary" >PROFILE</Button>
                     <Button
-                    onClick={(e) => {navigate(`${params.row.email}`)}}
+                    onClick={(e) => {navigate(`/profile/${params.row.email}`)}}
                     variant="contained"
                     color="secondary">
                         PROFILE
@@ -239,7 +239,7 @@ const UserList = () => {
                     }}>
                         <div style={{textAlign: 'right'}}>
                             <Button
-                            //onClick={handleCloseRoles}
+                            onClick={handleCloseRoles}
                             sx={{color:'black', fontWeight: 'bolder', fontSize: '20px', paddingRight:0, borderRadius:'20px'}} >
                                 x
                             </Button>

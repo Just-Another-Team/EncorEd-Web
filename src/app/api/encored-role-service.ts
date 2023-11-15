@@ -3,8 +3,8 @@ import { Permission } from "../../types/RoleTypes/Permission";
 import http from "./http-common"
 
 export type RoleInput = {
-    name: string,
-    desc: string,
+    name?: string,
+    desc?: string,
     //type: reqRole.type, < For identifying only
     institution?: string,
     type?: string;
@@ -52,14 +52,21 @@ class EncorEdRoleService {
         return http.get(`/role/assign/user/${userId}`)
     }
 
-    // getRoles(id) {
-    //     //console.log(data)
-    //     return http.get(`/role/assign/${id}`)
-    // }
+    getRolesByInstitution(institutionId: string) {
+        return http.get(`/role//list/u/${institutionId}`)
+    }
 
-    // addRole(data) {
-    //     return http.post('/role/add', data);
-    // }
+    addRole(data: RoleInput) {
+        return http.post('/role/add', data);
+    }
+
+    updateRole(roleId: string, data: RoleInput) {
+        return http.put(`/role/update/${roleId}`, data)
+    }
+
+    deleteRole(roleId: string) {
+        return http.delete(`/role/delete/${roleId}`)
+    }
 }
 
 export default new EncorEdRoleService();
