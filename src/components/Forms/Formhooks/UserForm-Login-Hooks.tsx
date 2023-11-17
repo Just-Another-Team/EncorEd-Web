@@ -3,19 +3,15 @@ import {useForm} from 'react-hook-form'
 import UserForm from '../UserForm';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-//Slices
-// import { getInstitution } from '../../../app/features/institution/authInstitution';
-// import { viewAssignedRoles } from '../../../app/features/role/authRoleSlice';
-// import { getUser, signIn } from '../../../app/features/auth/authSlice';
-
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../../app/encored-store-hooks';
 import { LoginFormCredential } from '../../../types/LoginFormCredential';
 import { LoginFormInput } from '../../../types/LoginFormInput';
-import { InputAdornment } from '@mui/material';
+import { Grid, InputAdornment, Typography } from '@mui/material';
 import { emailExist, getUser, register, signIn } from '../../../app/features/auth/authSlice';
 import { getInstitution } from '../../../app/features/institution/authInstitutionSlice';
 import { getAssignedRoles, logOutRoles } from '../../../app/features/role/authRoleSlice';
+import { Link } from 'react-router-dom';
 
 const LoginUserForm = () => {
     const dispatch = useAppDispatch();
@@ -138,7 +134,11 @@ const LoginUserForm = () => {
         title="Sign In"
         inputs={inputs}
         control={control}
-        onSubmit={handleSubmit(onSubmit)} /> //loading={user.loading || institution.loading || roles.loading} 
+        onSubmit={handleSubmit(onSubmit)}>
+            <Grid xs={12} marginTop={4}>
+                <Typography variant="body1" textAlign={"center"}>Don't have an account? <Link to="/register/user" style={{}}>Sign Up</Link></Typography>
+            </Grid>
+        </UserForm>
     )
 }
 

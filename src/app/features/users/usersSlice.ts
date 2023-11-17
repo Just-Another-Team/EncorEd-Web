@@ -28,7 +28,7 @@ const initialState: IUserInitialState = {
 }
 
 export const getUsers = createAsyncThunk(
-    "/users/get/institution",
+    "users/get/institution",
     async ({institution, user}: FixMeLater, {rejectWithValue}) => {
         return await EncorEdUserService.getAllUsersByInstitution(institution, user)
     }
@@ -42,7 +42,7 @@ export const getUsers = createAsyncThunk(
 // )
 
 export const addUsers = createAsyncThunk(
-    "/users/add",
+    "users/add",
     async (userData: FixMeLater, {rejectWithValue}) => {
         return await EncorEdUserService.addUser(userData)
             .then((res) => res)

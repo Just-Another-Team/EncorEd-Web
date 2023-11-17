@@ -2,6 +2,15 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit"
 import Institution from "../../api/encored-institution-service"
 import { RegisterFormCredential } from "../../../types/RegisterFormCredential"
 
+type InstitutionInitialType = {
+    id: "",
+    createdBy: "",
+    name: "",
+    creationDate: "",
+    desc: "",
+    status: "",
+}
+
 const initialState = {
     loading: false,
     data: {

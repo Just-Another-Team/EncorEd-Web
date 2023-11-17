@@ -1,13 +1,20 @@
 import React from "react"
 import {
     Box,
+    Button,
+    Divider,
     Grid,
+    Tab,
+    Tabs,
     Typography,
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { FixMeLater } from "../../../../types/FixMeLater"
 import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-hooks"
 import { useNavigate } from "react-router-dom"
+import FormInputTextField from "../../../../components/TextField/FormInputTextField"
+import FormInputDropDown from "../../../../components/DropDown/FormInputDropDown"
+import { RegisterFormInput } from "../../../../types/RegisterFormInput"
 
 type SubjectInput = {
     name?: string; 
@@ -22,7 +29,7 @@ type SubjectInput = {
     verifiedBy?: string; 
 }
 
-const AddRole = () => {
+const AddSubject = () => {
     const navigate = useNavigate();
 
     const dispatch = useAppDispatch()
@@ -37,55 +44,113 @@ const AddRole = () => {
             type: "", 
             units: 0,
             institution: institution,
-            createdBy: "", 
+            createdBy: user, 
         }
     })
 
     const handleInput = (data: FixMeLater) => {
-        
+        console.log(data)
+
+        reset();
     }
+
+    const subjectInputs: Array<RegisterFormInput> = [
+        {key: "name", label: "Name", type: "text", rules: { required: "Subject name is required" }},
+        {key: "edpCode", label: "EDP Code", type: "text", rules: { required: "EDP Code is required" }},
+        {key: "units", label: "Units", type: "text", rules: { required: "Unit is required" }},
+        {key: "type", label: "Type", rules: { required: "Role type is required" }},
+    ] 
+
+    const subjectTypes = [
+        {label: "Lecture", value: "lecture"},
+        {label: "Laboratory", value: "laboratory"},
+    ]
 
     return(
         <>
-            <Typography variant="h4" color={"#296EB4"} fontWeight={700} className="mb-2">
+            <Typography variant="h4" color={"#296EB4"} fontWeight={700} marginBottom={2}>
                 ADD SUBJECT
             </Typography>
 
-            <Box onSubmit={handleSubmit(handleInput)} component="form">
-                <Grid container>
-                    <Grid xs={12} item className="mb-1">
-                        <Typography variant="h6" color={"#296EB4"} fontWeight={700}>Details</Typography>
-                    </Grid>
-                    {/* {detailsInput.map(el => (
-                        el.key !== "type" ?
-                        <Grid key={el.key} xs={12} item className="mb-3">
-                            <Typography variant={"body1"} className="mb-1">{el.label}</Typography>
-                            <FormInputTextField fullWidth name={el.key} rules={el.rules} control={control} rows={el.rows}/>
-                        </Grid> :
-                        <Grid key={el.key} xs={12} item className="mb-3">
-                            <Stack direction="row" alignItems="center">
-                                <Typography
-                                variant={"body1"}
-                                className="mb-1"
-                                flex={1}>
-                                    {el.label}
-                                </Typography>
+            <Grid spacing={4} container>
+                <Grid md={6} item>
 
-                                <FormInputDropDown
-                                name={el.key}
-                                defaultValue=""
-                                label={"Choose a role type"}
-                                control={control}
-                                options={options}
-                                rules={el.rules}
-                                formControlProps={{flex: 1}}/>
-                            </Stack>
+                    <Box marginBottom={2} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                        <Tabs value={0} onChange={() => {}} aria-label="basic tabs example">
+                            <Tab label="Single Subject"/>
+                            <Tab label="Multiple Subject"/>
+                        </Tabs>
+                    </Box>
+
+                    <Box onSubmit={handleSubmit(handleInput)} component="form">
+                        {/* Move this thing in another component */}
+                        <Grid rowSpacing={1} columnSpacing={4} container marginBottom={2}   >
+                            <Grid xs={12} item>
+                                <Typography variant="h6" color={"#296EB4"} fontWeight={700}>Details</Typography>
+                            </Grid>
+
+                            {subjectInputs.map(el => (
+                                <Grid key={el.key} xs={12} lg={6} item>
+                                    <Typography variant="body1" marginBottom={1}>{el.label}</Typography>
+                                    {el.key !== "type" ? <FormInputTextField name={el.key} control={control} type={el.type} rules={el.rules} fullWidth/> : <FormInputDropDown name={el.key} control={control} options={subjectTypes} rules={el.rules} fullWidth />}
+                                </Grid>             
+                            ))}
+
+                            {/* <Grid xs={12} lg={6} item>
+                                <Typography variant="body1" marginBottom={1}>Title</Typography>
+                                <FormInputTextField name="Title" control={control} fullWidth/>
+                            </Grid>
+
+                            <Grid xs={12} lg={6} item>
+                                <Typography variant="body1" marginBottom={1}>EDP Code</Typography>
+                                <FormInputTextField name="edpCode" control={control} fullWidth/>
+                            </Grid>
+
+                            <Grid xs={12} lg={6} item>
+                                <Typography variant="body1" marginBottom={1}>Units</Typography>
+                                <FormInputTextField name="units" control={control} fullWidth/>
+                            </Grid>
+
+                            <Grid xs={12} lg={6} item>
+                                <Typography variant="body1" marginBottom={1}>Type</Typography>
+                                <FormInputDropDown name="type" control={control} options={subjectTypes} fullWidth />
+                            </Grid> */}
                         </Grid>
-                    ))} */}
+
+                        <Grid rowSpacing={1} columnSpacing={4} container marginBottom={2}>
+                            <Grid xs={12} item>
+                                <Button variant="outlined">Add Schedule</Button>
+                            </Grid>
+                        </Grid>
+
+                        <Grid rowSpacing={1} columnSpacing={4} container marginBottom={2}>
+                            <Grid xs={12} item>
+                                <Button variant="outlined">Assign Subject to Room</Button>
+                            </Grid>
+                        </Grid>
+
+                        <Grid justifyContent={"flex-end"} container marginBottom={2}>
+                            <Grid xs={12} sm={4} md={12} lg={4} item>
+                                <Button type="submit" fullWidth variant="contained">Add Subject</Button>
+                            </Grid>
+                        </Grid>
+                    </Box>
                 </Grid>
-            </Box>
+                <Grid md={6} item>
+                    <Typography>Added Subjects here</Typography>
+                </Grid>
+            </Grid>
+
+            <Grid justifyContent={"flex-end"} spacing={1} container>
+                <Grid xs={12} sm={2} lg={1} item>
+                    <Button fullWidth variant="contained">Submit</Button>
+                </Grid>
+                <Grid xs={12} sm={2} lg={1} item>
+                    <Button fullWidth color="error" variant="outlined">Cancel</Button>
+                </Grid>
+            </Grid>
         </>
     )
 }
 
-export default AddRole
+export default AddSubject

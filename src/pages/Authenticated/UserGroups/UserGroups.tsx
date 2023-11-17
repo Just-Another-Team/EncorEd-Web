@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import {
     Tabs,
     Tab,
@@ -6,19 +6,32 @@ import {
     Box,
     TabProps
 } from '@mui/material'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation, Link, } from 'react-router-dom'
 import { FixMeLater } from "../../../types/FixMeLater";
-import { Link } from "react-router-dom";
 import { useAppSelector } from "../../../app/encored-store-hooks";
 import CustomTab from "../../../components/Tab/CustomTab";
 
+type TabType = {
+    key: string,
+    label: string,
+    to: string
+}
+
 const UserGroups = () => {
+    const location = useLocation();
+
     const institution = useAppSelector(state => state.institution.data.id)
 
-    const [page, setPage] = React.useState(0);
+    const userGroupsTabs: Array<TabType> = [
+        {key: "user", label: "User", to: `users/u/${institution}`},
+        {key: "groups", label: "Groups", to: `groups/u/${institution}`},
+        {key: "roles", label: "Roles", to: `roles/u/${institution}`}
+    ]
+
+    const [page, setPage] = React.useState(userGroupsTabs.findIndex(tab => {return tab.to === location.pathname.replace('/dashboard/list/', '')}));
 
     const handleChange = (event: FixMeLater, newValue: FixMeLater) => {
-        setPage(newValue);
+        setPage(newValue)
     };
 
     return(

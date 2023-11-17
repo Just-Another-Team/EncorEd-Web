@@ -14,11 +14,15 @@ import SubList from "./pages/SubjectList";
 import SchedSubList from "./pages/ScheduledSubject";
 import SubRequest from "./pages/Request";
 import { FixMeLater } from "../../../types/FixMeLater";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import CustomTab from "../../../components/Tab/CustomTab";
 import { Link } from "react-router-dom";
 
 const Subject = () => {
+    const navigate = useNavigate();
+
+    const { institution } = useParams();
+
     const [page, setPage] = React.useState(0);
 
     const handleChange = (event: FixMeLater, newValue: FixMeLater) => {
@@ -33,7 +37,7 @@ const Subject = () => {
             
             {/* Add and Search Subject */}
             <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} marginBottom={1}>
-                <Button variant="contained" size="large">ADD SUBJECT</Button>
+                <Button variant="contained" size="large" onClick={() => {navigate(`/dashboard/subject/{institution}/add`)}}>ADD SUBJECT</Button>
                 <Grid container xs={4}>
                     <TextField label="Search Subject" fullWidth/>
                 </Grid>

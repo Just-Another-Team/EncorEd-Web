@@ -11,6 +11,7 @@ const FormInputDropDown = ({
     options,
     formControlProps,
     selectProps,
+    fullWidth,
     defaultValue
 }: FixMeLater) => {
 
@@ -25,7 +26,7 @@ const FormInputDropDown = ({
     }
 
     return(
-        <FormControl sx={formControlProps}>
+        <FormControl fullWidth={fullWidth} sx={formControlProps}>
             <InputLabel>{label}</InputLabel>
             <Controller
             name={name}
@@ -37,6 +38,7 @@ const FormInputDropDown = ({
                 value={value}
                 label={label}
                 sx={selectProps}
+                fullWidth={fullWidth}
                 error={!!error}>
                     {items()}
                 </Select>

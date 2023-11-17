@@ -47,14 +47,14 @@ const rows = [
 
 
 const Home = () => {
-    //const user = useAppSelector(state => state.user.data)
+    const user = useAppSelector(state => state.authentication.data)
     
     return(
         <>
             <Box
             marginBottom={3}>
                 <Typography variant="h4" fontWeight={700}>
-                    {/* Welcome {user.displayName}! */}
+                    Welcome {`${user.firstName} ${user.lastName}`}!
                 </Typography>
             </Box>
             
@@ -68,29 +68,28 @@ const Home = () => {
 
                 <Grid container overflow={'auto'} spacing={2} >
                     {Array.from({length: 4}).map((el, ind) => (
-                        <Grid item xs={3}>
+                        <Grid item xs={6} sm={3} md={6} lg={3}>
                             <SubjectEventCard src="/assets/SubjectTestPic.png"/>
                         </Grid>
                     ))}
                 </Grid>
             </Box>
             
-            <Box
-            marginBottom={4}>
+            <Box marginBottom={4}>
                 <Typography variant="h5" fontWeight={700} marginBottom={2}>
                     Ongoing Subjects
                 </Typography>
                 
                 <Grid container overflow={'auto'} spacing={2} >
                     {Array.from({length: 4}).map((el, ind) => (
-                        <Grid item xs={3}>
+                        <Grid item xs={6} sm={3} md={6} lg={3}>
                             <SubjectEventCard src="/assets/SubjectTestPic.png"/>
                         </Grid>
                     ))}
                 </Grid>
             </Box>
 
-            <Grid container marginBottom={4}  spacing={4}>
+            <Grid container marginBottom={4} spacing={4}>
                 <Grid item xs={12} md={6}>
                     <Typography variant="h5" fontWeight={700} marginBottom={1}>
                         Subject Requests
@@ -146,8 +145,7 @@ const Home = () => {
                 </Grid>
             </Grid>
 
-            <Box
-            marginBottom={2}>
+            <Box marginBottom={2}>
                 <Typography variant="h5" fontWeight={700} marginBottom={1}>
                     Navigation Activity
                 </Typography>

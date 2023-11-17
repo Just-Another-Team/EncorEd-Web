@@ -34,7 +34,6 @@ const ConnectedSideBar = () => {
         {key: "subject", name: "Subject", icon: <BookOutline />, href: `/dashboard/subject/${institution}`},
         {key: "maps", name: "Maps", icon: <MapOutline />, href: "/dashboard/map/list"},
         {key: "events", name: "Events", icon: <EventOutline />, href: `/dashboard/event/${institution}`},
-        
         {key: "userGroups", name: "User and Groups", icon: <GroupsOutline />, href: `/dashboard/list/users/u/${institution}`},
         {key: "institution", name: "Institution", icon: <OrganizationOutline />, href: "/dashboard/institution"},
         {key: "request", name: "Request", icon: <PostAddIcon />, href: "/dashboard/request"},
@@ -46,6 +45,7 @@ const ConnectedSideBar = () => {
         {key: "institution", name: "Institutions", icon: <OrganizationOutline />, href: "/admin/dashboard/institutions"},
     ]
 
+    // LATER
     // const selectNavigations = useMemo(() => {
     //     const roleType = roles.filter(role => typeof role?.employee !== 'boolean')
     //     const employeePermissions = roleType.map(role => role.employee)

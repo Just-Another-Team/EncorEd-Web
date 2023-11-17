@@ -46,6 +46,7 @@ import RoleAccess from './pages/Authenticated/UserGroups/Role/tabs/RoleAccess';
 import Report from './pages/Authenticated/Report/Report';
 import UsersLayout from './pages/Admin/Users/UsersLayout';
 import { logOutRoles } from './app/features/role/authRoleSlice';
+import AddSubject from './pages/Authenticated/Subject/pages/AddSubject';
 
 function App() {
   const dispatch = useAppDispatch()
@@ -92,7 +93,7 @@ function App() {
           <Route path='schedule' element={<SchedSubList />}/>
           <Route path='request' element={<SubRequest />}/>
         </Route>
-        <Route path='subject/:institution/add' /> {/* Add Subject */}
+        <Route path='subject/:institution/add' element={<AddSubject />}/> {/* Add Subject */}
         <Route path='subject/:institution/:id' /> {/* Selected Subject */}
         <Route path='subject/:institution/:id/update' /> {/* Update Subject */}
 

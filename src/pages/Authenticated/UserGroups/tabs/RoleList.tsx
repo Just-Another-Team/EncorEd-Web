@@ -9,6 +9,8 @@ import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-ho
 import { deleteRole, getRolesByInstitution } from "../../../../app/features/role/roleSlice";
 import dayjs from "dayjs";
 import { FixMeLater } from "../../../../types/FixMeLater";
+import NoRowsDataGridOverlay from "../../../../components/Overlay/NoRows/NowRowsOverlay";
+import LoadingRowsDataGridOverlay from "../../../../components/Overlay/LoadingRowsOverlay/LoadingRowsOverlay";
 
 const CustomDialog = ({open, handleClose, value}: FixMeLater) => {
     return(
@@ -47,12 +49,13 @@ const RoleList = () => {
 
     const dispatch = useAppDispatch();
 
+    const roleLoading = useAppSelector(state => state.role.loading)
     const roles = useAppSelector(state => state.role.data)
     const institution = useAppSelector(state => state.institution.data.id)
 
     const [open, setOpen] = React.useState(false);
     const [role, setRole] = React.useState({});
-    const [roleList, setRoleList] = React.useState(roles);
+    const [roleList, setRoleList] = React.useState<any>([]);
 
     const handleClickOpen = (params: any) => {
         dispatch(deleteRole(params.row.id)).unwrap()
@@ -131,8 +134,10 @@ const RoleList = () => {
     }
 
     useEffect(() => {
-        dispatch(getRolesByInstitution(institution?.toLowerCase()))
-    }, [roles])
+        dispatch(getRolesByInstitution(institution?.toLowerCase())).unwrap().then((roles) => {
+            setRoleList(roles.data)
+        })
+    }, [])
 
     return(
         <>            
@@ -149,26 +154,23 @@ const RoleList = () => {
                 </Grid>
             </Box>
 
-            <Box marginBottom={2}>
-
+            <Box height={560} marginBottom={2}>
                 <DataGrid
-                    autoHeight
                     rows={roleList}
                     columns={columns}
                     hideFooterSelectedRowCount
                     columnVisibilityModel={{
                         id: false,
                     }}
+                    slots={{
+                        noRowsOverlay: roleLoading ? LoadingRowsDataGridOverlay : NoRowsDataGridOverlay,
+                    }}
                     initialState={{
                         pagination: {
                             paginationModel: { page: 0, pageSize: 10},
                         },
                     }}
-                    onRowDoubleClick={(e) => {
-                        console.log(e.row)
-                        navigate(`${e.row.id}/access`)
-                        // window.location.href = '/dashboard/subject/testId'
-                    }}
+                    onRowDoubleClick={(e) => {navigate(`${e.row.id}/access`)}}
                     pageSizeOptions={[10]}
                     sx={{
                         '&.MuiDataGrid-root': {
