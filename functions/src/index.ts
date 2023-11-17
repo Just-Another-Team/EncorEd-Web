@@ -3,9 +3,6 @@ import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser';
 import { https } from 'firebase-functions'
-import {onRequest} from "firebase-functions/v2/https";
-import * as logger from "firebase-functions/logger";
-
 /**
  * Import function triggers from their respective submodules:
  *
@@ -34,20 +31,21 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 import userRouter from './routes/user'
-// import participantRouter from "./routes/participant"
-// import subjectRouter from "./routes/subject"
 import institutionRouter from "./routes/institution"
+import roleRouter from "./routes/role"
+import subjectRouter from "./routes/subject"
+
+// import participantRouter from "./routes/participant"
 // import eventRouter from "./routes/event"
 // import attendeeRouter from "./routes/attendees"
-import roleRouter from "./routes/role"
 
 app.use("/user", userRouter)
-// app.use("/participant", participantRouter)
-// app.use("/subject", subjectRouter)
 app.use("/institution", institutionRouter)
+app.use("/role", roleRouter)
+app.use("/subject", subjectRouter)
+// app.use("/participant", participantRouter)
 // app.use("/event", eventRouter)
 // app.use("/attendees", attendeeRouter)
-app.use("/role", roleRouter)
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);

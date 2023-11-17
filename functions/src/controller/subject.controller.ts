@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import {
     db,
-    Timestamp
 } from '../database';
 import IBaseService from '../interfaces/IBaseService';
 import ISubject from "../models/subject.model";
@@ -30,17 +29,15 @@ class SubjectService implements IBaseService {
                 creationDate: reqSubject.creationDate,
                 createdBy: reqSubject.createdBy,
                 
-                //updatedDate
-                //updatedBy
+                updatedDate: reqSubject.creationDate,
+                updatedBy: reqSubject.createdBy,
 
                 verifiedBy: reqSubject.verifiedBy,
                 status: reqSubject.status
             }
 
             // const subjectDocRef = await subjectCollection
-            const subjectDoc = await subjectCollection.doc(`${subject.institution}-${subject.name.toLowerCase().trim().replace(/\s/g, '')}`)
-
-            await subjectDoc.create(subject)
+            await subjectCollection.doc(`${subject.institution}-${subject.type.substring(0, 3).toLowerCase()}-${subject.name.toLowerCase().trim().replace(/\s/g, '')}`).create(subject)
 
             res.status(200).json({message: "Subject added successfully"})
 
@@ -54,26 +51,168 @@ class SubjectService implements IBaseService {
                     message: error.message
                 }
                 
-                res.status(400).json(subjectControllerError) //type: error.type, code: error.code
+                res.status(400).json(subjectControllerError) //Get this outside of the if statement
             }
         }
 
     }
 
     public async update(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        throw new Error('Method not implemented.');
+        const subjectParamId = req.params.id;
+        const reqSubject = req.body as ISubject;
+
+        //Update authentication as well
+
+        try{
+            const subjectDoc = subjectCollection.doc(subjectParamId);
+
+            const oldSubject = await subjectDoc.get()
+                                                .then(subject => ({id: subject.id, ...subject.data()} as ISubject))
+                                                .catch(error => { throw new Error(error) })
+
+            const newSubject: ISubject = {
+                name: reqSubject.name,
+                edpCode: reqSubject.edpCode,
+                type: reqSubject.type,
+                units: reqSubject.units,
+                institution: reqSubject.institution.toLowerCase().trim().replace(/\s/g, ''),
+                
+                creationDate: oldSubject.creationDate,
+                createdBy: oldSubject.createdBy,
+                
+                updatedDate: reqSubject.creationDate,
+                updatedBy: reqSubject.createdBy,
+
+                verifiedBy: reqSubject.verifiedBy,
+                status: oldSubject.status
+            }
+
+            const newSubId = `${newSubject.institution}-${newSubject.type.substring(0, 3).toLowerCase()}-${newSubject.name.toLowerCase().trim().replace(/\s/g, '')}`;
+
+            if (oldSubject.id !== newSubId) {
+                await subjectDoc.delete()
+                                .then(() => {
+                                    console.log("Successfully Updated Subject - Firestore (Delete Old)")
+                                })
+                                .catch(error => {throw new Error(error)})
+
+                await subjectCollection.doc(newSubId).set(newSubject)
+            }
+            else await subjectCollection.doc(newSubId).update(newSubject)
+
+            res.status(200).json({ message: "Subject updated successfully" })
+        }
+        catch(error) {
+            if (error instanceof Error) {
+                const subjectControllerError: ErrorController = {
+                    name: "Subject",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "Update",
+                    message: error.message,
+                    stack: error.stack
+                }
+                console.error(error)
+                
+                res.status(400).json(subjectControllerError) //type: error.type, code: error.code
+            }
+        }
     }
 
     public async delete(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        throw new Error('Method not implemented.');
+        const subjectId = req.params.id;
+
+        try {
+            await subjectCollection.doc(subjectId).delete();
+
+            res.status(200).json({ message: "Subject Deleted Successfully!" })
+
+        } catch (error) {
+            if (error instanceof Error) {
+                const subjectControllerError: ErrorController = {
+                    name: "Subject",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "View",
+                    message: error.message
+                }
+                
+                res.status(400).json(subjectControllerError) //Get this outside of the if statement
+            }
+        } 
     }
 
     public async view(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        throw new Error('Method not implemented.');
+        const subjectId = req.params.id;
+
+        try {
+            const subjectRef = await subjectCollection.doc(subjectId).get()
+
+            res.status(200).json({id: subjectRef.id, ...subjectRef.data()})
+
+        } catch (error) {
+            if (error instanceof Error) {
+                const subjectControllerError: ErrorController = {
+                    name: "Subject",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "View",
+                    message: error.message
+                }
+                
+                res.status(400).json(subjectControllerError) //Get this outside of the if statement
+            }
+        } 
     }
 
     public async viewAll(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        throw new Error('Method not implemented.');
+        try {
+            const subjectRef = await subjectCollection.get()
+
+            const subjects = subjectRef.docs.map(subject => ({id: subject.id, ...subject.data()}))
+
+            res.status(200).json(subjects)
+
+        } catch (error) {
+            if (error instanceof Error) {
+                const subjectControllerError: ErrorController = {
+                    name: "Subject",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "View All",
+                    message: error.message
+                }
+                
+                res.status(400).json(subjectControllerError) //Get this outside of the if statement
+            }
+        } 
+    }
+
+    public async viewAllByInstitution(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const institutionId = req.params.institution;
+
+        try {
+            const subjectRef = await subjectCollection.where('institution', '==', institutionId)
+                                                        .where('status', '==', 'Open')
+                                                        .get()
+
+            const subjects = subjectRef.docs.map(subject => ({id: subject.id, ...subject.data()}))
+
+            res.status(200).json(subjects)
+
+        } catch (error) {
+            if (error instanceof Error) {
+                const subjectControllerError: ErrorController = {
+                    name: "Subject",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "View All",
+                    message: error.message
+                }
+                
+                res.status(400).json(subjectControllerError) //Get this outside of the if statement
+            }
+        } 
     }
 }
 

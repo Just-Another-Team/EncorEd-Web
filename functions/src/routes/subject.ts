@@ -22,6 +22,7 @@ subjectRouter.put("/update/:id", SubjectService.update)
 subjectRouter.delete("/delete/:id", SubjectService.delete)
 subjectRouter.get("/list", SubjectService.viewAll)
 subjectRouter.get("/list/:id", SubjectService.view)
+subjectRouter.get("/list/u/:institution", SubjectService.viewAllByInstitution)
 
 // subjectRouter.get("/list/:institutionId/") <- Get Subject By Institution
 // subjectRouter.get("/list/:institutionId/:id") <- Get Subject By Institution and by Id

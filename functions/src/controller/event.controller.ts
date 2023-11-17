@@ -1,11 +1,67 @@
+import { Request, Response } from 'express';
+import { ParamsDictionary } from 'express-serve-static-core';
+import { ParsedQs } from 'qs';
 import {
     db,
     Timestamp,
 } from '../database'
+import IBaseService from '../interfaces/IBaseService';
 import { converter } from '../models/converter';
 import IEvent from "../models/event.model"
+import ErrorController from '../types/ErrorController';
 
 const eventCollection = db.collection(`/events/`).withConverter(converter<IEvent>())
+
+class EventService implements IBaseService {
+    public async add(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        try {
+            // const { name, desc, creationDate, createdBy, verifiedBy, status } = req.body;
+
+            // let event = new Event(
+            //     name,
+            //     desc,
+            //     new Date(creationDate),
+            //     createdBy,
+            //     verifiedBy,
+            //     status
+            // )
+
+            // await db.collection(`/events/`).doc().withConverter(eventConverter).create(event)
+            //     .then((result) => {
+            //         res.status(200).json({message: "Event added successfully"})
+            //     })
+            //     .catch((err) => {
+            //         throw {message: err.message}
+            //     })
+            
+        } catch (error) {
+            if (error instanceof Error) {
+                const eventControllerError: ErrorController = {
+                    name: "Event",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "Add",
+                    message: error.message
+                }
+                
+                res.status(400).json(eventControllerError) //type: error.type, code: error.code
+            }
+        }
+    }
+    update(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        throw new Error('Method not implemented.');
+    }
+    delete(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        throw new Error('Method not implemented.');
+    }
+    view(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        throw new Error('Method not implemented.');
+    }
+    viewAll(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        throw new Error('Method not implemented.');
+    }
+
+}
 
 // const addEvent = async (req, res) => {
 //     try {

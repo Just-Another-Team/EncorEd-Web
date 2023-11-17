@@ -8,8 +8,8 @@ export default interface ISubject {
     institution: string;
     creationDate: Date | string; 
     createdBy: string; 
-    //updatedDate
-    //updatedBy
-    verifiedBy: string; 
+    updatedDate?: Date | string; 
+    updatedBy?: string; 
+    verifiedBy: string | null; 
     status: string;
 }
