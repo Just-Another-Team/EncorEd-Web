@@ -24,7 +24,7 @@ class SubjectService implements IBaseService {
                 edpCode: reqSubject.edpCode,
                 type: reqSubject.type,
                 units: reqSubject.units,
-                institution: reqSubject.institution.toLowerCase().trim().replace(/\s/g, ''),
+                institution: reqSubject.institution!.toLowerCase().trim().replace(/\s/g, ''),
                 
                 creationDate: reqSubject.creationDate,
                 createdBy: reqSubject.createdBy,
@@ -61,9 +61,8 @@ class SubjectService implements IBaseService {
         const subjectParamId = req.params.id;
         const reqSubject = req.body as ISubject;
 
-        //Update authentication as well
-
         try{
+            
             const subjectDoc = subjectCollection.doc(subjectParamId);
 
             const oldSubject = await subjectDoc.get()
@@ -71,31 +70,28 @@ class SubjectService implements IBaseService {
                                                 .catch(error => { throw new Error(error) })
 
             const newSubject: ISubject = {
-                name: reqSubject.name,
-                edpCode: reqSubject.edpCode,
-                type: reqSubject.type,
-                units: reqSubject.units,
-                institution: reqSubject.institution.toLowerCase().trim().replace(/\s/g, ''),
+                name: reqSubject.name !== undefined ? reqSubject.name : oldSubject.name,
+
+                edpCode: reqSubject.edpCode !== undefined ? reqSubject.edpCode : oldSubject.edpCode,
+                type: reqSubject.type !== undefined ? reqSubject.type : oldSubject.type,
+                units: reqSubject.units !== undefined ? reqSubject.units : oldSubject.units,
+
+                institution: reqSubject.institution !== undefined ? reqSubject.institution.toLowerCase().trim().replace(/\s/g, '') : oldSubject.institution,
                 
                 creationDate: oldSubject.creationDate,
                 createdBy: oldSubject.createdBy,
                 
-                updatedDate: reqSubject.creationDate,
-                updatedBy: reqSubject.createdBy,
+                updatedDate: reqSubject.updatedDate,
+                updatedBy: reqSubject.updatedBy,
 
-                verifiedBy: reqSubject.verifiedBy,
+                verifiedBy: reqSubject.verifiedBy !== undefined ? reqSubject.verifiedBy : oldSubject.verifiedBy,
                 status: oldSubject.status
             }
 
             const newSubId = `${newSubject.institution}-${newSubject.type.substring(0, 3).toLowerCase()}-${newSubject.name.toLowerCase().trim().replace(/\s/g, '')}`;
 
             if (oldSubject.id !== newSubId) {
-                await subjectDoc.delete()
-                                .then(() => {
-                                    console.log("Successfully Updated Subject - Firestore (Delete Old)")
-                                })
-                                .catch(error => {throw new Error(error)})
-
+                await subjectDoc.delete().then(() => { console.log("Successfully Updated Subject - Firestore (Delete Old)") }).catch(error => { throw new Error(error) })
                 await subjectCollection.doc(newSubId).set(newSubject)
             }
             else await subjectCollection.doc(newSubId).update(newSubject)
