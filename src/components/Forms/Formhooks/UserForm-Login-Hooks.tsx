@@ -84,18 +84,23 @@ const LoginUserForm = () => {
                     .catch(error => Promise.reject(error))
             })
             .then((dbResult) => {
-                //get Roles
-                return dispatch(getAssignedRoles(dbResult.data.id)).unwrap()
-                    .then(() => Promise.resolve(dbResult))
-                    .catch(error => Promise.reject(error))
-            })
-            .then((dbResult) => {
                 dispatch(register(dbResult))
 
-                console.log(roles.data.find(role => role.appAdmin) != undefined)
-                if (roles.data.find(role => role.appAdmin)) navigate("/admin/dashboard/home")
+                //get Roles
+                return dispatch(getAssignedRoles(dbResult.data.id)).unwrap()
+                    .then((rolesResult) => Promise.resolve(rolesResult))
+                    .catch(error => Promise.reject(error))
+            })
+            .then((rolesResult: { data: { appAdmin: any; }; }) => {
+                //console.log(rolesResult.data.appAdmin)
+
+                if (rolesResult.data.appAdmin) navigate("/admin/dashboard/home")
                 else navigate("/dashboard/home")
-                
+
+                // console.log(roles.data.find(role => role.appAdmin) != undefined)
+                // if (roles.data.find(role => role.appAdmin)) navigate("/admin/dashboard/home")
+                // else navigate("/dashboard/home")
+
                 reset();
             })
             .catch((error) => {

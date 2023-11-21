@@ -8,6 +8,8 @@ import { RegisterFormCredential } from '../../../types/RegisterFormCredential';
 import { RegisterFormInput } from '../../../types/RegisterFormInput';
 import { useAppDispatch } from '../../../app/encored-store-hooks';
 import { InitialAuthType, emailExist, register } from '../../../app/features/auth/authSlice';
+import { Grid, Typography } from '@mui/material';
+import { Link } from 'react-router-dom';
 // import { getUser, signIn, signUp } from '../../../app/features/auth/authSlice';
 
 const RegistrationUserForm = () => {
@@ -118,8 +120,11 @@ const RegistrationUserForm = () => {
         type={"register"}
         inputs={inputs}
         control={control}
-        onSubmit={handleSubmit(onSubmit)}
-        />
+        onSubmit={handleSubmit(onSubmit)}>
+            <Grid xs={12} marginTop={4}>
+                <Typography variant="body1" textAlign={"center"}>Already have an account? <Link to="/login" style={{}}>Sign In</Link></Typography>
+            </Grid>
+        </UserForm>
     )
 }
 

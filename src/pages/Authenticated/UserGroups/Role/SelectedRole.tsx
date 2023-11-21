@@ -18,16 +18,18 @@ import {
     Tabs,
     Tab,
     Checkbox,
+    IconButton,
 } from '@mui/material'
 import { FixMeLater } from "../../../../types/FixMeLater"
 import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-hooks"
 import { deleteRole } from "../../../../app/features/role/roleSlice"
 import { Outlet, useNavigate, useParams } from "react-router-dom"
 import dayjs from "dayjs"
-import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid"
 import { User } from "../../../../app/features/users/usersSlice"
 import CustomTab from "../../../../components/Tab/CustomTab"
 import { Link } from "react-router-dom"
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
+import UpdateOutlinedIcon from '@mui/icons-material/UpdateOutlined';
 
 const SelectedRole = () => {
     const navigate = useNavigate();
@@ -68,13 +70,23 @@ const SelectedRole = () => {
                 <Grid spacing={2} container>
                     <Grid item xs={6}>
                         <Typography variant="h6" color={"#296EB4"} fontWeight={700}>
-                            {`${selectedRole?.name?.charAt(0).toLocaleUpperCase()}${selectedRole?.name?.substring(1)}`}
+                            {`${(selectedRole?.name as string).charAt(0).toLocaleUpperCase()}${(selectedRole?.name as string).substring(1)}`}
                         </Typography>
                     </Grid>
                     <Grid item xs={6}>
                         <Stack direction={"row-reverse"} gap={2}>
-                            <Button variant="contained" color="error" onClick={handleDelete}>Delete</Button>
-                            <Button variant="contained" color="secondary" onClick={handleUpdate}>Update</Button>
+                            <Button startIcon={<DeleteForeverOutlinedIcon />} size="small" variant="outlined" color="error" onClick={handleDelete}>
+                                Delete
+                            </Button>
+                            <Button startIcon={<UpdateOutlinedIcon />} size="small" variant="outlined" color="secondary" onClick={handleDelete}>
+                                Update
+                            </Button>
+                            {/* <IconButton color="error" onClick={handleDelete}>
+                                <DeleteForeverOutlinedIcon />
+                            </IconButton> */}
+                            {/* <IconButton color="secondary" onClick={handleUpdate}>
+                                <UpdateOutlinedIcon />
+                            </IconButton> */}
                         </Stack>
                     </Grid>
 

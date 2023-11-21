@@ -74,8 +74,8 @@ const UserList = () => {
             valueGetter: (params: GridValueGetterParams) => {
               return dayjs(params.row.joinDate).format("MMMM-DD-YYYY")
             },
-          },
-          {
+        },
+        {
             field: 'profile',
             sortable: false,
             renderHeader: () => (
@@ -238,19 +238,19 @@ const UserList = () => {
                 </Modal>
             </Box>
 
-            <Box marginBottom={2}>
+            <Box height={560} marginBottom={2}>
 
                 <DataGrid
-                    autoHeight
+                    // autoHeight
                     rows={users}
                     columns={columns}
                     hideFooterSelectedRowCount
                     initialState={{
                         pagination: {
-                            paginationModel: { page: 0, pageSize: 25},
+                            paginationModel: { page: 0, pageSize: 10},
                         },
                     }}
-                    pageSizeOptions={[25]}
+                    pageSizeOptions={[10]}
                     //disableRowSelectionOnClick={[true]}
                     disableColumnMenu={true}
                     sx={{

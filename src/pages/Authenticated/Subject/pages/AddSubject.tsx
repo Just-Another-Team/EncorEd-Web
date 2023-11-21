@@ -21,19 +21,7 @@ import { RegisterFormInput } from "../../../../types/RegisterFormInput"
 import SubjectEventCard from "../../../../components/Cards/SubjectEventCard"
 import ArrowForwardIosOutlinedIcon from '@mui/icons-material/ArrowForwardIosOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-
-type SubjectInput = {
-    name?: string; 
-    edpCode?: string; 
-    type?: string; 
-    units?: number;
-    institution?: string;
-
-    createdBy?: string; 
-    //updatedDate
-    //updatedBy
-    verifiedBy?: string; 
-}
+import { SubjectInput, addAllSubjects } from "../../../../app/features/subject/subjectSlice"
 
 const AddSubject = () => {
     const navigate = useNavigate();
@@ -44,37 +32,56 @@ const AddSubject = () => {
     const institution = useAppSelector(state => state.institution.data.name)
 
     const [showSchedule, setShowSchedule] = useState(false);
+    const [subjects, setSubjects] = useState<Array<SubjectInput>>([])
 
-    const {handleSubmit, reset, control, setValue, formState: {errors}} = useForm<SubjectInput>({
+    const {handleSubmit, reset, control, setValue, formState: {errors}, unregister} = useForm<SubjectInput>({
         defaultValues: {
-            name: "", 
-            edpCode: "", 
-            type: "", 
-            units: 0,
-            institution: institution,
-            createdBy: user, 
+            details: undefined,
+            schedule: undefined,
+            createdBy: user,
+            institution: institution
         }
     })
 
-    const handleInput = (data: FixMeLater) => {
+    const handleInput = (data: SubjectInput) => {
         console.log(data)
+        setSubjects(prev => [...prev, data])
 
-        reset();
+        reset({
+            details: {
+                name: "",
+                edpCode: "",
+                units: 0,
+                type: ""
+            },
+            createdBy: user,
+            institution: institution
+        });
+    }
+    const submitSubjects = () => {
+        dispatch(addAllSubjects(subjects)).unwrap()
+            .then(() => {
+                alert("Subjects added successfully!")
+                setSubjects([])
+            })
+            .catch((error) => {
+                console.error(error)
+                alert("Something is wrong")
+            })
     }
 
     const openSchedule = (e: FixMeLater) => {
         setShowSchedule(true)
     }
-
     const closeSchedule = (e: FixMeLater) => {
         setShowSchedule(false)
     }
 
     const subjectInputs: Array<RegisterFormInput> = [
-        {key: "name", label: "Name", type: "text", rules: { required: "Subject name is required" }},
-        {key: "edpCode", label: "EDP Code", type: "text", rules: { required: "EDP Code is required" }},
-        {key: "units", label: "Units", type: "text", rules: { required: "Unit is required" }},
-        {key: "type", label: "Type", rules: { required: "Role type is required" }},
+        {key: "details.name", label: "Name", type: "text", rules: { required: "Subject name is required" }},
+        {key: "details.edpCode", label: "EDP Code", type: "text", rules: { required: "EDP Code is required" }},
+        {key: "details.units", label: "Units", type: "text", rules: { required: "Unit is required" }},
+        {key: "details.type", label: "Type", rules: { required: "Role type is required" }},
     ] 
 
     const subjectTypes = [
@@ -108,13 +115,11 @@ const AddSubject = () => {
                             {subjectInputs.map(el => (
                                 <Grid key={el.key} xs={12} lg={6} item>
                                     <Typography variant="body1" marginBottom={1}>{el.label}</Typography>
-                                    {el.key !== "type" ? <FormInputTextField name={el.key} control={control} type={el.type} rules={el.rules} fullWidth/> : <FormInputDropDown name={el.key} control={control} options={subjectTypes} rules={el.rules} fullWidth />}
+                                    {el.key !== "details.type" ? <FormInputTextField name={el.key} control={control} type={el.type} rules={el.rules} fullWidth/> : <FormInputDropDown name={el.key} control={control} options={subjectTypes} rules={el.rules} fullWidth />}
                                 </Grid>             
                             ))}
 
                         </Grid>
-
-                        
 
                         <Grid container marginBottom={2} justifyContent={"space-between"}>
                             {showSchedule ? 
@@ -159,8 +164,10 @@ const AddSubject = () => {
                 </Grid>
                 <Grid position={"relative"} minHeight={480} xs={12} md={6} item padding={2}>
                     <Stack padding={2} gap={2} position={"absolute"} top={0} right={0} left={0} bottom={0} overflow={'auto'}>
-                        {Array.from({length: 4}).map(el => (
-                            <SubjectEventCard />
+                        {subjects.map(el => (
+                            <SubjectEventCard>
+                                <Typography variant="h6">{el.details?.name}</Typography>
+                            </SubjectEventCard>
                         ))}
                     </Stack>
                 </Grid>
@@ -168,7 +175,7 @@ const AddSubject = () => {
 
             <Grid justifyContent={"flex-end"} marginY={1} spacing={1} container>
                 <Grid xs={12} sm={2} lg={1} item>
-                    <Button fullWidth variant="contained">Submit</Button>
+                    <Button onClick={submitSubjects} fullWidth variant="contained">Submit</Button>
                 </Grid>
                 <Grid xs={12} sm={2} lg={1} item>
                     <Button fullWidth color="error" variant="outlined">Cancel</Button>

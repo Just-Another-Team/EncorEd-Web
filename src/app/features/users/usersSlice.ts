@@ -34,12 +34,12 @@ export const getUsers = createAsyncThunk(
     }
 )
 
-// export const getAllUsers = createAsyncThunk(
-//     "/users/get",
-//     async (_, {rejectWithValue}) => {
-//         return await EncorEdAuthService.getAll()
-//     }
-// )
+export const getAllUsers = createAsyncThunk(
+    "/users/get",
+    async (_, {rejectWithValue}) => {
+        return await EncorEdUserService.getAllUsers().catch(error => rejectWithValue(error))
+    }
+)
 
 export const addUsers = createAsyncThunk(
     "users/add",
@@ -70,6 +70,7 @@ const usersSlice = createSlice({
         }
     },
     extraReducers: (builder) => {
+        //Get Users by Institution
         {
             builder.addCase(getUsers.pending, (state, action) => {
                 state.loading = true
@@ -82,6 +83,25 @@ const usersSlice = createSlice({
                 state.error = null
             })
             builder.addCase(getUsers.rejected, (state, action: PayloadAction<FixMeLater>) => {
+                state.loading = false
+                state.data = []
+                state.error = action.payload
+            })
+        }
+
+        //Get All Users
+        {
+            builder.addCase(getAllUsers.pending, (state, action) => {
+                state.loading = true
+                state.data = []
+                state.error = null
+            })
+            builder.addCase(getAllUsers.fulfilled, (state, action: PayloadAction<FixMeLater>) => {
+                state.loading = false
+                state.data = action.payload.data
+                state.error = null
+            })
+            builder.addCase(getAllUsers.rejected, (state, action: PayloadAction<FixMeLater>) => {
                 state.loading = false
                 state.data = []
                 state.error = action.payload

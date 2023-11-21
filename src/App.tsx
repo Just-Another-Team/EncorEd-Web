@@ -53,7 +53,7 @@ function App() {
 
   //const role = useAppSelector(state => state.roles);
   const user = useAppSelector(state => state.authentication.data)
-  const roles = useAppSelector(state => state.assignRole.data)
+  const role = useAppSelector(state => state.assignRole.data)
 
   useEffect(() => {
     // console.log("Is Admin or Employee", roles.filter(role => role.admin || typeof role.employee === "object").length != 0)
@@ -82,7 +82,7 @@ function App() {
       </Route>
 
       {/* Authenticated Pages */}
-      <Route path='/dashboard' element={ Object.keys(user).length != 0 ? roles.filter(role => role.admin || typeof role.employee === "object").length != 0  ? <Dashboard /> : <Navigate replace to='/login' /> : <Navigate replace to='/login' />}> {/* */}
+      <Route path='/dashboard' element={ Object.keys(role).length != 0 && !role.appAdmin ? <Dashboard /> : <Navigate replace to='/login' /> }> {/* Object.keys(user).length != 0 ? roles.filter(role => role.admin || typeof role.employee === "object").length != 0  ? <Dashboard /> : <Navigate replace to='/login' /> : <Navigate replace to='/login' /> */}
         <Route index path='home' element={<InstitutionalHome />} />
 
         <Route path='map/list' element={<MapList />} />
@@ -129,7 +129,7 @@ function App() {
       {/* Admin Pages*/}
       {/* role.data.find(data => data._systemRole._superAdmin) ? <AdminDashboard /> : <Navigate replace to="/login" /> */}
 
-      <Route path='/admin/dashboard' element={Object.keys(user).length != 0 ? roles.filter(role => role.appAdmin).length != 0  ? <AdminDashboard /> : <Navigate replace to='/login'/> : <Navigate replace to='/login'/>}> {/* roles.filter(role => role.appAdmin).length != 0 */}
+      <Route path='/admin/dashboard' element={ Object.keys(role).length != 0 && role.appAdmin ? <AdminDashboard /> : <Navigate replace to='/login' /> }> {/* Object.keys(user).length != 0 ? roles.filter(role => role.appAdmin).length != 0  ? <AdminDashboard /> : <Navigate replace to='/login'/> : <Navigate replace to='/login'/> */}
         <Route path='home' element={<Home />}/>
 
         <Route path='users' element={<UsersLayout />} />

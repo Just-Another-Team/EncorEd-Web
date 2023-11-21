@@ -30,8 +30,6 @@ import { RoleInput } from "../../../../app/api/encored-role-service"
 import { useNavigate } from "react-router-dom"
 import LoadingDialog from "../../../../components/Dialog/LoadingDialog/LoadingDialog"
 
-
-
 type SwitchInputs = {
     key: string
     label: string
@@ -39,6 +37,7 @@ type SwitchInputs = {
 }
 
 {/* NEEDS OPTIMIZATION */}
+// IDK About that tho
 
 const AddRole = () => {
 
@@ -48,6 +47,11 @@ const AddRole = () => {
     const loading = useAppSelector(state => state.role.loading)
     const user = useAppSelector(state => state.authentication.data.email)
     const institution = useAppSelector(state => state.institution.data.name)
+
+    const users = useAppSelector(state => state.users.data.map(user => ({
+        label: `${user.firstName} ${user.lastName}`,
+        value: user.id
+    })))
 
     const defaultPermission: Permission = {
         viewMap: true,
@@ -226,18 +230,24 @@ const AddRole = () => {
         {key: "permission.addSubject.schedule", label: "Schedule"},
         {key: "permission.addSubject.participants", label: "Participants"},
         {key: "permission.addSubject.attendance.value", label: "Attendance"},
+        {key: "permission.addSubject.verify.value", label: "Requires Verification"},
+        {key: "permission.addSubject.verify.by", label: "Verified By", type: "select"},
     ]
     const editSubjectInputs: Array<RegisterFormInput> = [
         {key: "permission.editSubject.value", label: "Details"},
         {key: "permission.editSubject.schedule", label: "Schedule"},
         {key: "permission.editSubject.participants", label: "Participants"},
         {key: "permission.editSubject.attendance.value", label: "Attendance"},
+        {key: "permission.editSubject.verify.value", label: "Requires Verification"},
+        {key: "permission.editSubject.verify.by", label: "Verified By", type: "select"},
     ]
     const deleteSubjectInputs: Array<RegisterFormInput> = [
         {key: "permission.deleteSubject.value", label: "Details"},
         {key: "permission.deleteSubject.schedule", label: "Schedule"},
         {key: "permission.deleteSubject.participants", label: "Participants"},
         {key: "permission.deleteSubject.attendance.value", label: "Attendance"},
+        {key: "permission.deleteSubject.verify.value", label: "Requires Verification"},
+        {key: "permission.deleteSubject.verify.by", label: "Verified By", type: "select"},
     ]
     const subjectInputs: Array<SwitchInputs> = [
         {key: "view", label: "View", inputs: viewSubjectInputs},
@@ -257,18 +267,24 @@ const AddRole = () => {
         {key: "permission.addEvent.schedule", label: "Schedule"},
         {key: "permission.addEvent.participants", label: "Participants"},
         {key: "permission.addEvent.attendance.value", label: "Attendance"},
+        {key: "permission.addEvent.verify.value", label: "Requires Verification"},
+        {key: "permission.addEvent.verify.by", label: "Verified By", type: "select"},
     ]
     const editEventInputs: Array<RegisterFormInput> = [
         {key: "permission.editEvent.value", label: "Details"},
         {key: "permission.editEvent.schedule", label: "Schedule"},
         {key: "permission.editEvent.participants", label: "Participants"},
         {key: "permission.editEvent.attendance.value", label: "Attendance"},
+        {key: "permission.editEvent.verify.value", label: "Requires Verification"},
+        {key: "permission.editEvent.verify.by", label: "Verified By", type: "select"},
     ]
     const deleteEventInputs: Array<RegisterFormInput> = [
         {key: "permission.deleteEvent.value", label: "Details"},
         {key: "permission.deleteEvent.schedule", label: "Schedule"},
         {key: "permission.deleteEvent.participants", label: "Participants"},
         {key: "permission.deleteEvent.attendance.value", label: "Attendance"},
+        {key: "permission.deleteEvent.verify.value", label: "Requires Verification"},
+        {key: "permission.deleteEvent.verify.by", label: "Verified By", type: "select"},
     ]
     const eventInputs: Array<SwitchInputs> = [
         {key: "view", label: "View", inputs: viewEventInputs},
@@ -289,6 +305,8 @@ const AddRole = () => {
         {key: "permission.addUser", label: "Add Users"},
         {key: "permission.editUser", label: "Edit Users"},
         {key: "permission.deleteUser", label: "Delete Users"},
+        {key: "permission.verifyUser.value", label: "Requires Verification"},
+        {key: "permission.verifyUser.by", label: "Verified By", type: "select"},
     ]
 
     const groupInputs: Array<RegisterFormInput> = [
@@ -296,6 +314,8 @@ const AddRole = () => {
         {key: "permission.addGroup", label: "Add Groups"},
         {key: "permission.editGroup", label: "Edit Groups"},
         {key: "permission.deleteGroup", label: "Delete Groups"},
+        {key: "permission.verifyGroup.value", label: "Requires Verification"},
+        {key: "permission.verifyGroup.by", label: "Verified By", type: "select"},
     ]
 
     const roleInputs: Array<RegisterFormInput> = [
@@ -303,6 +323,8 @@ const AddRole = () => {
         {key: "permission.addRole", label: "Add Roles"},
         {key: "permission.editRole", label: "Edit Roles"},
         {key: "permission.deleteRole", label: "Delete Roles"},
+        {key: "permission.verifyRole.value", label: "Requires Verification"},
+        {key: "permission.verifyRole.by", label: "Verified By", type: "select"},
     ]
 
     const detailsInput: Array<RegisterFormInput> = [
@@ -320,6 +342,8 @@ const AddRole = () => {
     ]
 
     const handleInput = (data: RoleInput) => {
+        
+        console.log(data)
         dispatch(addRole(data)).unwrap()
             .then(() => {
                 alert("Role added successfully!")
@@ -403,10 +427,14 @@ const AddRole = () => {
                                         <Grid xs={12} item marginTop={ind !== 0 ? 2 : 0}>
                                             <Typography variant="body2" color="#747474" sx={{textDecoration: "underline"}}>{el.label}</Typography>
                                         </Grid>
-                                        {el.inputs.map(el => (
-                                            <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"} justifyContent={'space-between'}>
-                                                <Typography>{el.label}</Typography>
-                                                <FormInputSwitch name={el.key} control={control}/>
+                                        {el.inputs.map((el, ind) => (
+                                            <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"} justifyContent={'space-between'} marginTop={ind === 4 || ind === 5 ? 2 : 0}>
+                                                <Typography sx={{flex: 1}}>{el.label}</Typography>
+                                                {
+                                                    el.type === "select" ? 
+                                                    <FormInputDropDown name={el.key} control={control} options={users} formControlProps={{flex: 1}} /> :
+                                                    <FormInputSwitch name={el.key} control={control}/>
+                                                }
                                             </Grid>
                                         ))}
                                     </>
@@ -428,10 +456,14 @@ const AddRole = () => {
                                         <Grid xs={12} item marginTop={ind !== 0 ? 2 : 0}>
                                             <Typography variant="body2" color="#747474" sx={{textDecoration: "underline"}}>{el.label}</Typography>
                                         </Grid>
-                                        {el.inputs.map(el => (
-                                            <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"} justifyContent={'space-between'}>
-                                                <Typography>{el.label}</Typography>
-                                                <FormInputSwitch name={el.key} control={control}/>
+                                        {el.inputs.map((el, ind) => (
+                                            <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"} justifyContent={'space-between'} marginTop={ind === 4 || ind === 5 ? 2 : 0}>
+                                                <Typography sx={{flex: 1}}>{el.label}</Typography>
+                                                {
+                                                    el.type === "select" ? 
+                                                    <FormInputDropDown name={el.key} control={control} options={users} formControlProps={{flex: 1}} /> :
+                                                    <FormInputSwitch name={el.key} control={control}/>
+                                                }
                                             </Grid>
                                         ))}
                                     </>
@@ -447,10 +479,14 @@ const AddRole = () => {
                         <Box display={'flex'} padding={2}>
                             <Typography flex={0.5} variant="h6" color={"#4D4D4D"} fontWeight={300} marginBottom={2}>User</Typography>
                             <Grid flex={1} container>
-                                {userInputs.map(el => (
-                                    <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"} justifyContent={'space-between'}>
-                                        <Typography>{el.label}</Typography>
-                                        <FormInputSwitch name={el.key} control={control}/>
+                                {userInputs.map((el, ind) => (
+                                    <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"} justifyContent={'space-between'} marginTop={ind === 4 || ind === 5 ? 2 : 0}>
+                                        <Typography sx={{flex: 1}}>{el.label}</Typography>
+                                        {
+                                            el.type === "select" ? 
+                                            <FormInputDropDown name={el.key} control={control} options={users} formControlProps={{flex: 1}} /> :
+                                            <FormInputSwitch name={el.key} control={control}/>
+                                        }
                                     </Grid>
                                 ))}
                             </Grid>
@@ -463,10 +499,14 @@ const AddRole = () => {
                         <Box display={'flex'} padding={2}>
                             <Typography flex={0.5} variant="h6" color={"#4D4D4D"} fontWeight={300} marginBottom={2}>Groups</Typography>
                             <Grid flex={1} container>
-                                {groupInputs.map(el => (
-                                    <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"} justifyContent={'space-between'}>
-                                        <Typography>{el.label}</Typography>
-                                        <FormInputSwitch name={el.key} control={control}/>
+                                {groupInputs.map((el, ind) => (
+                                    <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"} justifyContent={'space-between'} marginTop={ind === 4 || ind === 5 ? 2 : 0}>
+                                        <Typography sx={{flex: 1}}>{el.label}</Typography>
+                                        {
+                                            el.type === "select" ? 
+                                            <FormInputDropDown name={el.key} control={control} options={users} formControlProps={{flex: 1}} /> :
+                                            <FormInputSwitch name={el.key} control={control}/>
+                                        }
                                     </Grid>
                                 ))}
                             </Grid>
@@ -481,8 +521,12 @@ const AddRole = () => {
                             <Grid flex={1} container>
                                 {roleInputs.map(el => (
                                     <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"} justifyContent={'space-between'}>
-                                        <Typography>{el.label}</Typography>
-                                        <FormInputSwitch name={el.key} control={control}/>
+                                        <Typography sx={{flex: 1}}>{el.label}</Typography>
+                                        {
+                                            el.type === "select" ? 
+                                            <FormInputDropDown name={el.key} control={control} options={users} formControlProps={{flex: 1}} /> :
+                                            <FormInputSwitch name={el.key} control={control}/>
+                                        }
                                     </Grid>
                                 ))}
                             </Grid>

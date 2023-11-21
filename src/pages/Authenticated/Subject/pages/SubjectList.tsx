@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 // import { getSubjects } from "../../../../app/features/subject/subjectSlice";
 import { FixMeLater } from "../../../../types/FixMeLater";
 import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-hooks";
+import { getSubjects } from "../../../../app/features/subject/subjectSlice";
 
 // Must be changed
 const columns = [
@@ -73,10 +74,13 @@ const subjectRow = (
 
 const SubList = () => {
     //const subjects = useAppSelector(state => state.subjects.subject)
-    const subjectDispatch = useAppDispatch();
+    const dispatch = useAppDispatch();
+
+    const institution = useAppSelector(state => state.institution.data)
+    const subjects = useAppSelector(state => state.subject.subjects)
 
     useEffect(() => {
-        // subjectDispatch(getSubjects())
+        dispatch(getSubjects(institution.id!))
     }, [])
 
     return(
@@ -84,7 +88,7 @@ const SubList = () => {
             <Box marginBottom={2}>
 
                 <DataGrid
-                    rows={[]}
+                    rows={subjects}
                     // !subjects.loading && subjects.map((el : FixMeLater) => {
                     //     return subjectRow(el.id, el.name, el.edpCode, el.type, el.units, el.creationDate, el.createdBy, el.verifiedBy, el.status)
                     // })

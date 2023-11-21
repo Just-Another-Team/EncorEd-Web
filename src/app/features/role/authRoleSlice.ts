@@ -6,7 +6,7 @@ import { User } from "../users/usersSlice"
 
 export type Role = {
     id?: string
-    name?: string
+    name?: string | Array<string>
     desc?: string
     institution?: string
     
@@ -17,7 +17,7 @@ export type Role = {
     student?: boolean | Permission
     visitor?: boolean | Permission
 
-    usersAssigned: Array<User>
+    usersAssigned?: Array<User>
 
     createdBy?: User | string
     creationDate?: string
@@ -26,15 +26,15 @@ export type Role = {
     status?: string
 }
 
-export interface IAssignedRoleInitialState {
+interface IAssignedRoleInitialState {
     loading: boolean
-    data: Array<Role>
+    data: Role
     error: any
 }
 
 const initialState: IAssignedRoleInitialState = {
     loading: false,
-    data: [],
+    data: {},
     error: null,
 }
 
@@ -67,7 +67,7 @@ const assignRoleSlice = createSlice({
     reducers:  {
         logOutRoles: (state) => {
             state.loading = false
-            state.data = []
+            state.data = {}
             state.error = null
         }
     },

@@ -1,16 +1,16 @@
 import React, {useEffect} from "react";
 import { 
-    Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, TextField,
+    Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, TextField,
 } from "@mui/material";
 import { DataGrid, GridCellParams, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-hooks";
 import { deleteRole, getRolesByInstitution } from "../../../../app/features/role/roleSlice";
 import dayjs from "dayjs";
 import { FixMeLater } from "../../../../types/FixMeLater";
 import NoRowsDataGridOverlay from "../../../../components/Overlay/NoRows/NowRowsOverlay";
 import LoadingRowsDataGridOverlay from "../../../../components/Overlay/LoadingRowsOverlay/LoadingRowsOverlay";
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 
 const CustomDialog = ({open, handleClose, value}: FixMeLater) => {
     return(
@@ -58,16 +58,16 @@ const RoleList = () => {
     const [roleList, setRoleList] = React.useState<any>([]);
 
     const handleClickOpen = (params: any) => {
-        dispatch(deleteRole(params.row.id)).unwrap()
-            .then(() => {
-                alert("Role successfully deleted!")
-            })
-            .catch((error) => {
-                alert(`Error on deleted: ${error.response.data}`)
-            })
+        // dispatch(deleteRole(params.row.id)).unwrap()
+        //     .then(() => {
+        //         alert("Role successfully deleted!")
+        //     })
+        //     .catch((error) => {
+        //         alert(`Error on deleted: ${error.response.data}`)
+        //     })
         // To Do - Verify Deletion
-        // setRole(params.row)
-        // setOpen(true);
+        setRole(params.row)
+        setOpen(true);
     };
     const handleClose = (event: {}, reason: "backdropClick" | "escapeKeyDown") => {
         if (reason != "backdropClick")
@@ -112,29 +112,29 @@ const RoleList = () => {
         {
             field: 'delete',
             sortable: false,
+            width: 64,
             renderHeader: () => (
                 <span></span>
             ),
             renderCell: (params: GridCellParams) => {
                 return (
-                    <Button
-                    onClick={() => {handleClickOpen(params)}}
-                    variant="contained"
-                    color="error">
-                        DELETE
-                    </Button>
+                    <IconButton color="error" onClick={() => {
+                        handleClickOpen(params)
+                    }}>
+                        <DeleteForeverOutlinedIcon />
+                    </IconButton>
                 )
             }
         }
     ];
     
     const handleSearchRole = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        let searchedValue = roles.filter(role => role.name?.toLowerCase().includes(e.target.value.toLowerCase()))
+        let searchedValue = roles.filter(role => (role.name as string).toLowerCase().includes(e.target.value.toLowerCase()))
         setRoleList(searchedValue)
     }
 
     useEffect(() => {
-        dispatch(getRolesByInstitution(institution?.toLowerCase())).unwrap().then((roles) => {
+        dispatch(getRolesByInstitution(institution!.toLowerCase())).unwrap().then((roles) => {
             setRoleList(roles.data)
         })
     }, [])

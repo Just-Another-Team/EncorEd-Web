@@ -125,7 +125,7 @@ const RoleUsers = () => {
     return(
         <Box height={640} marginBottom={2} sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <DataGrid
-                rows={selectedRole!.usersAssigned}
+                rows={selectedRole!.usersAssigned!}
                 columns={columns}
                 pageSizeOptions={[10]}
                 columnVisibilityModel={{
