@@ -193,7 +193,7 @@ class RoleUser implements IBaseService {
             }
 
             let institution = role.institution;
-            let name = role.name.toLowerCase().trim().replace(/\s/g, '');
+            let name = (role.name as string).toLowerCase().trim().replace(/\s/g, '');
 
             await roleCollection.doc(`${institution}-${name}`).create(role)
             
@@ -376,7 +376,7 @@ class RoleUser implements IBaseService {
             }
 
             let institution = role.institution;
-            let name = role.name.toLowerCase().trim().replace(/\s/g, '');
+            let name = (role.name as string).toLowerCase().trim().replace(/\s/g, '');
             
             const newRoleId = `${institution}-${name}`
 

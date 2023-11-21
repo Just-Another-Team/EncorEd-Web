@@ -13,12 +13,24 @@ import ErrorController from '../types/ErrorController';
 
 export const subjectCollection = db.collection(`/subjects/`).withConverter(converter<ISubject>())
 
+type SubjectInput = {
+    details?: ISubject;
+    schedule?: object;
+    assignedRoom?: object;
+
+    createdBy?: string;
+    creationDate?: string;
+    updatedBy?: string;
+    updatedDate?: string;
+
+    institution?: string;
+}
+
 class SubjectService implements IBaseService {
     public async add(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        
-        try {
-            const reqSubject = req.body as ISubject;
+        const reqSubject = req.body as ISubject;
 
+        try {
             const subject: ISubject = {
                 name: reqSubject.name,
                 edpCode: reqSubject.edpCode,
@@ -26,14 +38,14 @@ class SubjectService implements IBaseService {
                 units: reqSubject.units,
                 institution: reqSubject.institution!.toLowerCase().trim().replace(/\s/g, ''),
                 
-                creationDate: reqSubject.creationDate,
+                creationDate: new Date().toISOString(),
                 createdBy: reqSubject.createdBy,
                 
-                updatedDate: reqSubject.creationDate,
+                updatedDate: new Date().toISOString(),
                 updatedBy: reqSubject.createdBy,
 
-                verifiedBy: reqSubject.verifiedBy,
-                status: reqSubject.status
+                verifiedBy: null, //Soon
+                status: "Open"
             }
 
             // const subjectDocRef = await subjectCollection
@@ -55,6 +67,65 @@ class SubjectService implements IBaseService {
             }
         }
 
+    }
+
+    public async addAll(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const reqSubject = req.body as Array<SubjectInput>
+
+        try {
+            const batch = db.batch();
+
+            reqSubject.map((el) => {
+                if (!!el.details) {
+                    const reqSubjectDetails = el.details! as ISubject
+
+                    const subject: ISubject = {
+                        name: reqSubjectDetails.name,
+                        edpCode: reqSubjectDetails.edpCode,
+                        type: reqSubjectDetails.type,
+                        units: reqSubjectDetails.units,
+                        institution: el.institution!.toLowerCase().trim().replace(/\s/g, ''),
+                        
+                        creationDate: new Date().toISOString(),
+                        createdBy: el.createdBy!,
+                        
+                        updatedDate: new Date().toISOString(),
+                        updatedBy: el.createdBy!,
+        
+                        verifiedBy: null, //Soon
+                        status: "Open"
+                    }
+
+                    const subjectDetailRef = subjectCollection.doc(`${subject.institution}-${subject.type.substring(0, 3).toLowerCase()}-${subject.name.toLowerCase().trim().replace(/\s/g, '')}`)
+                    batch.create(subjectDetailRef, subject)
+                }
+
+                if (!!el.schedule) {
+                    console.log("Schedule")
+                }
+
+                if (!!el.assignedRoom) {
+                    console.log("Assigned Room")
+                }
+            })
+    
+            await batch.commit();
+
+            res.status(200).json("Subjects added successfully!")
+        } catch (error) {
+            console.log(error)
+            if (error instanceof Error) {
+                const subjectControllerError: ErrorController = {
+                    name: "Subject",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "Add Bulk",
+                    message: error.message
+                }
+                
+                res.status(400).json(subjectControllerError) //Get this outside of the if statement
+            }
+        }
     }
 
     public async update(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {

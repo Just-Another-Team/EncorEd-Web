@@ -1,4 +1,4 @@
 export type VerificationPermission = {
     value: boolean | undefined;
-    by: string | null | undefined;
+    by: Array<string> | string | null | undefined;
 }

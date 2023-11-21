@@ -17,7 +17,9 @@ import SubjectService from "../controller/subject.controller"
 const subjectRouter = Router();
 
 /* SUBJECT */
+subjectRouter.post("/add/all", SubjectService.addAll)
 subjectRouter.post("/add", SubjectService.add)
+
 subjectRouter.put("/update/:id", SubjectService.update)
 subjectRouter.delete("/delete/:id", SubjectService.delete)
 subjectRouter.get("/list", SubjectService.viewAll)

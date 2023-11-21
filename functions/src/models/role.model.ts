@@ -3,13 +3,14 @@ import { TimestampProps } from "../types/TimestampProps";
 
 export default interface IRole {
     id?: string;
-    name: string;
+    name: string | Array<string>;
     desc: string;
 	institution: string;
 	type?: string;
 
     appAdmin: boolean;
 	admin: boolean
+	
 	employee: Permission | boolean; // Permission type
 		
 	teacher: Permission | boolean, // Permission type

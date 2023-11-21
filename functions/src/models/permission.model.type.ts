@@ -23,8 +23,6 @@ export type Permission = {
     editUser: boolean | undefined;
     deleteUser: boolean | undefined;
     verifyUser: VerificationPermission | undefined; //Verify Object
-        // value: | undefined boolean,
-        // by: | undefined userId
 
     viewGroup: boolean | undefined;
     addGroup: boolean | undefined;
@@ -37,8 +35,6 @@ export type Permission = {
     editRole: boolean | undefined;
     deleteRole: boolean | undefined;
     verifyRole: VerificationPermission | undefined; //Verify Object
-        // value: | undefined boolean,
-        // by: | undefined userId
 
     viewInstitution: boolean | undefined;
 } | undefined

@@ -26,6 +26,8 @@ roleRouter.get("/list/u/:institution", RoleUser.viewAllByInsitution)
 // /* Assigning Roles */
 roleRouter.post("/assign", UserRole.assign)
 roleRouter.get("/assign/user/:id", UserRole.viewAssignedRoles)
+roleRouter.get("/debug/user/:id", UserRole.viewAssignedRolesDebug)
+
 roleRouter.get("/assign/role/:id", UserRole.viewAssignedUsers)
 
 export default roleRouter

@@ -19,7 +19,7 @@ const adminApp = adminInitializeApp({
     credential: admin.credential.cert("./serviceAccountKey/encored-bd6f8-firebase-adminsdk-oua3q-e9c83466f0.json"),
     serviceAccountId: "firebase-adminsdk-oua3q@encored-bd6f8.iam.gserviceaccount.com",
 });
-
+    
 const clientApp = clientInitializeApp(firebaseConfig)
 
 export { adminApp, clientApp, admin }
