@@ -17,7 +17,7 @@ import subjectSlice from "./features/subject/subjectSlice";
 const rootPersistConfig = {
     key: "root",
     storage,
-    blacklist: ['auth', 'institution', 'assignRole', 'role', 'users', 'subjects'], //'events', 'roles', 'floorPlan', 'reports', 'requests'
+    blacklist: ['auth', 'institution', 'assignRole', 'role', 'users', 'subject'], //'events', 'roles', 'floorPlan', 'reports', 'requests'
 }
 
 /* ======== Session Storages ======== */

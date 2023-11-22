@@ -78,7 +78,7 @@ const SelectedRole = () => {
                             <Button startIcon={<DeleteForeverOutlinedIcon />} size="small" variant="outlined" color="error" onClick={handleDelete}>
                                 Delete
                             </Button>
-                            <Button startIcon={<UpdateOutlinedIcon />} size="small" variant="outlined" color="secondary" onClick={handleDelete}>
+                            <Button startIcon={<UpdateOutlinedIcon />} size="small" variant="outlined" color="secondary" onClick={handleUpdate}>
                                 Update
                             </Button>
                             {/* <IconButton color="error" onClick={handleDelete}>

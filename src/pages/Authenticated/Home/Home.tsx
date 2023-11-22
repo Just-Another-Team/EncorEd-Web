@@ -11,6 +11,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import SubjectEventCard from "../../../components/Cards/SubjectEventCard";
 import { useAppSelector } from "../../../app/encored-store-hooks";
 import { FixMeLater } from "../../../types/FixMeLater";
+import NoRowsDataGridOverlay from "../../../components/Overlay/NoRows/NowRowsOverlay";
 
 const columns = [
     { field: 'id', headerName: 'ID', width: 70 },
@@ -49,6 +50,12 @@ const rows = [
 const Home = () => {
     const user = useAppSelector(state => state.authentication.data)
     
+    const subjectLength = 1;
+    const subjectRequestLength = 2
+
+    const eventLength = 0;
+    const eventRequestLength = 0
+
     return(
         <>
             <Box
@@ -66,12 +73,17 @@ const Home = () => {
                     </Typography>
                 </Box>
 
-                <Grid container overflow={'auto'} spacing={2} >
-                    {Array.from({length: 4}).map((el, ind) => (
+                <Grid minHeight={192} container overflow={'auto'} spacing={2} >
+                    {
+                    subjectLength > 0 ? Array.from({length: subjectLength}).map((el, ind) => (
                         <Grid item xs={6} sm={3} md={6} lg={3}>
                             <SubjectEventCard src="/assets/SubjectTestPic.png"/>
                         </Grid>
-                    ))}
+                    )) :
+                        <Grid item xs={12}>
+                            <NoRowsDataGridOverlay text="No events scheduled" />
+                        </Grid>
+                    }
                 </Grid>
             </Box>
             
@@ -80,12 +92,17 @@ const Home = () => {
                     Ongoing Subjects
                 </Typography>
                 
-                <Grid container overflow={'auto'} spacing={2} >
-                    {Array.from({length: 4}).map((el, ind) => (
+                <Grid minHeight={192} container overflow={'auto'} spacing={2} >
+                    {
+                    eventLength > 0 ? Array.from({length: eventLength}).map((el, ind) => (
                         <Grid item xs={6} sm={3} md={6} lg={3}>
                             <SubjectEventCard src="/assets/SubjectTestPic.png"/>
                         </Grid>
-                    ))}
+                    )) :
+                        <Grid item xs={12}>
+                            <NoRowsDataGridOverlay text="No subjects scheduled" />
+                        </Grid>
+                    }
                 </Grid>
             </Box>
 
@@ -95,8 +112,9 @@ const Home = () => {
                         Subject Requests
                     </Typography>
                     
-                    <Stack gap={2} overflow={'auto'}>
-                        {Array.from({length: 2}).map((el, ind) => (
+                    <Stack height={208} gap={2} overflow={'auto'}>
+                        {
+                        subjectRequestLength > 0 ? Array.from({length: subjectRequestLength}).map((el, ind) => (
                             <SubjectEventCard key={ind} height={null} sx={{paddingTop: 1, paddingBottom: 1}}>
                                 <Grid container>
                                     <Grid item xs={12}>
@@ -110,7 +128,11 @@ const Home = () => {
                                     </Grid>
                                 </Grid>
                             </SubjectEventCard>
-                        ))}
+                        )) :
+                            <Box height={"100%"}>
+                                <NoRowsDataGridOverlay text="No subjects requests" />
+                            </Box>
+                        }
                     </Stack>
                 </Grid>
 
@@ -119,8 +141,9 @@ const Home = () => {
                         Event Requests
                     </Typography>
                     
-                    <Stack gap={2} overflow={'auto'}>
-                        {Array.from({length: 2}).map((el, ind) => (
+                    <Stack height={208} gap={2} overflow={'auto'}>
+                        {
+                        eventRequestLength > 0 ? Array.from({length: eventRequestLength}).map((el, ind) => (
                             <SubjectEventCard key={ind} height={null} sx={{paddingTop: 1, paddingBottom: 1}}>
                                 <Grid container>
                                     <Grid item xs={12}>
@@ -140,7 +163,11 @@ const Home = () => {
                                     </Grid>
                                 </Grid>
                             </SubjectEventCard>
-                        ))}
+                        )) :
+                            <Box height={"100%"}>
+                                <NoRowsDataGridOverlay text="No event requests" />
+                            </Box>
+                        }
                     </Stack>
                 </Grid>
             </Grid>
@@ -162,10 +189,10 @@ const Home = () => {
                     onRowClick={(e) => {
                         console.log(e.row)
                     }}
-                    pageSizeOptions={[5, 10]}
+                    pageSizeOptions={[5]}
                     //disableRowSelectionOnClick
                     sx={{
-                        height: 400,
+                        height: 370,
                         '&.MuiDataGrid-root': {
                             border: '1px solid #EFEEFB'
                         },

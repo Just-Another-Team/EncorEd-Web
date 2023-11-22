@@ -36,7 +36,12 @@ const AddSubject = () => {
 
     const {handleSubmit, reset, control, setValue, formState: {errors}, unregister} = useForm<SubjectInput>({
         defaultValues: {
-            details: undefined,
+            details: {
+                name: "",
+                edpCode: "",
+                units: 0,
+                type: ""
+            },
             schedule: undefined,
             createdBy: user,
             institution: institution
@@ -85,6 +90,7 @@ const AddSubject = () => {
     ] 
 
     const subjectTypes = [
+        {label: "Subject type", value: ""},
         {label: "Lecture", value: "lecture"},
         {label: "Laboratory", value: "laboratory"},
     ]
@@ -164,8 +170,8 @@ const AddSubject = () => {
                 </Grid>
                 <Grid position={"relative"} minHeight={480} xs={12} md={6} item padding={2}>
                     <Stack padding={2} gap={2} position={"absolute"} top={0} right={0} left={0} bottom={0} overflow={'auto'}>
-                        {subjects.map(el => (
-                            <SubjectEventCard>
+                        {subjects.map((el, ind) => (
+                            <SubjectEventCard key={ind}>
                                 <Typography variant="h6">{el.details?.name}</Typography>
                             </SubjectEventCard>
                         ))}
@@ -178,7 +184,16 @@ const AddSubject = () => {
                     <Button onClick={submitSubjects} fullWidth variant="contained">Submit</Button>
                 </Grid>
                 <Grid xs={12} sm={2} lg={1} item>
-                    <Button fullWidth color="error" variant="outlined">Cancel</Button>
+                    <Button
+                    fullWidth
+                    onClick={() => {
+                        navigate('/dashboard/subject/encored/list')
+                        reset();
+                    }}
+                    color="error"
+                    variant="outlined">
+                        Cancel
+                    </Button>
                 </Grid>
             </Grid>
         </>

@@ -15,16 +15,6 @@ const FormInputDropDown = ({
     defaultValue
 }: FixMeLater) => {
 
-    const items = () => {
-        return options.map((option: FixMeLater) => {
-            return(
-                <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                </MenuItem>
-            )
-        })
-    }
-
     return(
         <FormControl fullWidth={fullWidth} sx={formControlProps}>
             <InputLabel>{label}</InputLabel>
@@ -34,13 +24,20 @@ const FormInputDropDown = ({
             rules={rules}
             render={({field: {onChange, value}, fieldState: {error}}) => (
                 <Select
+                displayEmpty
                 onChange={onChange}
                 value={value}
                 label={label}
                 sx={selectProps}
                 fullWidth={fullWidth}
                 error={!!error}>
-                    {items()}
+                    {options.map((option: FixMeLater) => {
+                        return(
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        )
+                    })}
                 </Select>
             )}
             />

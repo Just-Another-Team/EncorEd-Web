@@ -31,21 +31,33 @@ const Subject = () => {
 
     return(
         <>
-            <Typography variant="h4" fontWeight={700} marginBottom={1}>
-                Subjects
-            </Typography>
+            
             
             {/* Add and Search Subject */}
-            <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} marginBottom={1}>
+            {/* <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} marginBottom={1}>
                 <Button variant="contained" size="large" onClick={() => {navigate(`/dashboard/subject/{institution}/add`)}}>ADD SUBJECT</Button>
                 <Grid container xs={4}>
                     <TextField label="Search Subject" fullWidth/>
                 </Grid>
-            </Box>
+            </Box> */}
+
+            <Grid container alignItems={'center'} justifyContent={'space-between'} marginBottom={1}>
+                <Grid item>
+                    <Typography variant="h4" fontWeight={700} marginBottom={1}>
+                        Subjects
+                    </Typography>
+                </Grid>
+                <Grid item>
+                    <Button variant="contained" size="large" onClick={() => {navigate(`/dashboard/subject/{institution}/add`)}}>ADD SUBJECT</Button>
+                </Grid>
+                {/* <Grid item xs={6} lg={4}>
+                    <TextField label="Search Subject" fullWidth/>
+                </Grid> */}
+            </Grid>
 
             {/* Tabs */}
             <Box marginBottom={2} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={page} onChange={handleChange} aria-label="basic tabs example">
+                <Tabs value={page} variant="scrollable" onChange={handleChange}>
                     <CustomTab label="Summary" component={Link} to=""/>
                     <CustomTab label="Subject List" component={Link} to="list"/>
                     <CustomTab label="Scheduled Subject" component={Link} to="schedule"/>

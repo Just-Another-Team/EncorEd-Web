@@ -23,6 +23,7 @@ import { resetUsers } from "../../app/features/users/usersSlice";
 import { resetRoles } from "../../app/features/role/roleSlice";
 
 import MenuIcon from '@mui/icons-material/Menu';
+import { resetSubjects } from "../../app/features/subject/subjectSlice";
 
 
 const Navbar = () => {
@@ -45,6 +46,8 @@ const Navbar = () => {
 
         logoutDispatch(resetUsers())
         logoutDispatch(resetRoles())
+
+        logoutDispatch(resetSubjects())
 
         navigate("/login")
     }

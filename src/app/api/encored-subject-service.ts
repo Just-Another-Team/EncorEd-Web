@@ -15,9 +15,9 @@ class Subject {
     //     console.log(data)
     // }
 
-    // deleteSubject(data) {
-    //     console.log(data)
-    // }
+    deleteSubject(subjectId: string) {
+        return http.delete(`/subject/delete/${subjectId}`)
+    }
 
     // viewSubject(data) {
     //     console.log(data)

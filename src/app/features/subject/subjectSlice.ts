@@ -3,16 +3,19 @@ import Subject from "../../api/encored-subject-service"
 import { FixMeLater } from "../../../types/FixMeLater";
 
 export type DetailsInput = {
+    id?: string;
     name?: string; 
     edpCode?: string; 
     type?: string | null;  
     units?: number | null;
     institution?: string;
 
-    createdBy?: string; 
+    createdBy?: string;
+    creationDate?: Date | string;
     //updatedDate
     //updatedBy
-    verifiedBy?: string; 
+    verifiedBy?: string;
+    status?: string
 }
 
 export type SubjectInput = {
@@ -24,13 +27,13 @@ export type SubjectInput = {
 
 type InitialSubjectState = {
     loading: boolean
-    subjects: Array<SubjectInput>
+    data: Array<SubjectInput>
     error: null
 }
 
 const initialState: InitialSubjectState = {
     loading: false,
-    subjects: [],
+    data: [],
     error: null
 }
 
@@ -48,13 +51,28 @@ export const getSubjects = createAsyncThunk(
     }
 )
 
+export const deleteSubject = createAsyncThunk(
+    "subject/institution/delete",
+    async (subjectId: string, {rejectWithValue}) => {
+        return await Subject.deleteSubject(subjectId).catch(error => rejectWithValue(error))
+    }
+)
+
+//TO-DO
+export const updateSubject = createAsyncThunk(
+    "subject/institution/update",
+    async (subjectId: string, {rejectWithValue}) => {
+        return await Subject.deleteSubject(subjectId).catch(error => rejectWithValue(error))
+    }
+)
+
 const subjectSlice = createSlice({
     name: 'subject',
     initialState,
     reducers: {
         resetSubjects: (state) => {
             state.loading = false
-            state.subjects = []
+            state.data = []
             state.error = null
         },
     },
@@ -83,10 +101,26 @@ const subjectSlice = createSlice({
             })
             builder.addCase(getSubjects.fulfilled, (state, action: PayloadAction<any>) => {
                 state.loading = false
-                state.subjects = action.payload.data
+                state.data = action.payload.data
                 state.error = null
             })
             builder.addCase(getSubjects.rejected, (state, action: PayloadAction<any>) => {
+                state.loading = false
+                state.error = action.payload
+            })
+        }
+
+        // Delete Subject
+        {
+            builder.addCase(deleteSubject.pending, (state, action) => {
+                state.loading = true
+                state.error = null
+            })
+            builder.addCase(deleteSubject.fulfilled, (state, action: PayloadAction<any>) => {
+                state.loading = false
+                state.error = null
+            })
+            builder.addCase(deleteSubject.rejected, (state, action: PayloadAction<any>) => {
                 state.loading = false
                 state.error = action.payload
             })

@@ -94,7 +94,7 @@ function App() {
           <Route path='request' element={<SubRequest />}/>
         </Route>
         <Route path='subject/:institution/add' element={<AddSubject />}/> {/* Add Subject */}
-        <Route path='subject/:institution/:id' /> {/* Selected Subject */}
+        <Route path='subject/:institution/:id' element={<SelectedSubject />} /> {/* Selected Subject */}
         <Route path='subject/:institution/:id/update' /> {/* Update Subject */}
 
         <Route path='event/:institution' element={<Event />}>

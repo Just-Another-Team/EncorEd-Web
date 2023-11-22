@@ -145,7 +145,7 @@ const SubSummary = () => {
 
                 <Stack overflow={'auto'} maxHeight={360} gap={2}>
                     {Array.from({length: 3}).map((el, ind) => (
-                        <SubjectEventCard height={108} src="/assets/SubjectTestPic.png">
+                        <SubjectEventCard key={ind} height={108} src="/assets/SubjectTestPic.png">
                             <Grid container>
                                 <Grid item xs={12}>
                                     <Typography variant="h5" fontWeight={700}>Subject Title {ind + 1}</Typography>

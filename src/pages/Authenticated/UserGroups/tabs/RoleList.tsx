@@ -69,6 +69,7 @@ const RoleList = () => {
         setRole(params.row)
         setOpen(true);
     };
+    
     const handleClose = (event: {}, reason: "backdropClick" | "escapeKeyDown") => {
         if (reason != "backdropClick")
             setOpen(false)
