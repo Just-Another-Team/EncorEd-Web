@@ -312,6 +312,34 @@ class UserService implements IBaseService {
         }
     }
 
+    public async viewUser(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const id = req.params.id;
+
+        try {
+            const userRef = await userCollection.doc(id).get();
+
+            if (!userRef.exists)
+                throw {code: 'firestore/missing-email', message: `User with id: ${id} does not exist.`}
+            //console.log(userRef.data())
+            //const userDoc = await getDoc(userRef);
+
+            res.status(200).json({id: userRef.id, ...userRef.data()})
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                const userControllerError: ErrorController = {
+                    name: "User",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "View",
+                    message: error.message
+                }
+                
+                res.status(400).json(userControllerError) //type: error.type, code: error.code
+            }        
+        }
+    }
+
     public async viewAuth(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         try {
             const userId = req.params.email;

@@ -27,7 +27,7 @@ userRouter.put("/delete/:id", userService.delete)
 
 //View
 userRouter.get("/list/u/:institution/:user", userService.viewAllByInstitution)
-// userRouter.get("/list/:id", viewUser)
+userRouter.get("/profile/:id", userService.viewUser)
 // userRouter.get("/profile/:userName", viewUserByName)
 //router.get("/list/:institution", <method for users based on institution>)
 
