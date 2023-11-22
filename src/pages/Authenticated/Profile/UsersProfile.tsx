@@ -8,6 +8,9 @@ import {
     List,
     ListItem,
     ListItemText,
+    Button,
+    Modal,
+    Switch,
 } from "@mui/material";
 import dayjs from 'dayjs'
 import { Controller, useForm } from "react-hook-form";
@@ -15,6 +18,10 @@ import { viewUserRoles, viewUser } from "../../../app/features/profile/profileSl
 import { useNavigate, useParams } from "react-router-dom";
 import { FixMeLater } from "../../../types/FixMeLater";
 import { useAppDispatch, useAppSelector } from "../../../app/encored-store-hooks";
+import { AssignRoleInput } from "../../../app/api/encored-role-service";
+import { GridColDef, DataGrid } from "@mui/x-data-grid";
+import FormInputDropDown from "../../../components/DropDown/FormInputDropDown";
+
 
 const UsersProfile = () => {
     //const { email } = useParams();
@@ -23,7 +30,8 @@ const UsersProfile = () => {
 
     const profile = useAppSelector(state => state.profile)
     const user = useAppSelector(state => state.profile.data)
-    const roles = useAppSelector(state => state.profile.roles)
+    const userRoles = useAppSelector(state => state.profile.roles)
+    const rolesList = useAppSelector(state => state.role.data)
     
     // const val: object = arr.filter((data: FixMeLater) => data.userName === result)
     const userDispatch = useAppDispatch();
@@ -41,13 +49,20 @@ const UsersProfile = () => {
             } finally {
                 setIsLoading(false)
                 console.log(user)
-                console.log(roles)
+                console.log(userRoles)
             }
         }
 
         fetchData()
     }, [])
     // const user = useAppSelector(state => state.profile.data)
+    const [openAssign, setOpenAssign] = useState(false);
+    const handleOpenAssign = () => setOpenAssign(true);
+    const handleCloseAssign = () => setOpenAssign(false);
+
+    const columns: GridColDef[] = [
+        { field: 'name', headerName: 'Role Name', width: 200, sortingOrder:['asc', 'desc'], }
+    ]
     
     return (
         <>
@@ -97,10 +112,47 @@ const UsersProfile = () => {
                         
                         <Grid container marginBottom={2} sx={{backgroundColor: '#F6F5FF', borderRadius: 4, padding: 2}}>
                             <Grid item xs={12}>
-                                <Typography variant="h5" fontWeight={700}>Role</Typography>
+                                <Typography variant="h5" fontWeight={700}>Roles</Typography>
                             </Grid>
-                            <Grid item xs={12}>
-                                <Typography variant="body1">{roles.name}</Typography>
+                            <Grid item xs={12} marginBottom={2}>
+                                <DataGrid
+                                    autoHeight
+                                    rows={userRoles}
+                                    columns={columns}
+                                    hideFooterSelectedRowCount
+                                    initialState={{
+                                        pagination: {
+                                            paginationModel: { page: 0, pageSize: 5},
+                                        },
+                                    }}
+                                    pageSizeOptions={[10]}
+                                    //disableRowSelectionOnClick={[true]}
+                                    disableColumnMenu={true}
+                                    sx={{
+                                        '&.MuiDataGrid-root' : {
+                                            border: '1px solid #EFEEFB',
+                                        },
+                                        '.MuiDataGrid-columnHeaders': {
+                                            backgroundColor: '#D0E7FF;',
+                                            color: '#296EB4',
+                                            fontSize: 16,
+                                            
+                                        },
+                                        '.MuiTablePagination-displayedRows': {
+                                            marginTop: '1em',
+                                            marginBottom: '1em'
+                                        },
+                                        '.MuiTablePagination-displayedRows, .MuiTablePagination-selectLabel': {
+                                            marginTop: '1em',
+                                            marginBottom: '1em',
+                                        },
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={6} marginBottom={2}>
+                                <Button onClick={handleOpenAssign}>
+                                    Assign Roles
+                                </Button>
                             </Grid>
                         </Grid>
                     </Box>
@@ -108,6 +160,48 @@ const UsersProfile = () => {
                 )
                 }
             </Grid>
+            <Modal
+                    open={openAssign}
+                    //onClose={handleClose} //close on clicking outside modal
+                    aria-labelledby="Add Institutional User"
+                    aria-describedby="Form for adding institutional users"
+                    >
+                    <Box sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 500,
+                        bgcolor: "#45A1FD",
+                        border: '1px solid #000',
+                        borderRadius: '20px',
+                        boxShadow: 24,
+                    }}>
+                        <div style={{textAlign: 'right'}}>
+                            <Button
+                            onClick={handleCloseAssign}
+                            sx={{color:'black', fontWeight: 'bolder', fontSize: '20px', paddingRight:0, borderRadius:'20px'}}
+                            >
+                                x
+                            </Button>
+                        </div>
+                        <Box display={'block'} padding={2}>
+                        <div style={{padding: '35px', paddingTop: '0px'}}>
+                            {rolesList.map((el) => (
+                                <Grid flex={2} padding={2} sx={{backgroundColor: 'white', borderRadius: '20px'}} marginBottom={2} item display={'flex'} alignItems={"center"} justifyContent={'space-between'}>
+                                    <Typography>{el.name}</Typography>
+                                </Grid>
+                            ))}
+                        </div>
+                        </Box>
+
+                        <div style={{padding: '35px', paddingTop: '0px'}}>
+                            <Grid item xs={12} marginTop={3}>
+                                <Button fullWidth type="submit" size="large" variant="contained">Assign</Button>
+                            </Grid> 
+                        </div>
+                    </Box>
+                </Modal>
         </>
     )
 }

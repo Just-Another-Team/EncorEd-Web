@@ -81,8 +81,8 @@ class EncorEdUserService {
         return http.get(`/user/profile/${id}`)
     }
 
-    viewUserRoles(userId: string) {
-        return http.get(`/role/assign/user/${userId}`)
+    viewUserRoles(id: string) {
+        return http.get(`/role/debug/user/${id}`)
     }
 
     //password verification before action

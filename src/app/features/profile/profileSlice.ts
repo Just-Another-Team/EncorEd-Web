@@ -21,8 +21,6 @@ export type Role = {
     id?: string
     name?: string
     desc?: string
-    institution?: string
-    
     appAdmin?: boolean
     admin?: boolean
     employee?: boolean | Permission
@@ -34,13 +32,13 @@ export type Role = {
 interface IProfileInitialState {
     loading: boolean,
     data: User,
-    roles: Role,
+    roles: Array<Role>,
     error: any
 }
 const initialState: IProfileInitialState = {
     loading: false,
     data: {},
-    roles: {},
+    roles: [],
     error: null
 }
 export const viewUser = createAsyncThunk(
