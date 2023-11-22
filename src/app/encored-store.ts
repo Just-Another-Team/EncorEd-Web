@@ -11,6 +11,7 @@ import usersSlice from "./features/users/usersSlice";
 import roleSlice from "./features/role/roleSlice";
 import targetSlice from "./features/users/targetSlice";
 import subjectSlice from "./features/subject/subjectSlice";
+import profileSlice from "./features/profile/profileSlice"
 
 // import subjectSlice from "./features/subject/subjectSlice";
 // import eventSlice from "./features/event/eventSlice";
@@ -18,7 +19,7 @@ import subjectSlice from "./features/subject/subjectSlice";
 const rootPersistConfig = {
     key: "root",
     storage,
-    blacklist: ['auth', 'institution', 'assignRole', 'role', 'users', 'target', 'subjects'], //'events', 'roles', 'floorPlan', 'reports', 'requests'
+    blacklist: ['auth', 'institution', 'assignRole', 'role', 'users', 'target', 'profile', 'subjects'], //'events', 'roles', 'floorPlan', 'reports', 'requests'
 }
 
 /* ======== Session Storages ======== */
@@ -55,9 +56,20 @@ const rolePersistConfig = {
 const subjectPersistConfig = {
     key: "subject",
     storage: sessionStorage,
-    blacklist: ['loading', 'error']
+    blacklist: ['loading','error']
 }
 
+const profilePersistConfig = {
+    key: "profile",
+    storage: sessionStorage,
+    blacklist: ['loading', 'data', 'roles', 'error']
+}
+
+const targetPersistConfig = {
+    key: "target",
+    storage: sessionStorage,
+    blacklist: ['loading', 'error']
+}
 
 /* ======== Local Storages ======== */
 const navigationPersistConfig = {
@@ -73,8 +85,9 @@ const combinedReducers = combineReducers({
     navigation: persistReducer(navigationPersistConfig, navigationSlice),
     users: persistReducer(usersPersistConfig, usersSlice),
     role: persistReducer(rolePersistConfig, roleSlice),
-    target: targetSlice,
-    subject: persistReducer(subjectPersistConfig, subjectSlice)
+    subject: persistReducer(subjectPersistConfig, subjectSlice),
+    target: persistReducer(targetPersistConfig, targetSlice),
+    profile: persistReducer(profilePersistConfig, profileSlice),
 });
 
 const persistedCombinedReducers = persistReducer(rootPersistConfig, combinedReducers)

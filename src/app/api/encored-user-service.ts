@@ -77,9 +77,13 @@ class EncorEdUserService {
     //     return http.get(`/user/list/${email}`)
     // }
 
-    // viewUser(data) {
-    //     return http.get(`/user/profile/${data}`)
-    // }
+    viewUser(id: FixMeLater) {
+        return http.get(`/user/profile/${id}`)
+    }
+
+    viewUserRoles(userId: string) {
+        return http.get(`/role/assign/user/${userId}`)
+    }
 
     //password verification before action
     verifyPassword(data: FixMeLater){

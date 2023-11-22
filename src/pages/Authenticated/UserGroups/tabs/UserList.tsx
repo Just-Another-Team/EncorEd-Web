@@ -12,6 +12,8 @@ import { targetUser } from "../../../../app/features/users/targetSlice";
 import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-hooks";
 import { FixMeLater } from "../../../../types/FixMeLater";
 import { userListObj } from "../../../../types/UserListObject";
+import NoRowsDataGridOverlay from "../../../../components/Overlay/NoRows/NowRowsOverlay";
+import LoadingRowsDataGridOverlay from "../../../../components/Overlay/LoadingRowsOverlay/LoadingRowsOverlay";
 
 const UserList = () => {
     const navigate = useNavigate()
@@ -19,6 +21,7 @@ const UserList = () => {
 
     const userInstitution = useAppSelector(state => state.institution.data.id)
     const users = useAppSelector(state => state.users.data)
+    const usersLoading = useAppSelector(state => state.users.loading)
     const currUser = useAppSelector(state => state.authentication.data.id)
 
     const usersDispatch = useAppDispatch()
@@ -57,8 +60,14 @@ const UserList = () => {
         // targetDispatch(targetAction("Roles"))
         handleOpenRoles()
     }
+    
+    //user roles
+    const handleProfile = (data: FixMeLater) => {
+        targetDispatch(targetUser(data))
+        navigate(`/dashboard/profile/${data}`)
+    }
 
-    //list of users
+    //list of users state
     useEffect(()=>{
         usersDispatch(getUsers(userList))
     }, [])
@@ -70,6 +79,7 @@ const UserList = () => {
         setSearchedUsers(searchResult)
     }
 
+    
     const columns: GridColDef[] = [
         { field: 'id', headerName: 'Email', width: 200, sortingOrder:['asc', 'desc'], },
         { field: 'firstName', headerName: 'First name', width: 130, sortingOrder:['asc', 'desc'], },
@@ -87,42 +97,6 @@ const UserList = () => {
             valueFormatter: (params: GridValueFormatterParams) => {
                 return dayjs(params.value).format('MMMM-DD-YYYY')
             },
-        },
-        {
-            field: 'profile',
-            sortable: false,
-            renderHeader: () => (
-                <span></span>
-            ),
-            renderCell: (params: GridCellParams) => {
-                return (
-                    // <Button onClick={(e) => {window.location.href=`/dashboard/profile/${params.row.userName}`}} variant="contained" color="secondary" >PROFILE</Button>
-                    <Button
-                    onClick={(e) => {navigate(`/profile/${params.row.email}`)}}
-                    variant="contained"
-                    color="secondary">
-                        PROFILE
-                    </Button>
-                )
-            }
-        },
-        {
-            field: 'roles',
-            sortable: false,
-            renderHeader: () => (
-                <span></span>
-            ),
-            renderCell: (params: GridCellParams) => {
-                return (
-                    <Button
-                    //onClick={(e) => {handleRoles(params.row.id)}}
-                    onClick={(e) => {console.log(params.row)}}
-                    variant="contained"
-                    color="primary">
-                        ROLES
-                    </Button>
-                )
-            }
         },
         {
             field: 'delete',
@@ -258,6 +232,10 @@ const UserList = () => {
                     rows={searchedUsers}
                     columns={columns}
                     hideFooterSelectedRowCount
+                    onRowDoubleClick={(e) => {handleProfile(e.row.email)}}
+                    slots={{
+                        noRowsOverlay: usersLoading ? LoadingRowsDataGridOverlay : NoRowsDataGridOverlay,
+                    }}
                     initialState={{
                         pagination: {
                             paginationModel: { page: 0, pageSize: 10},

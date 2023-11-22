@@ -120,7 +120,7 @@ function App() {
         <Route path='institution' element={<Institution />} />
 
         <Route path='profile/' element={<Profile />}/>
-
+        <Route path='profile/:id' element={<UsersProfile />}/>
 
         <Route path='report' element={<Report />}/>
 
