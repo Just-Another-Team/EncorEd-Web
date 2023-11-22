@@ -11,7 +11,7 @@ import { converter } from '../models/converter';
 import ErrorController from '../types/ErrorController';
 // import { viewUser, userCollection } from './user.controller';
 
-export const subjectCollection = db.collection(`/subjects/`).withConverter(converter<ISubject>())
+export const subjectCollection = db.collection(`/subjects/`).withConverter(converter<ISubject | SubjectInput>())
 
 type SubjectInput = {
     details?: ISubject;
@@ -263,7 +263,22 @@ class SubjectService implements IBaseService {
                                                         .where('status', '==', 'Open')
                                                         .get()
 
-            const subjects = subjectRef.docs.map(subject => ({id: subject.id, ...subject.data()}))
+            console.log("Is this being searched??")
+
+            const subjects = subjectRef.docs.map(subject => ({
+                details: {id: subject.id, ...subject.data() as ISubject},
+            }))
+
+            // details?: ISubject;
+            // schedule?: object;
+            // assignedRoom?: object;
+
+            // createdBy?: string;
+            // creationDate?: string;
+            // updatedBy?: string;
+            // updatedDate?: string;
+
+            // institution?: string;
 
             res.status(200).json(subjects)
 
