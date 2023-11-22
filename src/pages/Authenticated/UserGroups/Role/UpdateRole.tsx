@@ -217,7 +217,7 @@ const UpdateRole = () => {
 
     const {handleSubmit, reset, control, setValue, formState: {errors}} = useForm<RoleInput>({
         defaultValues: {
-            name: role.name,
+            name: role.name as string,
             desc: role.desc,
             type:   typeof role?.employee !== 'boolean' ? "employee" : 
                     typeof role?.teacher !== 'boolean' ? "teacher" :

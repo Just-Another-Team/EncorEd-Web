@@ -8,7 +8,11 @@ import {
     ListItem,
     ListItemText,
     ListItemButtonProps,
-    Box
+    Box,
+    useTheme,
+    useMediaQuery,
+    Typography,
+    Stack
 } from '@mui/material'
 import { nextPage } from "../../app/features/navigation/navigationSlice";
 import { Link } from "react-router-dom";
@@ -21,22 +25,33 @@ const CustomListItemButton = <C extends React.ElementType>(props: ListItemButton
 }
 
 const Sidebar = ({navigations, select, selectedPage}: FixMeLater) => {
+
+    const theme = useTheme()
+    const belowMid = useMediaQuery(theme.breakpoints.down("md"))
+    const belowSmall = useMediaQuery(theme.breakpoints.down("sm"))
+
     return(
         <Drawer
-            variant="permanent"
-            sx={{
+        variant={!belowMid ? "permanent" : "temporary"}
+        sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            [`& .MuiDrawer-paper`]: { 
                 width: drawerWidth,
-                flexShrink: 0,
-                [`& .MuiDrawer-paper`]: { 
-                    width: drawerWidth,
-                    boxSizing: 'border-box' ,
-                    backgroundColor: '#45A3FD',
-                    color: '#FFFFFF'
-                },
-            }}
+                boxSizing: 'border-box' ,
+                backgroundColor: '#45A3FD',
+                color: '#FFFFFF'
+            },
+        }}
         >
             <Toolbar/>
             <Box sx={{ overflow: 'auto'}}>
+
+                <Stack display={belowSmall ? "flex" : "none"} alignItems={"center"} padding={1} gap={1}>
+                    <img width={128} height={128} src="/assets/profilepic.png"/>
+                    <Typography variant="h6">Hello World!</Typography>
+                </Stack>
+
                 <List disablePadding>
                     {navigations?.map((navigation: FixMeLater, index: FixMeLater) => (
                         <ListItem key={navigation.name} disablePadding>

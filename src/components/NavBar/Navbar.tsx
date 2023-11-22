@@ -6,24 +6,23 @@ import {
     Button,
     Box,
     IconButton,
-    Badge
+    Badge,
+    useTheme,
+    useMediaQuery,
+    Stack
 } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../app/encored-store-hooks";
 import { Link, useNavigate } from "react-router-dom";
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import { FixMeLater } from "../../types/FixMeLater";
-// import { logOut } from "../../app/features/user/userSlice";
-
-// import { logOutInstitution } from "../../app/features/institution/institutionSlice";
-// import { logOutRoles } from "../../app/features/role/roleSlice";
-// import { nextPage } from "../../app/features/navigation/navigationSlice";
-
 import { logOut } from "../../app/features/auth/authSlice";
 import { logOutRoles } from "../../app/features/role/authRoleSlice";
 import { logOutInstitution } from "../../app/features/institution/authInstitutionSlice";
 import { resetPage } from "../../app/features/navigation/navigationSlice";
 import { resetUsers } from "../../app/features/users/usersSlice";
 import { resetRoles } from "../../app/features/role/roleSlice";
+
+import MenuIcon from '@mui/icons-material/Menu';
 
 
 const Navbar = () => {
@@ -32,12 +31,13 @@ const Navbar = () => {
 
     const logoutDispatch = useAppDispatch()
 
-    let navigate = useNavigate()
+    const navigate = useNavigate()
+
+    const theme = useTheme()
+    const belowMid = useMediaQuery(theme.breakpoints.down("md"))
+    const belowSmall = useMediaQuery(theme.breakpoints.down("sm"))
 
     const handleSignOut = (e: FixMeLater) => {
-
-        console.log("IS THIS WORKING!")
-
         logoutDispatch(logOut())    
         logoutDispatch(logOutInstitution())
         logoutDispatch(logOutRoles())
@@ -45,7 +45,7 @@ const Navbar = () => {
 
         logoutDispatch(resetUsers())
         logoutDispatch(resetRoles())
-            
+
         navigate("/login")
     }
 
@@ -62,6 +62,17 @@ const Navbar = () => {
                 display={"flex"}
                 gap={2}
                 flex={1}>
+                    <IconButton
+                    size="small"
+                    sx={{
+                        display: !belowMid ? "none" : "block",
+                        color: "#FFFFFF"
+                    }}>
+                        <Badge badgeContent={0} color="primary">
+                            <MenuIcon />
+                        </Badge>
+                    </IconButton>
+
                     <img width={32} src="/assets/Logo.png"/>
                     <Typography
                     variant="h5"
@@ -73,36 +84,38 @@ const Navbar = () => {
                 
 
                 <Box display={"flex"} gap={2}>
-                    
-                    {/* Notification button */}
                     <IconButton
                     size="small"
-                    sx={{backgroundColor: '#FFFFFF', color: '#FDB833'}}>
+                    sx={{color: '#FFFFFF'}}>
                         <Badge badgeContent={0} color="primary">
                             <NotificationsNoneOutlinedIcon />
                         </Badge>
                     </IconButton>
 
-                    <Typography
-                    variant="h6"
-                    fontWeight={400}
-                    component={Link}
-                    //to={(loggedIn.role && "/dashboard/profile") || (loggedIn.role && "/admin/dashboard/profile")}
-                    //to={((loggedIn.role.find(data => data._systemRole._admin) || loggedIn.role.find(data => data._systemRole._employee)) && "/dashboard/profile") || (loggedIn.role.find(data => data._systemRole._superAdmin) && "/admin/dashboard/profile")}
-                    to={"/dashboard/profile"}
-                    sx={{
-                        textDecoration: 'none',
-                        color: '#FFFFFF',
-                    }}>
-                        {user ? `${user.firstName} ${user.lastName}` : "User Full name"}
-                    </Typography>
+                    
 
-                    <Button
-                    variant="contained"
-                    size="small"
-                    onClick={handleSignOut}>
-                        LOGOUT
-                    </Button>
+                    <Stack display={!belowSmall ? "flex" : "none"} alignItems={"center"} direction={"row"} gap={2}>
+                        <img width={36} height={36} src="/assets/profilepic.png"/>
+
+                        <Typography
+                        variant="h6"
+                        fontWeight={400}
+                        component={Link}
+                        to={"/dashboard/profile"}
+                        sx={{
+                            textDecoration: 'none',
+                            color: '#FFFFFF',
+                        }}>
+                            {user ? `${user.firstName} ${user.lastName}` : "User Full name"}
+                        </Typography>
+
+                        <Button
+                        variant="contained"
+                        size="small"
+                        onClick={handleSignOut}>
+                            LOGOUT
+                        </Button>
+                    </Stack>
                 </Box>
 
                 

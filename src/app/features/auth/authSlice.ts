@@ -27,18 +27,7 @@ export type InitialAuthType = {
 
 const initialState: InitialAuthType = {
     loading: false,
-    data: {
-        id: "",
-        institution: "",
-        firstName: "",
-        lastName: "",
-        joinDate: "",
-        addedBy: "",
-        userName: "",
-        email: "",
-        isalumni: false,
-        status: ""
-    },
+    data: {},
     error: null
 }
 
@@ -171,18 +160,7 @@ const authSlice = createSlice({
         },
         logOut: (state) => {
             state.loading = false
-            state.data = {
-                id: "",
-                institution: "",
-                firstName: "",
-                lastName: "",
-                joinDate: "",
-                addedBy: "",
-                userName: "",
-                email: "",
-                isalumni: false,
-                status: ""
-            }
+            state.data = {}
             state.error = null;
         }
     },

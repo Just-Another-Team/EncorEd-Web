@@ -34,7 +34,6 @@ const ConnectedSideBar = () => {
         {key: "subject", name: "Subject", icon: <BookOutline />, href: `/dashboard/subject/${institution}`},
         {key: "maps", name: "Maps", icon: <MapOutline />, href: "/dashboard/map/list"},
         {key: "events", name: "Events", icon: <EventOutline />, href: `/dashboard/event/${institution}`},
-        
         {key: "userGroups", name: "User and Groups", icon: <GroupsOutline />, href: `/dashboard/list/users/u/${institution}`},
         {key: "institution", name: "Institution", icon: <OrganizationOutline />, href: "/dashboard/institution"},
         {key: "request", name: "Request", icon: <PostAddIcon />, href: "/dashboard/request"},
@@ -46,6 +45,7 @@ const ConnectedSideBar = () => {
         {key: "institution", name: "Institutions", icon: <OrganizationOutline />, href: "/admin/dashboard/institutions"},
     ]
 
+    // LATER
     // const selectNavigations = useMemo(() => {
     //     const roleType = roles.filter(role => typeof role?.employee !== 'boolean')
     //     const employeePermissions = roleType.map(role => role.employee)
@@ -65,9 +65,22 @@ const ConnectedSideBar = () => {
     return (
         <Sidebar 
         //navigations={(userRole.find(data => data._systemRole._employee) && navigations) || (userRole.find(data => data._systemRole._superAdmin) && adminNavigations)}
-        navigations={
-            roles.find(role => role.admin || role.employee) && navigations ||
-            roles.find(role => role.appAdmin) && adminNavigations
+        navigations={ 
+            roles.appAdmin ? 
+            adminNavigations : 
+            navigations.filter((el, ind) => {
+
+                const permissions = roles.employee as Permission
+
+                if (!roles.admin) {
+                    if (!permissions.viewMap) return el.key !== "maps"
+                    if (!permissions.viewSubject) return el.key !== "subject"
+                    if (!permissions.viewEvent) return el.key !== "events"
+                    if (!permissions.viewUser && !permissions.viewGroup && !permissions.viewRole) return el.key !== "userGroups"
+                }
+
+                return el;
+            })
         }
         select={select}
         selectedPage={selectedPage}

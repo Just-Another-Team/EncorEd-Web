@@ -1,3 +1,4 @@
+import { FixMeLater } from "../../types/FixMeLater";
 import http from "./http-common";
 
 class Subject {
@@ -5,10 +6,10 @@ class Subject {
     //     console.log(data)
     // }
 
-    // //For Bulk add
-    // addSubjects(data) {
-    //     console.log(data)
-    // }
+    //For Bulk add
+    addSubjects(data: FixMeLater) {
+        return http.post(`/subject/add/all`, data)
+    }
 
     // updateSubject(data) {
     //     console.log(data)
@@ -22,9 +23,9 @@ class Subject {
     //     console.log(data)
     // }
 
-    // viewSubjects() {
-    //     return http.get("/subject/list")
-    // }
+    viewSubjectsByInstitution(institutionId: string) {
+        return http.get(`/subject/list/u/${institutionId}`)
+    }
 }
 
 export default new Subject

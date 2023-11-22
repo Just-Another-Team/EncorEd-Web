@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import { 
-    Box, Button, Grid, TextField, Modal
+    Box, Button, Grid, TextField, Modal, Typography
 } from "@mui/material";
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 // import { AddUserFormHook } from '../../../../components/Forms/Formhooks/AddUserForm-Hooks'
 import { useDispatch, useSelector } from "react-redux";
 // import { getAllUsers } from "../../../../app/features/users/usersSlice";
 import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-hooks";
 import { FixMeLater } from "../../../../types/FixMeLater";
+import { User, getAllUsers } from "../../../../app/features/users/usersSlice";
 
 
 const UserList = () => {
@@ -17,18 +18,19 @@ const UserList = () => {
 
     const usersDispatch = useAppDispatch()
     
+    const users = useAppSelector(state => state.users.data)
 
     //Modal stuffs
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
-    // useEffect(()=>{
-    //     usersDispatch(getAllUsers())
-    // }, [])
+    useEffect(()=>{
+        usersDispatch(getAllUsers())
+    }, [])
 
     // Must be changed
-    const columns = [
+    const columns: GridColDef[] = [
         {
             field: 'firstName',
             headerName: 'First name',
@@ -53,9 +55,17 @@ const UserList = () => {
             field: 'dateAdded',
             headerName: 'Date Joined',
             width: 160,
-            valueGetter: (params: FixMeLater) => {
-            return dayjs(params.row.joinDate).format("MMMM-DD-YYYY")
+            valueGetter: (params: GridCellParams<User>) => {
+                return dayjs(params.row.joinDate).format("MMMM-DD-YYYY")
             },
+        },
+        {
+            field: 'status',
+            headerName: 'Status',
+            flex: 0.3,
+            renderCell: (params: GridRenderCellParams<User>) => (
+                <Typography color={params.row.status === "Closed" ? "red" : "black"} variant="body2">{params.row.status}</Typography>
+            )
         },
         // {
         //     field: 'update',
@@ -63,24 +73,24 @@ const UserList = () => {
         //     renderHeader: () => (
         //         <span></span>
         //     ),
-        //     renderCell: (params) => {
+        //     renderCell: (params: GridCellParams) => {
         //         return (
         //             <Button onClick={(e) => {console.log(params.row)}} variant="contained" color="primary" >UPDATE</Button>
         //         )
         //     }
         // },
-        // {
-        //     field: 'delete',
-        //     sortable: false,
-        //     renderHeader: () => (
-        //         <span></span>
-        //     ),
-        //     renderCell: (params) => {
-        //         return (
-        //             <Button variant="contained" color="error" >DELETE</Button>
-        //         )
-        //     }
-        // }
+        {
+            field: 'delete',
+            sortable: false,
+            renderHeader: () => (
+                <span></span>
+            ),
+            renderCell: (params: GridCellParams) => {
+                return (
+                    <Button variant="contained" color="error" >BAN</Button>
+                )
+            }
+        }
     ];
 
     return(
@@ -90,6 +100,7 @@ const UserList = () => {
                 <Grid container xs={4}>
                     <TextField label="Search User" fullWidth/>
                 </Grid>
+
                 <Modal
                     open={open}
                     // onClose={handleClose} //close on clicking outside modal
@@ -115,20 +126,20 @@ const UserList = () => {
                         </div>
                     </Box>
                 </Modal>
+
             </Box>
 
-            <Box marginBottom={2}>
+            <Box height={560}  marginBottom={2}>
 
-                <DataGrid
-                    autoHeight={true}
-                    rows={[]}
+                <DataGrid   
+                    rows={users}
                     columns={columns}
                     initialState={{
                         pagination: {
-                            paginationModel: { page: 0, pageSize: 25},
+                            paginationModel: { page: 0, pageSize: 10},
                         },
                     }}
-                    pageSizeOptions={[25]}
+                    pageSizeOptions={[10]}
                     //disableRowSelectionOnClick={[true]}
                     disableColumnMenu={true}
                     sx={{

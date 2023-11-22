@@ -101,38 +101,40 @@ const GroupList = () => {
                 </Grid>
             </Box>
 
-            <DataGrid
-                rows={rows}
-                columns={columns}
-                initialState={{
-                    pagination: {
-                        paginationModel: { page: 0, pageSize: 25},
-                    },
-                }}
-                onRowDoubleClick={(e) => {
-                    console.log(e.row)
-                }}
-                pageSizeOptions={[25]}
-                //disableRowSelectionOnClick
-                sx={{
-                    '&.MuiDataGrid-root': {
-                        border: '1px solid #EFEEFB'
-                    },
-                    '.MuiDataGrid-columnHeaders': {
-                        backgroundColor: '#D0E7FF;',
-                        color: '#296EB4',
-                        fontSize: 16,
-                    },
-                    '.MuiTablePagination-displayedRows': {
-                        marginTop: '1em',
-                        marginBottom: '1em'
-                    },
-                    '.MuiTablePagination-displayedRows, .MuiTablePagination-selectLabel': {
-                        marginTop: '1em',
-                        marginBottom: '1em'
-                    }
-                }}
-            />
+            <Box height={560} marginBottom={2}>
+                <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    initialState={{
+                        pagination: {
+                            paginationModel: { page: 0, pageSize: 10},
+                        },
+                    }}
+                    onRowDoubleClick={(e) => {
+                        console.log(e.row)
+                    }}
+                    pageSizeOptions={[10]}
+                    //disableRowSelectionOnClick
+                    sx={{
+                        '&.MuiDataGrid-root': {
+                            border: '1px solid #EFEEFB'
+                        },
+                        '.MuiDataGrid-columnHeaders': {
+                            backgroundColor: '#D0E7FF;',
+                            color: '#296EB4',
+                            fontSize: 16,
+                        },
+                        '.MuiTablePagination-displayedRows': {
+                            marginTop: '1em',
+                            marginBottom: '1em'
+                        },
+                        '.MuiTablePagination-displayedRows, .MuiTablePagination-selectLabel': {
+                            marginTop: '1em',
+                            marginBottom: '1em'
+                        }
+                    }}
+                />
+            </Box>
 
             {/* <Box marginBottom={2}>
 

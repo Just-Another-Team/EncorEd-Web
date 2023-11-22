@@ -53,6 +53,10 @@ class EncorEdUserService {
         return http.get(`/user/list/u/${institution}/${user}` )
     }
 
+    getAllUsers () {
+        return http.get(`${this.authCommon}/list/`)
+    }
+
     addUser(data: FixMeLater) {
         const user: UserInput = {
             institution: data.institution,

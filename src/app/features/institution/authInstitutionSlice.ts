@@ -2,16 +2,24 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit"
 import Institution from "../../api/encored-institution-service"
 import { RegisterFormCredential } from "../../../types/RegisterFormCredential"
 
-const initialState = {
+type InstitutionData = {
+    id?: string,
+    createdBy?: string,
+    name?: string,
+    creationDate?: string,
+    desc?: string,
+    status?: string,
+}
+
+type InitialInstitutionType = {
+    loading?: boolean,
+    data: InstitutionData,
+    error?: any
+}
+
+const initialState: InitialInstitutionType = {
     loading: false,
-    data: {
-        id: "",
-        createdBy: "",
-        name: "",
-        creationDate: "",
-        desc: "",
-        status: "",
-    },
+    data: {},
     error: null
 }
 
@@ -37,14 +45,7 @@ const institutionSlice = createSlice({
     reducers: {
         logOutInstitution: (state) => {
             state.loading = false
-            state.data = {
-                id: "",
-                createdBy: "",
-                name: "",
-                creationDate: "",
-                desc: "",
-                status: "",
-            }
+            state.data = {}
             state.error = null
         } 
     },

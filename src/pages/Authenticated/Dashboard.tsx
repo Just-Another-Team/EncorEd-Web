@@ -22,7 +22,6 @@ const Dashboard = () => {
                 <Toolbar variant="regular"/>
                 
                 {/* Test for the Data Grid */}
-
                 <Outlet />
             </Container>
         </Box>

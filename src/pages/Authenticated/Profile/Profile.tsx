@@ -167,7 +167,7 @@ const Profile = () => {
                                 <Typography variant="body1">{dayjs(user.data.joinDate).format("MMMM D, YYYY")}</Typography>
                             </Grid>
 
-                            {roles.data.find(role => role.appAdmin) && (
+                            {roles.data.appAdmin && (
                                 <>
                                     <Grid item xs={12} marginBottom={2}>
                                         <Typography variant="body1" fontWeight={700}>Institution:</Typography>
@@ -189,13 +189,18 @@ const Profile = () => {
 
                         <Grid container marginBottom={2} sx={{backgroundColor: '#F6F5FF', borderRadius: 4, padding: 2}}>
                             <Grid item xs={12}>
-                                <Typography variant="h5" fontWeight={700}>Role{roles.data.length !== 1 && 's'}</Typography>
+                                <Typography variant="h5" fontWeight={700}>Roles</Typography>
                             </Grid>
                             <Grid item xs={12}>
                                 <List>
-                                    {roles.data.map((role, ind) => (
+                                    {/* {roles.data.map((role, ind) => (
                                         <ListItem key={ind}>
                                             <ListItemText primary={`${role.name!.charAt(0).toUpperCase()}${role.name!.slice(1)}`} />
+                                        </ListItem>
+                                    ))} */}
+                                    {(roles.data.name as Array<string>).map((name, ind) => (
+                                        <ListItem key={ind}>
+                                            <ListItemText primary={`${name}`} />
                                         </ListItem>
                                     ))}
                                 </List>

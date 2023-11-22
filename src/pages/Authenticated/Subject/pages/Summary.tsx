@@ -16,6 +16,16 @@ import { DataGrid } from '@mui/x-data-grid'
 import SubjectEventCard from "../../../../components/Cards/SubjectEventCard";
 import { FixMeLater } from "../../../../types/FixMeLater";
 
+type OngoingSubjectType = {
+    id: string | number
+    name: string
+    edpCode: string | number
+    subjectType: string
+    units: number
+    createdBy: string
+    status: string
+}
+
 // Must be changed
 const columns = [
     { 
@@ -56,19 +66,26 @@ const columns = [
 ];
 
 const subject = (
-    id: FixMeLater,
-    name: FixMeLater,
-    edpCode: FixMeLater,
-    subjectType: FixMeLater,
-    units: FixMeLater,
-    createdBy: FixMeLater,
-    status: FixMeLater
-) => {
-    return {id: id, name: name, edpCode: edpCode, subjectType: subjectType, units: units, createdBy: createdBy, status: status}
+    id: string | number,
+    name: string,
+    edpCode: string | number,
+    subjectType: string,
+    units: number,
+    createdBy: string,
+    status: string
+): OngoingSubjectType => {
+    return {id: id, name: name, edpCode: edpCode, subjectType: subjectType, units: units, createdBy: createdBy, status: status} as OngoingSubjectType
 }
 
-const rows = [
-    subject(1, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing")
+const rows: Array<OngoingSubjectType> = [
+    subject(1, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
+    subject(2, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
+    subject(3, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
+    subject(4, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
+    subject(5, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
+    subject(6, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
+    subject(7, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
+    subject(8, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
 ];
 
 const SubSummary = () => {
@@ -79,45 +96,46 @@ const SubSummary = () => {
                     Ongoing Subjects
                 </Typography>
 
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    initialState={{
-                        pagination: {
-                            paginationModel: { page: 0, pageSize: 5 },
-                        },
-                        columns: {
-                            columnVisibilityModel: {
-                                id: false,
+                <Box height={370}>
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        initialState={{
+                            pagination: {
+                                paginationModel: { page: 0, pageSize: 5 },
+                            },
+                            columns: {
+                                columnVisibilityModel: {
+                                    id: false,
+                                }
                             }
-                        }
-                    }}
-                    onRowDoubleClick={(e) => {
-                        console.log(e.row)
-                        
-                    }}
-                    pageSizeOptions={[5, 10]}
-                    //disableRowSelectionOnClick
-                    sx={{
-                        height: 400,
-                        '&.MuiDataGrid-root': {
-                            border: '1px solid #EFEEFB'
-                        },
-                        '.MuiDataGrid-columnHeaders': {
-                            backgroundColor: '#D0E7FF;',
-                            color: '#296EB4',
-                            fontSize: 16,
-                        },
-                        '.MuiTablePagination-displayedRows': {
-                            marginTop: '1em',
-                            marginBottom: '1em'
-                        },
-                        '.MuiTablePagination-displayedRows, .MuiTablePagination-selectLabel': {
-                            marginTop: '1em',
-                            marginBottom: '1em'
-                        }
-                    }}
-                />
+                        }}
+                        onRowDoubleClick={(e) => {
+                            console.log(e.row)
+                            
+                        }}
+                        pageSizeOptions={[5]}
+                        //disableRowSelectionOnClick
+                        sx={{
+                            '&.MuiDataGrid-root': {
+                                border: '1px solid #EFEEFB'
+                            },
+                            '.MuiDataGrid-columnHeaders': {
+                                backgroundColor: '#D0E7FF;',
+                                color: '#296EB4',
+                                fontSize: 16,
+                            },
+                            '.MuiTablePagination-displayedRows': {
+                                marginTop: '1em',
+                                marginBottom: '1em'
+                            },
+                            '.MuiTablePagination-displayedRows, .MuiTablePagination-selectLabel': {
+                                marginTop: '1em',
+                                marginBottom: '1em'
+                            }
+                        }}
+                    />
+                </Box>
             </Box>
 
             <Box>

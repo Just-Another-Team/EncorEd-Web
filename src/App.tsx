@@ -46,13 +46,14 @@ import RoleAccess from './pages/Authenticated/UserGroups/Role/tabs/RoleAccess';
 import Report from './pages/Authenticated/Report/Report';
 import UsersLayout from './pages/Admin/Users/UsersLayout';
 import { logOutRoles } from './app/features/role/authRoleSlice';
+import AddSubject from './pages/Authenticated/Subject/pages/AddSubject';
 
 function App() {
   const dispatch = useAppDispatch()
 
   //const role = useAppSelector(state => state.roles);
   const user = useAppSelector(state => state.authentication.data)
-  const roles = useAppSelector(state => state.assignRole.data)
+  const role = useAppSelector(state => state.assignRole.data)
 
   useEffect(() => {
     // console.log("Is Admin or Employee", roles.filter(role => role.admin || typeof role.employee === "object").length != 0)
@@ -81,7 +82,7 @@ function App() {
       </Route>
 
       {/* Authenticated Pages */}
-      <Route path='/dashboard' element={ Object.keys(user).length != 0 ? roles.filter(role => role.admin || typeof role.employee === "object").length != 0  ? <Dashboard /> : <Navigate replace to='/login' /> : <Navigate replace to='/login' />}> {/* */}
+      <Route path='/dashboard' element={ Object.keys(role).length != 0 && !role.appAdmin ? <Dashboard /> : <Navigate replace to='/login' /> }> {/* Object.keys(user).length != 0 ? roles.filter(role => role.admin || typeof role.employee === "object").length != 0  ? <Dashboard /> : <Navigate replace to='/login' /> : <Navigate replace to='/login' /> */}
         <Route index path='home' element={<InstitutionalHome />} />
 
         <Route path='map/list' element={<MapList />} />
@@ -92,7 +93,7 @@ function App() {
           <Route path='schedule' element={<SchedSubList />}/>
           <Route path='request' element={<SubRequest />}/>
         </Route>
-        <Route path='subject/:institution/add' /> {/* Add Subject */}
+        <Route path='subject/:institution/add' element={<AddSubject />}/> {/* Add Subject */}
         <Route path='subject/:institution/:id' /> {/* Selected Subject */}
         <Route path='subject/:institution/:id/update' /> {/* Update Subject */}
 
@@ -129,7 +130,7 @@ function App() {
       {/* Admin Pages*/}
       {/* role.data.find(data => data._systemRole._superAdmin) ? <AdminDashboard /> : <Navigate replace to="/login" /> */}
 
-      <Route path='/admin/dashboard' element={Object.keys(user).length != 0 ? roles.filter(role => role.appAdmin).length != 0  ? <AdminDashboard /> : <Navigate replace to='/login'/> : <Navigate replace to='/login'/>}> {/* roles.filter(role => role.appAdmin).length != 0 */}
+      <Route path='/admin/dashboard' element={ Object.keys(role).length != 0 && role.appAdmin ? <AdminDashboard /> : <Navigate replace to='/login' /> }> {/* Object.keys(user).length != 0 ? roles.filter(role => role.appAdmin).length != 0  ? <AdminDashboard /> : <Navigate replace to='/login'/> : <Navigate replace to='/login'/> */}
         <Route path='home' element={<Home />}/>
 
         <Route path='users' element={<UsersLayout />} />
