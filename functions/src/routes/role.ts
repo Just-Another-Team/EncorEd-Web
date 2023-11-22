@@ -19,7 +19,7 @@ roleRouter.get("/list/u/:institution", RoleUser.viewAllByInsitution)
 // //Update
 // //Delete
 // roleRouter.get("/list/") //List by App Admin
-// roleRouter.get("/list/:id") //Select role from list
+// roleRouter.get("/list/:id") //Select role from listy
 // roleRouter.get("/list/:institution") //Select role by institution
 // roleRouter.get("/list/:institution/:id") //Select role by institution and by id
 

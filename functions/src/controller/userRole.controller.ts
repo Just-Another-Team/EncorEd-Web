@@ -12,6 +12,7 @@ import { Permission } from '../models/permission.model.type';
 import { ActivityPermission } from '../models/activityPermission.model.type';
 import { AttendancePermissions } from '../models/attendancePermission.model.type';
 import { VerificationPermission } from '../models/verificationPermission.model.type';
+import { documentId } from 'firebase/firestore';
 
 export const userRoleCollection = db.collection(`/userRole/`).withConverter(converter<IUserRole>())
 
@@ -103,7 +104,7 @@ class UserRole implements IAssignService {
                         currentEmployee!.viewSubject = setPermission(resultEmployee?.viewSubject, currentEmployee?.viewSubject);
                         currentEmployee!.addSubject = setPermission(resultEmployee?.addSubject, currentEmployee?.addSubject);
                         currentEmployee!.editSubject = setPermission(resultEmployee?.editSubject!, currentEmployee?.editSubject!);
-                        currentEmployee!.deleteSubject = setPermission(resultEmployee?.deleteSubject!, currentEmployee?.deleteSubject!);4
+                        currentEmployee!.deleteSubject = setPermission(resultEmployee?.deleteSubject!, currentEmployee?.deleteSubject!);
                         
                         currentEmployee!.viewEvent = setPermission(resultEmployee?.viewEvent, currentEmployee?.viewEvent);
                         currentEmployee!.addEvent = setPermission(resultEmployee?.addEvent, currentEmployee?.addEvent);
