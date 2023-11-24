@@ -58,6 +58,15 @@ export const deleteUser = createAsyncThunk(
     }
 )
 
+export const assignUserToRole = createAsyncThunk(
+    "/users/assign/role",
+    async (data: FixMeLater, {rejectWithValue}) => {
+        return await EncorEdUserService.assignUserToRole(data)
+        .then((res) => res) 
+        .catch((error) => rejectWithValue(error))
+    }
+)
+
 const usersSlice = createSlice({
     name: 'users',
     initialState,

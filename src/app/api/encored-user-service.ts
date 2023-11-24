@@ -85,6 +85,10 @@ class EncorEdUserService {
         return http.get(`/role/debug/user/${id}`)
     }
 
+    assignUserToRole(data: FixMeLater) {
+        return http.post(`/role/assign/`, data)
+    }
+
     //password verification before action
     verifyPassword(data: FixMeLater){
         const { password } = data

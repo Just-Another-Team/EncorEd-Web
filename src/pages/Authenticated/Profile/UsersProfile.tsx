@@ -11,6 +11,7 @@ import {
     Button,
     Modal,
     Switch,
+    Checkbox,
 } from "@mui/material";
 import dayjs from 'dayjs'
 import { Controller, useForm } from "react-hook-form";
@@ -19,8 +20,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FixMeLater } from "../../../types/FixMeLater";
 import { useAppDispatch, useAppSelector } from "../../../app/encored-store-hooks";
 import { AssignRoleInput } from "../../../app/api/encored-role-service";
-import { GridColDef, DataGrid } from "@mui/x-data-grid";
+import { GridColDef, DataGrid, GridCellParams } from "@mui/x-data-grid";
 import FormInputDropDown from "../../../components/DropDown/FormInputDropDown";
+import { getRolesByInstitution } from "../../../app/features/role/roleSlice";
+import { assignUserToRole } from "../../../app/features/users/usersSlice";
 
 
 const UsersProfile = () => {
@@ -32,6 +35,9 @@ const UsersProfile = () => {
     const user = useAppSelector(state => state.profile.data)
     const userRoles = useAppSelector(state => state.profile.roles)
     const rolesList = useAppSelector(state => state.role.data)
+    const institution = useAppSelector(state => state.institution.data.id)
+    
+    const [instRoleList, setInstRoleList] = React.useState<any>([]);
     
     // const val: object = arr.filter((data: FixMeLater) => data.userName === result)
     const userDispatch = useAppDispatch();
@@ -40,7 +46,9 @@ const UsersProfile = () => {
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true)
-
+            roleDispatch(getRolesByInstitution(institution!.toLowerCase())).unwrap().then((roles) => {
+                setInstRoleList(roles.data)
+            })
             try{
                 await userDispatch(viewUser(email))
                 await roleDispatch(viewUserRoles(email))
@@ -48,20 +56,70 @@ const UsersProfile = () => {
                 console.log(e)
             } finally {
                 setIsLoading(false)
-                console.log(user)
-                console.log(userRoles)
             }
         }
 
         fetchData()
     }, [])
+
     // const user = useAppSelector(state => state.profile.data)
     const [openAssign, setOpenAssign] = useState(false);
     const handleOpenAssign = () => setOpenAssign(true);
     const handleCloseAssign = () => setOpenAssign(false);
 
+    const [isChecked, setIsChecked] = useState(false);
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setIsChecked(event.target.checked);
+    };
+
+    //Assign roles components
+    function isAssigned(arr1: FixMeLater[], arr2: FixMeLater[]): boolean {
+        return arr1.some(el => arr2.includes(el));
+    }
+
+
     const columns: GridColDef[] = [
         { field: 'name', headerName: 'Role Name', width: 200, sortingOrder:['asc', 'desc'], }
+    ]
+
+    let rolesNames = userRoles.map((e:any) => e.name)
+
+    const assignRole = async (userId: FixMeLater, roleId: string) => {
+        const data = {userId: userId, roleId: roleId}
+        try{
+            await roleDispatch(assignUserToRole(data))
+            .then(()=>{
+                alert('Successfully assigned')
+            })
+        }
+        catch(e){
+            console.log(e)
+        }
+    }
+
+    const assignColumns: GridColDef[] = [
+        {
+            field: 'name',
+            headerName: 'Roles',
+            flex: 1,
+        },
+        {
+            field: 'status',
+            headerName: '',
+            renderCell: (params: GridCellParams) => {
+                return(
+                    <>
+                        {isAssigned(rolesNames, params.row.name) ? (
+                                <Checkbox checked={true} color='success' onClick={() => {console.log(params.row)}}/>
+                            ) : (
+                                <Checkbox color='success' onClick={() => {assignRole(user.id, params.row.id).then(()=>{window.location.reload()})}}/>
+                            )
+                        }
+                    </>
+                )
+            }
+        }
     ]
     
     return (
@@ -187,19 +245,38 @@ const UsersProfile = () => {
                         </div>
                         <Box display={'block'} padding={2}>
                         <div style={{padding: '35px', paddingTop: '0px'}}>
-                            {rolesList.map((el) => (
-                                <Grid flex={2} padding={2} sx={{backgroundColor: 'white', borderRadius: '20px'}} marginBottom={2} item display={'flex'} alignItems={"center"} justifyContent={'space-between'}>
-                                    <Typography>{el.name}</Typography>
-                                </Grid>
-                            ))}
+                            <DataGrid
+                                autoHeight
+                                rows={instRoleList}
+                                columns={assignColumns}
+                                columnVisibilityModel={{
+                                    id: false
+                                }}
+                                disableColumnFilter
+                                disableRowSelectionOnClick
+                                hideFooter
+                                sx={{
+                                    '&.MuiDataGrid-root': {
+                                        border: '1px solid #EFEEFB',
+                                        backgroundColor: 'white'
+                                    },
+                                    '.MuiDataGrid-columnHeaders': {
+                                        backgroundColor: '#D0E7FF;',
+                                        color: '#296EB4',
+                                        fontSize: 16,
+                                    },
+                                    '.MuiTablePagination-displayedRows': {
+                                        marginTop: '1em',
+                                        marginBottom: '1em'
+                                    },
+                                    '.MuiTablePagination-displayedRows, .MuiTablePagination-selectLabel': {
+                                        marginTop: '1em',
+                                        marginBottom: '1em'
+                                    }
+                                }}
+                            />
                         </div>
                         </Box>
-
-                        <div style={{padding: '35px', paddingTop: '0px'}}>
-                            <Grid item xs={12} marginTop={3}>
-                                <Button fullWidth type="submit" size="large" variant="contained">Assign</Button>
-                            </Grid> 
-                        </div>
                     </Box>
                 </Modal>
         </>
