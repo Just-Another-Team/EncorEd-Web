@@ -90,7 +90,7 @@ class UserRole implements IAssignService {
                 current.admin = result.admin || current.admin
 
                 // Employee
-                if (typeof current.teacher === "boolean") current.employee = result.employee || current.employee
+                if (typeof current.employee === "boolean") current.employee = result.employee || current.employee
                 else {
                     const currentEmployee = current.employee as Permission
                     const resultEmployee = result.employee as Permission
