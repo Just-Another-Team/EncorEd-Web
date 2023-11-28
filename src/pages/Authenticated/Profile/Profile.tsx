@@ -198,11 +198,24 @@ const Profile = () => {
                                             <ListItemText primary={`${role.name!.charAt(0).toUpperCase()}${role.name!.slice(1)}`} />
                                         </ListItem>
                                     ))} */}
-                                    {(roles.data.name as Array<string>).map((name, ind) => (
+                                    {
+                                    (roles.data.name as Array<string>).length >= 1 && (
+                                        <ListItem>
+                                            <ListItemText primary={`${roles.data.name}`}/>
+                                        </ListItem>
+                                    ) ||
+                                    (roles.data.name as Array<string>).length == 0 && (
+                                        <ListItem>
+                                            <ListItemText primary="No Roles"/>
+                                        </ListItem>
+                                    )
+                                    }
+                                    
+                                    {/* {(roles.data.name as Array<string>).map((name, ind) => (
                                         <ListItem key={ind}>
                                             <ListItemText primary={`${name}`} />
                                         </ListItem>
-                                    ))}
+                                    ))} */}
                                 </List>
                             </Grid>
                         </Grid>

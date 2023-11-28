@@ -12,6 +12,7 @@ import {
     Modal,
     Switch,
     Checkbox,
+    TextField,
 } from "@mui/material";
 import dayjs from 'dayjs'
 import { Controller, useForm } from "react-hook-form";
@@ -39,7 +40,6 @@ const UsersProfile = () => {
     
     const [instRoleList, setInstRoleList] = React.useState<any>([]);
     
-    // const val: object = arr.filter((data: FixMeLater) => data.userName === result)
     const userDispatch = useAppDispatch();
     const roleDispatch = useAppDispatch();
 
@@ -67,24 +67,27 @@ const UsersProfile = () => {
     const handleOpenAssign = () => setOpenAssign(true);
     const handleCloseAssign = () => setOpenAssign(false);
 
-    const [isChecked, setIsChecked] = useState(false);
+    //~~~~Edit profile components~~~~
+    const [isEditing, setIsEditing] = useState(false);
+    const handleOpenEdit = () => setIsEditing(true);
+    const handleCloseEdit = () => setIsEditing(false);
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setIsChecked(event.target.checked);
-    };
 
-    //Assign roles components
+
+    //~~~~Assign roles components~~~~
     function isAssigned(arr1: FixMeLater[], arr2: FixMeLater[]): boolean {
         return arr1.some(el => arr2.includes(el));
     }
 
-
+    //Roles list
     const columns: GridColDef[] = [
         { field: 'name', headerName: 'Role Name', width: 200, sortingOrder:['asc', 'desc'], }
     ]
 
+    //Get Names of Roles
     let rolesNames = userRoles.map((e:any) => e.name)
 
+    //Function to assign roles
     const assignRole = async (userId: FixMeLater, roleId: string) => {
         const data = {userId: userId, roleId: roleId}
         try{
@@ -97,7 +100,8 @@ const UsersProfile = () => {
             console.log(e)
         }
     }
-
+    
+    //Show status of roles in the modal (if assigned or not)
     const assignColumns: GridColDef[] = [
         {
             field: 'name',
@@ -126,7 +130,7 @@ const UsersProfile = () => {
         <>
             <Grid spacing={3} container>
                 {isLoading ? (
-                    <Typography variant="h4" fontWeight={700}>Loading...</Typography>
+                    <Typography position={"absolute"} variant="h4" fontWeight={700}>Loading...</Typography>
                 ) : (
                 <Grid xs={9} item>
                     {/* Banner Cover */}
@@ -136,7 +140,17 @@ const UsersProfile = () => {
                         <Box sx={{borderRadius: 360}}>
                             <img width={160} height={160} src="/assets/profilepic.png"/>
                         </Box>
-                        <Typography variant="h4" fontWeight={700}>{user!.firstName} {user?.lastName}</Typography> {/* {user.firstName} {user.lastName} */}
+                        <div>
+                            {isEditing ? (
+                                <Typography variant="h4" fontWeight={700}>
+                                    <TextField type="text" />
+                                </Typography>
+                                ) : (
+                                    <Typography variant="h4" fontWeight={700}>
+                                        {user!.firstName} {user?.lastName} 
+                                    </Typography>
+                                    )}
+                        </div>
                     </Box>
 
                     <Box display={'block'}>
@@ -166,8 +180,19 @@ const UsersProfile = () => {
                                     <Typography variant="body1">{user.addedBy}</Typography>
                                 </Grid>
                             )}
+
+                            <Grid item xs={12}>
+                                <Box display={'flex'}>
+                                    {isEditing ? (
+                                        <Button onClick={handleCloseEdit} variant="contained">SAVE</Button>
+                                    ): (
+                                        <Button onClick={handleOpenEdit} variant="contained">EDIT PROFILE</Button>
+                                    )}
+                                </Box>
+                            </Grid>
                         </Grid>
-                        
+
+
                         <Grid container marginBottom={2} sx={{backgroundColor: '#F6F5FF', borderRadius: 4, padding: 2}}>
                             <Grid item xs={12}>
                                 <Typography variant="h5" fontWeight={700}>Roles</Typography>
