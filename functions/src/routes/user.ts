@@ -7,6 +7,7 @@ const userRouter = Router();
 
 userRouter.post("/add", userService.add);
 userRouter.put("/update/:id", userService.update)
+userRouter.put("/edit/profile/:id", userService.editUserProfile)
 
 userRouter.get("/exist/:id", userService.isExist)
 userRouter.get("/list/", userService.viewAll)
