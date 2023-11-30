@@ -55,6 +55,13 @@ export const viewUserRoles = createAsyncThunk(
     }    
 )
 
+export const editUserProfile = createAsyncThunk(
+    "/profile/edit",
+    async (data: FixMeLater, {rejectWithValue}) => {
+        return await EncorEdUserService.editUserProfile(data).catch((error) => rejectWithValue(error))
+    }
+)
+
 const profileSlice = createSlice({
     name: 'profile',
     initialState,
@@ -74,7 +81,6 @@ const profileSlice = createSlice({
                 state.loading = false
                 state.error = action.payload
             })
-        
         }
         {
             builder.addCase(viewUserRoles.pending, (state, action) => {
@@ -90,7 +96,21 @@ const profileSlice = createSlice({
                 state.loading = false
                 state.error = action.payload
             })
-        
+        }
+        {
+            builder.addCase(editUserProfile.pending, (state, action) => {
+                state.loading = true
+                state.error = null
+            })
+            builder.addCase(editUserProfile.fulfilled, (state, action: PayloadAction<FixMeLater>) => {
+                state.loading = false
+                state.roles = action.payload.data
+                state.error = null
+            })
+            builder.addCase(editUserProfile.rejected, (state, action: PayloadAction<FixMeLater>) => {
+                state.loading = false
+                state.error = action.payload
+            })
         }
     }
 })

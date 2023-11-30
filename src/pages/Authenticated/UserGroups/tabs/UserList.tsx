@@ -193,40 +193,9 @@ const UserList = () => {
                     </Box>
                 </Modal>
 
-                {/* user roles modal */}
-                <Modal
-                    open={false}
-                    // onClose={handleClose} //close on clicking outside modal
-                    aria-labelledby="User Roles"
-                    aria-describedby="Modal for viewing target user roles"
-                    >
-                    <Box sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: 500,
-                        bgcolor: "#45A1FD",
-                        border: '1px solid #000',
-                        borderRadius: '20px',
-                        boxShadow: 24,
-                    }}>
-                        <div style={{textAlign: 'right'}}>
-                            <Button
-                            onClick={handleCloseRoles}
-                            sx={{color:'black', fontWeight: 'bolder', fontSize: '20px', paddingRight:0, borderRadius:'20px'}} >
-                                x
-                            </Button>
-                        </div>
-                        <div style={{padding: '15px', paddingTop: '0px'}}>
-                            {/* <PasswordAuthHook/> */}
-                        </div>
-                    </Box>
-                </Modal>
             </Box>
 
             <Box height={560} marginBottom={2}>
-
                 <DataGrid
                     autoHeight
                     rows={searchedUsers}

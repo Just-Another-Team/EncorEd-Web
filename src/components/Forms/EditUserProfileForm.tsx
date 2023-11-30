@@ -13,9 +13,9 @@ import { LoginFormInput } from "../../types/LoginFormInput";
 import { FixMeLater } from "../../types/FixMeLater";
 import FormInputTextField from "../TextField/FormInputTextField";
 
-type PasswordAuthProps = {
+type EditUserProfileProps = {
     title: string | null,
-    type: "verifypassword",
+    type: "edituserprofile",
     submitName?: string,
     inputs: FixMeLater,
     control: string | any,
@@ -23,7 +23,7 @@ type PasswordAuthProps = {
     loading?: boolean | undefined,
 }
 
-const PasswordAuthForm = ({
+const EditUserProfileForm = ({
     title,
     type, 
     submitName = "Confirm", 
@@ -31,7 +31,7 @@ const PasswordAuthForm = ({
     control,
     onSubmit,
     loading,
-}: PasswordAuthProps) => {
+}: EditUserProfileProps) => {
     return (
         <Grid
         onSubmit={onSubmit}
@@ -79,4 +79,4 @@ const PasswordAuthForm = ({
     )
 }
 
-export default PasswordAuthForm
+export default EditUserProfileForm

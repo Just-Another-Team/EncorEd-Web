@@ -99,6 +99,10 @@ class EncorEdUserService {
 
         return reauthenticateWithCredential(currentUser, credentials)
     }
+
+    editUserProfile(data: FixMeLater) {
+        return http.put(`/user/edit/profile/${data.id}`, data)
+    }
 }
 
 export default new EncorEdUserService()

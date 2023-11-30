@@ -22,9 +22,9 @@ import { FixMeLater } from "../../../types/FixMeLater";
 import { useAppDispatch, useAppSelector } from "../../../app/encored-store-hooks";
 import { AssignRoleInput } from "../../../app/api/encored-role-service";
 import { GridColDef, DataGrid, GridCellParams } from "@mui/x-data-grid";
-import FormInputDropDown from "../../../components/DropDown/FormInputDropDown";
 import { getRolesByInstitution } from "../../../app/features/role/roleSlice";
 import { assignUserToRole } from "../../../app/features/users/usersSlice";
+import { EditUserProfileHook } from "../../../components/Forms/Formhooks/EditUserProfile-Hook";
 
 
 const UsersProfile = () => {
@@ -71,13 +71,9 @@ const UsersProfile = () => {
     const [isEditing, setIsEditing] = useState(false);
     const handleOpenEdit = () => setIsEditing(true);
     const handleCloseEdit = () => setIsEditing(false);
-
-
+    
 
     //~~~~Assign roles components~~~~
-    function isAssigned(arr1: FixMeLater[], arr2: FixMeLater[]): boolean {
-        return arr1.some(el => arr2.includes(el));
-    }
 
     //Roles list
     const columns: GridColDef[] = [
@@ -85,7 +81,21 @@ const UsersProfile = () => {
     ]
 
     //Get Names of Roles
-    let rolesNames = userRoles.map((e:any) => e.name)
+    var roleNames: any[]
+    function getRoleNames() {
+        try{
+            roleNames = userRoles.map((e:any) => e.name)
+
+        }catch(e)
+        {
+            console.log(e);
+        }
+    }
+    getRoleNames()
+
+    function isAssigned(arr1: FixMeLater[], arr2: FixMeLater[]): boolean {
+        return arr1.some(el => arr2.includes(el));
+    }
 
     //Function to assign roles
     const assignRole = async (userId: FixMeLater, roleId: string) => {
@@ -114,7 +124,7 @@ const UsersProfile = () => {
             renderCell: (params: GridCellParams) => {
                 return(
                     <>
-                        {isAssigned(rolesNames, params.row.name) ? (
+                        {isAssigned(roleNames, params.row.name) ? (
                                 <Checkbox checked={true} color='success' onClick={() => {console.log(params.row)}}/>
                             ) : (
                                 <Checkbox color='success' onClick={() => {assignRole(user.id, params.row.id).then(()=>{window.location.reload()})}}/>
@@ -183,11 +193,7 @@ const UsersProfile = () => {
 
                             <Grid item xs={12}>
                                 <Box display={'flex'}>
-                                    {isEditing ? (
-                                        <Button onClick={handleCloseEdit} variant="contained">SAVE</Button>
-                                    ): (
-                                        <Button onClick={handleOpenEdit} variant="contained">EDIT PROFILE</Button>
-                                    )}
+                                    <Button onClick={handleOpenEdit} variant="contained">EDIT PROFILE</Button>
                                 </Box>
                             </Grid>
                         </Grid>
@@ -243,11 +249,13 @@ const UsersProfile = () => {
                 )
                 }
             </Grid>
+
+            {/* Modal For Assigning User Roles*/}
             <Modal
                     open={openAssign}
                     //onClose={handleClose} //close on clicking outside modal
-                    aria-labelledby="Add Institutional User"
-                    aria-describedby="Form for adding institutional users"
+                    aria-labelledby="Assign user with roles"
+                    aria-describedby="Form for assigning roles"
                     >
                     <Box sx={{
                         position: 'absolute',
@@ -302,6 +310,37 @@ const UsersProfile = () => {
                             />
                         </div>
                         </Box>
+                    </Box>
+                </Modal>
+
+                {/* edit user profile modal */}
+                <Modal
+                    open={isEditing}
+                    //onClose={handleClose} //close on clicking outside modal
+                    aria-labelledby="Verify Password"
+                    aria-describedby="Form for verifying current user password then deleting target user"
+                    >
+                    <Box sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 500,
+                        bgcolor: "#45A1FD",
+                        border: '1px solid #000',
+                        borderRadius: '20px',
+                        boxShadow: 24,
+                    }}>
+                        <div style={{textAlign: 'right'}}>
+                            <Button
+                            onClick={handleCloseEdit}
+                            sx={{color:'black', fontWeight: 'bolder', fontSize: '20px', paddingRight:0, borderRadius:'20px'}}>
+                                x
+                            </Button>
+                        </div>
+                        <div style={{padding: '15px', paddingTop: '0px'}}>
+                            <EditUserProfileHook/>
+                        </div>
                     </Box>
                 </Modal>
         </>
