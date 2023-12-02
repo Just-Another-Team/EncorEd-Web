@@ -67,6 +67,15 @@ export const assignUserToRole = createAsyncThunk(
     }
 )
 
+export const userBanRestore = createAsyncThunk(
+    "/users/ban-restore",
+    async (data: FixMeLater, {rejectWithValue}) => {
+        return await EncorEdUserService.userBanRestore(data)
+        .then((res) => res) 
+        .catch((error) => rejectWithValue(error))
+    }
+)
+
 const usersSlice = createSlice({
     name: 'users',
     initialState,

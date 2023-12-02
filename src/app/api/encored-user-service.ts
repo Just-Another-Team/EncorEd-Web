@@ -103,6 +103,10 @@ class EncorEdUserService {
     editUserProfile(data: FixMeLater) {
         return http.put(`/user/edit/profile/${data.id}`, data)
     }
+
+    userBanRestore(data: FixMeLater) {
+        return http.put(`/user/ban-restore/${data.id}`, data)
+    }
 }
 
 export default new EncorEdUserService()

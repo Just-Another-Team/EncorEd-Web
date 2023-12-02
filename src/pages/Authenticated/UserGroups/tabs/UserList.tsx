@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { 
-    Box, Button, Grid, TextField, Modal
+    Box, Button, Grid, TextField, Modal, Typography
 } from "@mui/material";
-import { DataGrid, GridCellParams, GridColDef, GridValueFormatterParams, GridValueGetterParams } from '@mui/x-data-grid'
+import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams, GridValueFormatterParams, GridValueGetterParams } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import { AddUserFormHook } from '../../../../components/Forms/Formhooks/AddUserForm-Hooks'
 import { getUsers } from "../../../../app/features/users/usersSlice";
@@ -43,22 +43,10 @@ const UserList = () => {
     const handleOpenVerif = () => setOpenVerif(true);
     const handleCloseVerif = () => setOpenVerif(false);
 
-    //roles form
-    const [openRoles, setOpenRoles] = useState(false);
-    const handleOpenRoles = () => setOpenRoles(true);
-    const handleCloseRoles = () => setOpenRoles(false);
-
     //delete user
     const handleVerification = (data: FixMeLater) => {
         targetDispatch(targetUser(data))
         handleOpenVerif()
-    }
-
-    //user roles
-    const handleRoles = (data: FixMeLater) => {
-        // targetDispatch(targetUser(data))
-        // targetDispatch(targetAction("Roles"))
-        handleOpenRoles()
     }
     
     //user roles
@@ -90,13 +78,32 @@ const UserList = () => {
             headerName: 'Date added',
             sortable: true,
             sortingOrder:['asc', 'desc'],
-            flex: 1,
+            flex: 0.3,
             valueGetter: (params: GridValueGetterParams) => {
               return dayjs(params.row.joinDate).format('MM-DD-YYYY')
             },
             valueFormatter: (params: GridValueFormatterParams) => {
                 return dayjs(params.value).format('MMMM-DD-YYYY')
             },
+        },
+        {
+            field: 'status',
+            headerName: 'Status',
+            flex: 0.4,
+            renderCell: (params: GridRenderCellParams) => (
+                <Typography variant="body2">
+                    {params.row.status === "Closed" && (
+                        <Typography color={"red"} variant="body2">
+                            {params.row.status}
+                        </Typography>
+                    )}
+                    {params.row.status === "Open" && (
+                        <Typography color={"green"} variant="body2">
+                            {params.row.status}
+                        </Typography>
+                    )}
+                </Typography>
+            )
         },
         {
             field: 'delete',

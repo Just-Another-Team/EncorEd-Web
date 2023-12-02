@@ -9,14 +9,18 @@ import { useDispatch, useSelector } from "react-redux";
 // import { getAllUsers } from "../../../../app/features/users/usersSlice";
 import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-hooks";
 import { FixMeLater } from "../../../../types/FixMeLater";
-import { User, getAllUsers } from "../../../../app/features/users/usersSlice";
+import { User, getAllUsers, userBanRestore } from "../../../../app/features/users/usersSlice";
+import { targetUser } from "../../../../app/features/users/targetSlice";
+import { useNavigate } from "react-router-dom";
 
 
 const UserList = () => {
     // const userInstitution = useAppSelector(state => state.institution.data.id)
     // const usersArr = useAppSelector(state => state.users.users)
+    const navigate = useNavigate()
 
     const usersDispatch = useAppDispatch()
+    const targetDispatch = useAppDispatch()
     
     const users = useAppSelector(state => state.users.data)
 
@@ -25,9 +29,30 @@ const UserList = () => {
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
+    const handleChange = (data: FixMeLater) => {
+        targetDispatch(targetUser(data))
+        usersDispatch(userBanRestore(data))
+        .then(() => {
+            window.location.reload()
+        })
+    }
+
     useEffect(()=>{
         usersDispatch(getAllUsers())
     }, [])
+
+    //searching user
+    const [searchedUsers, setSearchedUsers] = useState(users)
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const searchResult =  users.filter((val) => val.firstName.toUpperCase().includes(e.currentTarget.value.toUpperCase()) || val.lastName.toUpperCase().includes(e.currentTarget.value.toUpperCase()))
+        setSearchedUsers(searchResult)
+    }
+
+    //user profile
+    const handleProfile = (data: FixMeLater) => {
+        targetDispatch(targetUser(data))
+        navigate(`/admin/dashboard/profile/${data}`)
+    }
 
     // Must be changed
     const columns: GridColDef[] = [
@@ -62,35 +87,46 @@ const UserList = () => {
         {
             field: 'status',
             headerName: 'Status',
-            flex: 0.3,
+            flex: 0.4,
             renderCell: (params: GridRenderCellParams<User>) => (
-                <Typography color={params.row.status === "Closed" ? "red" : "black"} variant="body2">{params.row.status}</Typography>
+                <Typography variant="body2">
+                    {params.row.status == "Closed" && (
+                        <Typography color={"red"} variant="body2">
+                            {params.row.status}
+                        </Typography>
+                    )}
+                    {params.row.status == "Open" && (
+                        <Typography color={"green"} variant="body2">
+                            {params.row.status}
+                        </Typography>
+                    )}
+                    {params.row.status == "BANNED" && (
+                        <Typography color={"black"} variant="body2" fontWeight={"bold"}>
+                            {params.row.status}
+                        </Typography>
+                    )}
+                </Typography>
             )
         },
-        // {
-        //     field: 'update',
-        //     sortable: false,
-        //     renderHeader: () => (
-        //         <span></span>
-        //     ),
-        //     renderCell: (params: GridCellParams) => {
-        //         return (
-        //             <Button onClick={(e) => {console.log(params.row)}} variant="contained" color="primary" >UPDATE</Button>
-        //         )
-        //     }
-        // },
         {
-            field: 'delete',
+            field: 'ban/restore',
             sortable: false,
             renderHeader: () => (
                 <span></span>
             ),
             renderCell: (params: GridCellParams) => {
-                return (
-                    <Button variant="contained" color="error" >BAN</Button>
+                return(
+                <>
+                    {params.row.status === "Open" && (
+                        <Button variant="contained" color="error" onClick={e => {handleChange(params.row)}}>BAN</Button>
+                    )}
+                    {params.row.status === "BANNED" && (
+                        <Button variant="contained" color="success" onClick={e => {handleChange(params.row)}}>RESTORE</Button>
+                    )}
+                </>
                 )
             }
-        }
+        },
     ];
 
     return(
@@ -98,7 +134,7 @@ const UserList = () => {
             <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} marginBottom={2}>
                 <Button onClick={handleOpen} variant="contained" size="large">ADD USER</Button>
                 <Grid container xs={4}>
-                    <TextField label="Search User" fullWidth/>
+                    <TextField onChange={handleSearch} label="Search User" fullWidth/>
                 </Grid>
 
                 <Modal
@@ -132,8 +168,10 @@ const UserList = () => {
             <Box height={560}  marginBottom={2}>
 
                 <DataGrid   
-                    rows={users}
+                    rows={searchedUsers}
                     columns={columns}
+                    hideFooterSelectedRowCount
+                    onRowDoubleClick={(e) => {handleProfile(e.row.email)}}
                     initialState={{
                         pagination: {
                             paginationModel: { page: 0, pageSize: 10},
