@@ -26,6 +26,9 @@ userRouter.get("/list/auth/:email", userService.viewAuth)
 //Delete
 userRouter.put("/delete/:id", userService.delete)
 
+//Ban/Restore
+userRouter.put("/ban-restore/:id", userService.userBanRestore)
+
 //View
 userRouter.get("/list/u/:institution/:user", userService.viewAllByInstitution)
 userRouter.get("/profile/:id", userService.viewUser)
