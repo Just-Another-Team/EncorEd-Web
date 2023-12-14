@@ -11,17 +11,13 @@ class Subject {
         return http.post(`/subject/add/all`, data)
     }
 
-    // updateSubject(data) {
-    //     console.log(data)
-    // }
-
     deleteSubject(subjectId: string) {
         return http.delete(`/subject/delete/${subjectId}`)
     }
 
-    // viewSubject(data) {
-    //     console.log(data)
-    // }
+    deleteSubjectSchedule(subjectId: string) {
+        return http.delete(`/subject/schedule/delete/${subjectId}`)
+    }
 
     viewSubjectsByInstitution(institutionId: string) {
         return http.get(`/subject/list/u/${institutionId}`)

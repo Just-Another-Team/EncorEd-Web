@@ -1,6 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import Subject from "../../api/encored-subject-service"
 import { FixMeLater } from "../../../types/FixMeLater";
+import { Dayjs } from "dayjs";
 
 export type DetailsInput = {
     id?: string;
@@ -18,9 +19,16 @@ export type DetailsInput = {
     status?: string
 }
 
+export type ScheduleInput = {
+    startTime: Dayjs;
+    endTime: Dayjs;
+    assignDays: Array<string>;
+    status?: string;
+}
+
 export type SubjectInput = {
     details?: DetailsInput | undefined;
-    schedule?: undefined;
+    schedule?: ScheduleInput | undefined;
     createdBy?: string;
     institution?: string;
 }
@@ -55,6 +63,13 @@ export const deleteSubject = createAsyncThunk(
     "subject/institution/delete",
     async (subjectId: string, {rejectWithValue}) => {
         return await Subject.deleteSubject(subjectId).catch(error => rejectWithValue(error))
+    }
+)
+
+export const deleteSubjectSchedule = createAsyncThunk(
+    "subject/schedule/institution/delete",
+    async (subjectId: string, {rejectWithValue}) => {
+        return await Subject.deleteSubjectSchedule(subjectId).catch(error => rejectWithValue(error))
     }
 )
 

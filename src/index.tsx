@@ -9,6 +9,8 @@ import { ThemeProvider } from '@emotion/react';
 import { defaultTheme } from './styles/defaultTheme';
 import store, { persistor } from './app/encored-store';
 import { PersistGate } from 'redux-persist/integration/react';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -16,13 +18,19 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      {/* <PersistGate loading={null} persistor={persistor}> */}
-        <BrowserRouter>
-          <ThemeProvider theme={defaultTheme}>
-            <App />
-          </ThemeProvider>
-        </BrowserRouter>
-      {/* </PersistGate> */}
+      <PersistGate loading={null} persistor={persistor}>
+
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+
+          <BrowserRouter>
+            <ThemeProvider theme={defaultTheme}>
+              <App />
+            </ThemeProvider>
+          </BrowserRouter>
+          
+        </LocalizationProvider>
+        
+      </PersistGate>
     </Provider>
   </React.StrictMode>
 );

@@ -193,16 +193,14 @@ const Profile = () => {
                             </Grid>
                             <Grid item xs={12}>
                                 <List>
-                                    {/* {roles.data.map((role, ind) => (
-                                        <ListItem key={ind}>
-                                            <ListItemText primary={`${role.name!.charAt(0).toUpperCase()}${role.name!.slice(1)}`} />
-                                        </ListItem>
-                                    ))} */}
-                                    {(roles.data.name as Array<string>).map((name, ind) => (
-                                        <ListItem key={ind}>
-                                            <ListItemText primary={`${name}`} />
-                                        </ListItem>
-                                    ))}
+                                    {Array.isArray(roles.data.name) ? 
+                                        (roles.data.name as Array<string>).map((name, ind) => (
+                                            <ListItem key={ind}>
+                                                <ListItemText primary={`${name}`} />
+                                            </ListItem>
+                                        )) : 
+                                        roles.data.name
+                                    }
                                 </List>
                             </Grid>
                         </Grid>
@@ -221,25 +219,6 @@ const Profile = () => {
                             {inputs.map((el, ind) => {
                                 return(
                                     <Grid key={el.key} item xs={el.key === "firstName" || el.key === "lastName" ? 6 : 12}>
-                                        {/* <Controller
-                                        name={el.key}
-                                        control={control}
-                                        rules={{
-                                            required: (el.key !== 'password' && el.key !== 'confirmPassword') && `${el.label} is required`,
-                                            minLength: el.key === "password" ? {
-                                                value: 8,
-                                                message: "Password must be 8 characters long"
-                                            } : null
-                                        }} Give each controller the error
-                                        render={({field}) => (
-                                            <TextField
-                                            fullWidth
-                                            label={el.label}
-                                            type={el.type}
-                                            error={el.error ? true : false}
-                                            helperText={el.error ? el.error.message : null}
-                                            {...field}/>
-                                        )}/> */}
                                         <FormInputTextField
                                         fullWidth
                                         name={el.key}

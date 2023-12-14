@@ -97,19 +97,17 @@ const LoginUserForm = () => {
                 if (rolesResult.data.appAdmin) navigate("/admin/dashboard/home")
                 else navigate("/dashboard/home")
 
-                // console.log(roles.data.find(role => role.appAdmin) != undefined)
-                // if (roles.data.find(role => role.appAdmin)) navigate("/admin/dashboard/home")
-                // else navigate("/dashboard/home")
-
                 reset();
             })
             .catch((error) => {
-                console.error("Error", error)
+                //TO-DO: Must be transferred in Service/Slice instead
 
-                if ((error.code === "ERR_BAD_REQUEST" && error.response.data.code === "firestore/missing-email") || error.code === "auth/user-not-found") // 
-                    setError("email", {message: "Email not found. Please register"})
+                if (error.code === "ERR_NETWORK") {
+                    alert("Network Error")
+                    return;
+                }
 
-                if (error.code === 'auth/missing-email')
+                if (error.response.data.code === "firestore/missing-email" || error.code === "auth/user-not-found" || error.code === 'auth/missing-email') // 
                     setError("email", {message: "Email not found. Please register"})
 
                 if (error.code === "auth/network-request-failed")

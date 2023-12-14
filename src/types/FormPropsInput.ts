@@ -18,5 +18,13 @@ export type FormPropsInput = {
     color?: OverridableStringUnion<"error" | "primary" | "secondary" | "info" | "success" | "warning", TextFieldPropsColorOverrides> | undefined,
     sx?: SxProps<Theme> | undefined
 
+    formControlProps?: SxProps<Theme> | undefined;
+    selectProps?: SxProps<Theme> | undefined;
+
+    options?: Array<{ label: string; value: string; }>;
+    defaultValue?: string;
+
     InputProps?: Partial<OutlinedInputProps> | Partial<InputProps> | Partial<FilledInputProps> | undefined
+
+    setValue?: any
 }

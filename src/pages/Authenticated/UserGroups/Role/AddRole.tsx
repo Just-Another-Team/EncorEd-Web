@@ -334,7 +334,7 @@ const AddRole = () => {
     ]
 
     const options = [
-        //{label: "Admin", value: "admin"},
+        {label: "Choose user type", value: ""},
         {label: "Employee", value: "employee"},
         {label: "Teacher", value: "teacher"},
         {label: "Student", value: "student"},
@@ -342,8 +342,6 @@ const AddRole = () => {
     ]
 
     const handleInput = (data: RoleInput) => {
-        
-        console.log(data)
         dispatch(addRole(data)).unwrap()
             .then(() => {
                 alert("Role added successfully!")

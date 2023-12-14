@@ -13,6 +13,7 @@ import PostAddIcon from '@mui/icons-material/PostAdd';
 import { useAppDispatch, useAppSelector } from "../../../app/encored-store-hooks"
 import { useCallback, useEffect, useMemo } from "react"
 import { Permission } from "../../../types/RoleTypes/Permission"
+import { FixMeLater } from "../../../types/FixMeLater"
 
 export type LinkType = {
     key: string
@@ -21,7 +22,10 @@ export type LinkType = {
     href: string
 }
 
-const ConnectedSideBar = () => {
+const ConnectedSideBar = ({
+    open,
+    onClose
+}: FixMeLater) => {
     const select = useAppDispatch()
 
     const roles = useAppSelector(state => state.assignRole.data)
@@ -45,23 +49,6 @@ const ConnectedSideBar = () => {
         {key: "institution", name: "Institutions", icon: <OrganizationOutline />, href: "/admin/dashboard/institutions"},
     ]
 
-    // LATER
-    // const selectNavigations = useMemo(() => {
-    //     const roleType = roles.filter(role => typeof role?.employee !== 'boolean')
-    //     const employeePermissions = roleType.map(role => role.employee)
-    
-    //     return navigations.filter(navigation => {
-    //         return employeePermissions.find(permission => (permission as Permission).viewUser || (permission as Permission).viewGroup || (permission as Permission).viewRole) == undefined ? navigation.key != "userGroups" : navigation
-    //     })
-    // },[])
-
-    // useEffect(() => {
-    //     const roleType = roles.filter(role => typeof role?.employee !== 'boolean')
-    //     const employeePermissions = roleType.map(role => role.employee)
-
-    //     console.log(employeePermissions.find(permission => (permission as Permission).viewUser || (permission as Permission).viewGroup || (permission as Permission).viewRole))
-    // }, [])
-
     return (
         <Sidebar 
         //navigations={(userRole.find(data => data._systemRole._employee) && navigations) || (userRole.find(data => data._systemRole._superAdmin) && adminNavigations)}
@@ -82,6 +69,8 @@ const ConnectedSideBar = () => {
                 return el;
             })
         }
+        open={open}
+        onClose={onClose}
         select={select}
         selectedPage={selectedPage}
         />

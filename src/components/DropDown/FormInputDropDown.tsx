@@ -1,9 +1,17 @@
 import React from 'react'
 import { FormControl, MenuItem, InputLabel, Select } from '@mui/material'
-import { Controller } from 'react-hook-form' 
+import { Control, Controller, FieldValue, FieldValues } from 'react-hook-form' 
 import { FixMeLater } from '../../types/FixMeLater'
+import { FormPropsInput } from '../../types/FormPropsInput'
 
-const FormInputDropDown = ({
+// type InputDropDownType = {
+//     name: string;
+//     control?: Control<FieldValues> | undefined;
+//     label: string;
+//     rules?: 
+// }
+
+const FormInputDropDown: React.FC<FormPropsInput> = ({
     name,
     control,
     label,
@@ -13,7 +21,7 @@ const FormInputDropDown = ({
     selectProps,
     fullWidth,
     defaultValue
-}: FixMeLater) => {
+}) => {
 
     return(
         <FormControl fullWidth={fullWidth} sx={formControlProps}>
@@ -31,7 +39,7 @@ const FormInputDropDown = ({
                 sx={selectProps}
                 fullWidth={fullWidth}
                 error={!!error}>
-                    {options.map((option: FixMeLater) => {
+                    {options?.map((option) => {
                         return(
                             <MenuItem key={option.value} value={option.value}>
                                 {option.label}

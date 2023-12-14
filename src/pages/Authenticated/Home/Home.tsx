@@ -115,7 +115,7 @@ const Home = () => {
                     <Stack height={208} gap={2} overflow={'auto'}>
                         {
                         subjectRequestLength > 0 ? Array.from({length: subjectRequestLength}).map((el, ind) => (
-                            <SubjectEventCard key={ind} height={null} sx={{paddingTop: 1, paddingBottom: 1}}>
+                            <SubjectEventCard key={ind} height={"auto"} sx={{paddingTop: 1, paddingBottom: 1}}>
                                 <Grid container>
                                     <Grid item xs={12}>
                                         <Typography variant="h5" fontWeight={700}>Subject Title {ind + 1}</Typography>
@@ -144,7 +144,7 @@ const Home = () => {
                     <Stack height={208} gap={2} overflow={'auto'}>
                         {
                         eventRequestLength > 0 ? Array.from({length: eventRequestLength}).map((el, ind) => (
-                            <SubjectEventCard key={ind} height={null} sx={{paddingTop: 1, paddingBottom: 1}}>
+                            <SubjectEventCard key={ind} height={"auto"} sx={{paddingTop: 1, paddingBottom: 1}}>
                                 <Grid container>
                                     <Grid item xs={12}>
                                         <Typography variant="h5" fontWeight={700}>Event Title 1</Typography>

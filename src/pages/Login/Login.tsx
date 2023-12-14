@@ -30,9 +30,7 @@ const Login = () => {
                 <img alt="EncorEd Logo" src="/assets/LoginLogo.svg" width={224} height={224}/>
                 
                 <LoginUserForm />
-                
-                {/* <Typography variant="h6">Don't have an account? <Link to="/register/user" style={{color:"indigo"}}>Sign Up</Link></Typography> */}
-                {/* <h4>Don't have an account? <a style={{color:"indigo"}} href="/register/user">Sign Up</a></h4> */}
+
             </Container>
         </>
     )

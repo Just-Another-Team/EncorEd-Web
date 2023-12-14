@@ -24,7 +24,13 @@ const CustomListItemButton = <C extends React.ElementType>(props: ListItemButton
     return (<ListItemButton {...props}>{props.children}</ListItemButton>)
 }
 
-const Sidebar = ({navigations, select, selectedPage}: FixMeLater) => {
+const Sidebar = ({
+    navigations,
+    select,
+    selectedPage,
+    open,
+    onClose
+}: FixMeLater) => {
 
     const theme = useTheme()
     const belowMid = useMediaQuery(theme.breakpoints.down("md"))
@@ -33,6 +39,8 @@ const Sidebar = ({navigations, select, selectedPage}: FixMeLater) => {
     return(
         <Drawer
         variant={!belowMid ? "permanent" : "temporary"}
+        open={open}
+        onClose={onClose}
         sx={{
             width: drawerWidth,
             flexShrink: 0,

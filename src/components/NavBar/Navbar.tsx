@@ -26,7 +26,11 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { resetSubjects } from "../../app/features/subject/subjectSlice";
 
 
-const Navbar = () => {
+const Navbar = ({
+    openSidebar,
+    onOpenSidebar,
+    onCloseSidebar
+}: FixMeLater) => {
     const user = useAppSelector(state => state.authentication.data)
     //const role = useAppSelector(state => state.roles)
 
@@ -52,6 +56,11 @@ const Navbar = () => {
         navigate("/login")
     }
 
+    const handleSidebar = (e: FixMeLater) => {
+        if (openSidebar) onCloseSidebar(e)
+        else if (!openSidebar) onOpenSidebar(e)
+    }
+
     return(
         <AppBar
         position="fixed"
@@ -67,6 +76,7 @@ const Navbar = () => {
                 flex={1}>
                     <IconButton
                     size="small"
+                    onClick={handleSidebar}
                     sx={{
                         display: !belowMid ? "none" : "block",
                         color: "#FFFFFF"

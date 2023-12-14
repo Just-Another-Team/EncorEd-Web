@@ -4,10 +4,11 @@ import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogCo
 import { DetailsInput } from '../../../app/features/subject/subjectSlice'
 
 type DialogType = {
-    open: boolean
-    value?: DetailsInput
-    valueType?: string
-    handleConfirmation: React.MouseEventHandler<HTMLButtonElement>
+    open: boolean;
+    //title: string;
+    value?: DetailsInput;
+    valueType?: string;
+    handleConfirmation: React.MouseEventHandler<HTMLButtonElement>;
     handleClose?: React.MouseEventHandler<HTMLButtonElement> | undefined
 }
 

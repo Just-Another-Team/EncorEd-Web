@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { 
     Box,
     Tabs,
@@ -17,17 +17,26 @@ import { FixMeLater } from "../../../types/FixMeLater";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import CustomTab from "../../../components/Tab/CustomTab";
 import { Link } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../../app/encored-store-hooks";
+import { getSubjects } from "../../../app/features/subject/subjectSlice";
 
 const Subject = () => {
     const navigate = useNavigate();
 
-    const { institution } = useParams();
+    const dispatch = useAppDispatch();
+
+    const institution = useAppSelector(state => state.institution.data)
+    const subjects = useAppSelector(state => state.subject.data.map(el => el.details))
 
     const [page, setPage] = React.useState(0);
 
     const handleChange = (event: FixMeLater, newValue: FixMeLater) => {
         setPage(newValue);
     };
+
+    useEffect(() => {
+        dispatch(getSubjects(institution.id!))
+    }, [])
 
     return(
         <>

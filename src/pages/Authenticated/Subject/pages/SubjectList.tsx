@@ -37,7 +37,6 @@ const SubList = () => {
     const handleConfirmDelete = (value: DetailsInput) => {
         dispatch(deleteSubject(value.id!)).unwrap()
             .then(() => {
-                // alert("Subject successfully deleted!")
                 handleClickClose();
                 navigate(0)
             })
@@ -53,9 +52,7 @@ const SubList = () => {
     }
 
     useEffect(() => {
-        dispatch(getSubjects(institution.id!)).unwrap().then((result) => {
-            setSubjectList(result.data.map((el: SubjectInput) => el.details))
-        })
+        setSubjectList(subjects)
     }, [])
 
     const columns: GridColDef[] = [
@@ -119,9 +116,10 @@ const SubList = () => {
             minWidth: 128,
         },
         {
-            field: 'delete',
+            field: 'actions',
             sortable: false,
             width: 64,
+            disableColumnMenu: true,
             renderHeader: () => (
                 <span></span>
             ),
@@ -186,7 +184,12 @@ const SubList = () => {
                 />
             </Box>
 
-            <EnsureDialog open={openEnsureDialog} value={dialogTarget} valueType={"subject"} handleClose={handleClickClose} handleConfirmation={(e) => {handleConfirmDelete(dialogTarget)}}/>
+            <EnsureDialog
+            open={openEnsureDialog}
+            value={dialogTarget}
+            valueType={"subject schedule"}
+            handleClose={handleClickClose}
+            handleConfirmation={(e) => {handleConfirmDelete(dialogTarget)}}/>
         </>
     )
 }

@@ -6,18 +6,26 @@ import {
     Typography
 } from '@mui/material'
 import Navbar from "../../components/NavBar/Navbar";
-import Sidebar from "../../components/NavBar/Sidebar";
 import { Outlet } from "react-router-dom";
-import { useSelector } from "react-redux";
 import ConnectedSideBar from "../../components/NavBar/hooks/SidebarHook";
+import { FixMeLater } from "../../types/FixMeLater";
 
 
 const Dashboard = () => {
 
+    const [ openSidebar, setOpenSidebar ] = React.useState<boolean>(false);
+
+    const handleOpenSidebar = (e: FixMeLater) => {
+        setOpenSidebar(true)
+    }
+    const handleCloseSidebar = (e: FixMeLater) => {
+        setOpenSidebar(false)
+    }
+
     return(
         <Box sx={{display: 'flex'}}>
-            <Navbar />
-            <ConnectedSideBar />
+            <Navbar openSidebar={openSidebar} onOpenSidebar={handleOpenSidebar} onCloseSidebar={handleCloseSidebar} />
+            <ConnectedSideBar open={openSidebar} onClose={handleCloseSidebar}/>
             <Container maxWidth="lg" component="main" sx={{ flexGrow: 1, p: 3, }}>
                 <Toolbar variant="regular"/>
                 

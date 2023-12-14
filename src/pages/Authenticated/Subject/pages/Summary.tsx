@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { 
     Box,
     Grid,
@@ -12,9 +12,13 @@ import {
     TableRow,
     Typography 
 } from "@mui/material";
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid'
 import SubjectEventCard from "../../../../components/Cards/SubjectEventCard";
 import { FixMeLater } from "../../../../types/FixMeLater";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-hooks";
+import { SubjectInput } from "../../../../app/features/subject/subjectSlice";
+import dayjs from "dayjs";
 
 type OngoingSubjectType = {
     id: string | number
@@ -25,45 +29,6 @@ type OngoingSubjectType = {
     createdBy: string
     status: string
 }
-
-// Must be changed
-const columns = [
-    { 
-        field: 'id',
-        headerName: 'Id',
-        flex: 0.5
-    },
-    { 
-        field: 'name',
-        headerName: 'Subject Name',
-        flex: 1
-    },
-    { 
-        field: 'edpCode',
-        headerName: 'EDP',
-        flex: 1
-    },
-    {
-        field: 'subjectType',
-        headerName: 'Type',
-        flex: 1
-    },
-    {
-        field: 'units',
-        headerName: 'Units',
-        flex: 1,
-    },
-    {
-        field: 'createdBy',
-        headerName: 'Created By',
-        flex: 1,
-    },
-    {
-        field: 'status',
-        headerName: 'Status',
-        flex: 1,
-    },
-];
 
 const subject = (
     id: string | number,
@@ -77,18 +42,78 @@ const subject = (
     return {id: id, name: name, edpCode: edpCode, subjectType: subjectType, units: units, createdBy: createdBy, status: status} as OngoingSubjectType
 }
 
-const rows: Array<OngoingSubjectType> = [
-    subject(1, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
-    subject(2, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
-    subject(3, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
-    subject(4, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
-    subject(5, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
-    subject(6, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
-    subject(7, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
-    subject(8, "Subject 1", 75343, "Lecture", 3, "Admin", "Ongoing"),
-];
-
 const SubSummary = () => {
+
+    const navigate = useNavigate();
+
+    const dispatch = useAppDispatch();
+
+    const institution = useAppSelector(state => state.institution.data)
+    const subjectSchedule = useAppSelector(state => state.subject.data.filter(el => el.schedule && dayjs().isBefore(el.schedule!.startTime, 'minutes')))
+
+    const [ ongoingSubjectList, setOngoingSubjectList ] = React.useState<any>([])
+
+    useEffect(() => {
+        setOngoingSubjectList(subjectSchedule)
+    }, [])
+
+    // Must be changed
+    const columns: Array<GridColDef<SubjectInput>> = [
+        { 
+            field: 'id',
+            headerName: 'Id',
+            flex: 0.5
+        },
+        { 
+            field: 'name',
+            headerName: 'Subject Name',
+            flex: 1,
+            valueGetter: (params: GridValueGetterParams<SubjectInput>) => {
+                return params.row.details!.name
+            },
+        },
+        { 
+            field: 'edpCode',
+            headerName: 'EDP',
+            flex: 1,
+            valueGetter: (params: GridValueGetterParams<SubjectInput>) => {
+                return params.row.details!.edpCode
+            },
+        },
+        {
+            field: 'subjectType',
+            headerName: 'Type',
+            flex: 1,
+            valueGetter: (params: GridValueGetterParams<SubjectInput>) => {
+                return params.row.details!.type
+            },
+        },
+        {
+            field: 'units',
+            headerName: 'Units',
+            flex: 1,
+            valueGetter: (params: GridValueGetterParams<SubjectInput>) => {
+                return params.row.details!.units
+            },
+        },
+        {
+            field: 'createdBy',
+            headerName: 'Created By',
+            flex: 1,
+            valueGetter: (params: GridValueGetterParams<SubjectInput>) => {
+                return params.row.details!.createdBy
+            },
+        },
+        {
+            field: 'status',
+            headerName: 'Status',
+            flex: 1,
+            valueGetter: (params: GridValueGetterParams<SubjectInput>) => {
+                return params.row.details!.status
+            },
+        },
+    ];
+
     return(
         <>            
             <Box marginBottom={2}>
@@ -98,8 +123,9 @@ const SubSummary = () => {
 
                 <Box height={370}>
                     <DataGrid
-                        rows={rows}
+                        rows={ongoingSubjectList}
                         columns={columns}
+                        getRowId={(row) => row.details!.id!}
                         initialState={{
                             pagination: {
                                 paginationModel: { page: 0, pageSize: 5 },
