@@ -45,6 +45,7 @@ const AddSubject = () => {
 
     const [showSchedule, setShowSchedule] = useState(false);
     const [subjects, setSubjects] = useState<Array<SubjectInput>>([])
+    const [selectedItems, setSelectedItems] = useState<Array<string>>([]);
 
     const {handleSubmit, reset, resetField, control, getValues, setValue, formState: {errors}, unregister} = useForm<SubjectInput>({
         defaultValues: {
@@ -54,25 +55,22 @@ const AddSubject = () => {
                 units: 0,
                 type: ""
             },
-            schedule: {
-                startTime: dayjs(),
-                endTime: dayjs(),
-                assignDays: [],
-            },
+            schedule: undefined,
             createdBy: user,
             institution: institution
         }
     })
 
     const handleInput = (data: SubjectInput) => {
-        if (data.schedule !== undefined)
-            Object.assign(data, {schedule: {
-                startTime: data.schedule?.startTime,
-                endTime: data.schedule?.endTime,
-                assignDays: data.schedule.assignDays
-            }});
-        setSubjects(prev => [...prev, data])
+        // if (data.schedule !== undefined)
+        //     Object.assign(data, {schedule: {
+        //         startTime: data.schedule?.startTime,
+        //         endTime: data.schedule?.endTime,
+        //         assignDays: data.schedule.assignDays
+        //     }});
+        // setSubjects(prev => [...prev, data])
 
+        // setSelectedItems([]);
         reset();
     }
     const removeInput = (index: number) => {
@@ -95,8 +93,8 @@ const AddSubject = () => {
     const openSchedule = (e: FixMeLater) => {
         setShowSchedule(true)
 
-        // setValue('schedule.startTime', dayjs());
-        // setValue('schedule.endTime', dayjs());
+        setValue('schedule.startTime', dayjs().toDate());
+        setValue('schedule.endTime', dayjs().toDate());
     }
 
     const closeSchedule = (e: FixMeLater) => {
@@ -177,7 +175,7 @@ const AddSubject = () => {
                                         name="schedule.startTime"
                                         control={control}
                                         rules={{
-                                            validate: value => (!value.isAfter(getValues("schedule.endTime")) && !value.isSame(getValues("schedule.endTime")))
+                                            validate: value => (!dayjs(value).isAfter(getValues("schedule.endTime")) && !dayjs(value).isSame(getValues("schedule.endTime")))
                                         }}
                                         label="Start"/>
 
@@ -187,7 +185,7 @@ const AddSubject = () => {
                                         name="schedule.endTime"
                                         control={control}
                                         rules={{
-                                            validate: value => (!value.isBefore(getValues("schedule.startTime")) && !value.isSame(getValues("schedule.startTime"))) || "Start time must not be greater than or equal to End time!"
+                                            validate: value => (!dayjs(value).isBefore(getValues("schedule.startTime")) && !dayjs(value).isSame(getValues("schedule.startTime"))) || "Start time must not be greater than or equal to End time!"
                                         }}
                                         label="End"/>
                                     </Stack>
@@ -200,6 +198,8 @@ const AddSubject = () => {
                                 <Grid xs={12} item>
                                     <FormInputMultiCheckbox
                                     name="schedule.assignDays"
+                                    selectedItems={selectedItems}
+                                    setSelectedItems={setSelectedItems}
                                     control={control}
                                     label="Weekly Schedule"
                                     options={weeks}
@@ -272,7 +272,7 @@ const AddSubject = () => {
                                             </Box>
                                         </Grid>
                                         <Grid xs={12} item>
-                                            <Typography variant="body1">{el.schedule!.startTime.format("hh:mm A")} - {el.schedule!.endTime.format("hh:mm A")}</Typography>
+                                            <Typography variant="body1">{dayjs(el.schedule!.startTime).format("hh:mm A")} - {dayjs(el.schedule!.endTime).format("hh:mm A")}</Typography>
                                         </Grid>
                                     </Grid>
                                 )}

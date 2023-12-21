@@ -4,17 +4,22 @@ import { Controller } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { FixMeLater } from "../../types/FixMeLater";
 
+type MultiCheckboxProp = {
+    selectedItems: Array<string>;
+    setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>;
+} & FormPropsInput
 
-const FormInputMultiCheckbox: React.FC<FormPropsInput> = ({
+const FormInputMultiCheckbox: React.FC<MultiCheckboxProp> = ({
     name,
     control,
     //rules,
     label,
     options,
     setValue,
+    selectedItems,
+    setSelectedItems
 }) => {
-    //selectedItems must be cleared on reset
-    const [selectedItems, setSelectedItems] = useState<Array<string>>([]);
+    //const [selectedItems, setSelectedItems] = useState<Array<string>>([]);
 
     // we are handling the selection manually here
     const handleSelect = (value: FixMeLater) => {

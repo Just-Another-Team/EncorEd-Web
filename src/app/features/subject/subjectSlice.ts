@@ -20,8 +20,8 @@ export type DetailsInput = {
 }
 
 export type ScheduleInput = {
-    startTime: Dayjs;
-    endTime: Dayjs;
+    startTime: Date;
+    endTime: Date;
     assignDays: Array<string>;
     status?: string;
 }

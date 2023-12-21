@@ -22,7 +22,7 @@ export type FormPropsInput = {
     selectProps?: SxProps<Theme> | undefined;
 
     options?: Array<{ label: string; value: string; }>;
-    defaultValue?: string;
+    defaultValue?: any;
 
     InputProps?: Partial<OutlinedInputProps> | Partial<InputProps> | Partial<FilledInputProps> | undefined
 

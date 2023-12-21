@@ -1,6 +1,7 @@
 import { TimePicker } from "@mui/x-date-pickers"
 import { Controller } from "react-hook-form"
 import { FormPropsInput } from "../../types/FormPropsInput"
+import dayjs from "dayjs"
 
 
 const InputTimePicker = ({ 
@@ -20,7 +21,7 @@ const InputTimePicker = ({
         }) => (
             <TimePicker
             label={label}
-            value={value}
+            value={dayjs(value)}
             onChange={onChange}
             slotProps={{
                 textField: {
