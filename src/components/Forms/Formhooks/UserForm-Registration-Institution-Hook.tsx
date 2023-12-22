@@ -7,19 +7,10 @@ import { signUp } from "../../../app/features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import { addInstitution } from "../../../app/features/institution/authInstitutionSlice";
 import { addAdminRole, assignAdminRole } from "../../../app/features/role/authRoleSlice";
-// import { assignInstitution } from "../../../app/features/auth/authSlice";
-// import { addAdminRole, assignAdminRole, viewAssignedRoles } from "../../../app/features/role/authRoleSlice";
-// import { setInstitution } from "../../../app/features/institution/institutionSlice";
-// import { setRoles } from "../../../app/features/role/roleSlice";
-
 const RegistrationInstitutionForm = () => {
     const navigate = useNavigate()
 
     const registeredUser = useAppSelector(state => state.authentication.data);
-    // const user = useSelector(state => state.user)
-    // const authUser = useSelector(state => state.authentication)
-    // const authInstitution = useSelector(state => state.authInstitution)
-    // const authRoles = useSelector(state => state.authRole)
 
     const dispatch = useAppDispatch();
 
@@ -34,9 +25,9 @@ const RegistrationInstitutionForm = () => {
 
     const inputs: Array<RegisterFormInput> = [
         {key: 'institution.name', label: "Institution name", type: "text", rules: {required: "Institution name is required."}, },
-        {key: 'institution.desc', label: "Description", type: "text", rules: {required: "Give at least a small description of the institution."}, rows: 4,},
-        // {key: 'businessPermit', label: "Business Permit", type: "file", rules: {required: "Business permit is required."},},
-        // {key: 'file', label: "File", type: "file", rules: {required: "Random file test"},},
+        // {key: 'institution.desc', label: "Description", type: "text", rules: {required: "Give at least a small description of the institution."}, rows: 4,},
+        {key: 'businessPermit', label: "Business Permit", type: "file", rules: {required: "Business permit is required."},},
+        {key: 'chedDoc', label: "CHED Document", type: "file", rules: {required: "Random file test"},},
     ]
 
     const onSubmit = (institutionCredential: RegisterFormCredential) => {

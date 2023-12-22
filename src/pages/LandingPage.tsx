@@ -7,6 +7,7 @@ import {
     Button,
     Stack
 } from '@mui/material'
+import {LandingPagePrimaryButton, LandingPageSecondaryButton} from "../components/Buttons/LandingPageButton"
 
 const LandingPage = () => {
     return (
@@ -47,9 +48,10 @@ const LandingPage = () => {
                     </Typography>
 
                     <Stack direction={"row"} spacing={2}>
-                        {/* <Button size="large" variant="contained">SIGN IN</Button> */}
-                        <Button size="large" href="login" variant="contained">SIGN IN</Button>
-                        <Button size="large" href="register/user" variant="outlined">SIGN UP</Button>
+                        <LandingPagePrimaryButton size="large" href="login" variant="contained">SIGN IN</LandingPagePrimaryButton>
+                        {/* <Button size="large" href="login" variant="contained">SIGN IN</Button> */}
+                        <LandingPageSecondaryButton size="large" href="login" variant="outlined">SIGN IN</LandingPageSecondaryButton>
+                        {/* <Button size="large" href="register/user" variant="outlined">SIGN UP</Button> */}
                     </Stack>
                 </Stack>
             </Box>

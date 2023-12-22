@@ -62,8 +62,21 @@ const UserForm = ({
                     </Grid>
                 )}
 
-                {inputs.map((el, ind: FixMeLater) => (
+                {inputs.map((el, ind) => (
                     <Grid key={ind} item xs={type === "register" && (el.key === "firstName" || el.key === "lastName") ? 6 : 12}>
+                        {el.type === "file" ?
+                        <Box display="flex" gap={1}>
+                            <Button
+                            variant="contained"
+                            component="label">
+                                {`Upload ${el.label}`}
+                                <input
+                                type="file"
+                                accept="application/pdf"
+                                hidden/>
+                            </Button>
+                            <Typography variant="body2" align="center">{null}</Typography>
+                        </Box> :
                         <FormInputTextField
                         name={el.key}
                         control={control}
@@ -73,7 +86,7 @@ const UserForm = ({
                         variant='outlined'
                         type={el.type}
                         InputProps={el.icon}
-                        fullWidth/>
+                        fullWidth/>}
                     </Grid>
                 ))}
 

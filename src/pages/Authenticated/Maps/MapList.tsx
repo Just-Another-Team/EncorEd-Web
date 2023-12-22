@@ -1,56 +1,47 @@
-import React from "react"
+import React, { MouseEventHandler, useState } from "react"
 import {
     Box,
+    Button,
     Grid,
+    PaginationItem,
     Typography
 } from '@mui/material'
-import SubjectEventCard from "../../../components/Cards/SubjectEventCard"
+import CampusMap from "../../../components/Map/Map";
+
+type FloorType = {
+    selected: boolean;
+    value: string
+}
 
 const MapList = () => {
+    const [selectedFloor, setSelectedFloor] = useState<string>("G")
+
+    const floors:Array<string> = [
+        "2",
+        "M",
+        "G",
+        "B"
+    ]
+
+    const handleFloorChange = (floor: string) => {
+        setSelectedFloor(floor);
+    }
+
     return(
-        <>
+        <Box position={"relative"} sx={{width: '100%', height: 620}}>
+            <CampusMap selectedFloor={selectedFloor} />
             <Box
-            marginBottom={2}>
-                <Typography variant="h4" fontWeight={700}>
-                    Maps
-                </Typography>
+            display={'flex'}
+            gap={1}
+            flexDirection={"column"}
+            position={'absolute'}
+            bottom={40}
+            right={16}>
+                {floors.map((floor, ind) => (
+                    <PaginationItem key={ind} color="primary" onClick={() => {handleFloorChange(floor)}} selected={floor === selectedFloor} page={floor}/>
+                ))}
             </Box>
-            
-            <Box
-            marginBottom={4}>
-                <Typography variant="h5" fontWeight={500} marginBottom={1}>
-                    Recently Opened
-                </Typography>
-
-                <Grid container spacing={2} >
-                    {Array.from({length: 4}).map((el, ind) => (
-                        <Grid item xs={3}>
-                            {/* <div style={{border: '3px solid blue', minHeight: 128, borderRadius: 8}}>
-                                HELLO!?
-                            </div> */}
-                            <SubjectEventCard src="/assets/SubjectTestPic.png"/>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box>
-
-            <Box>
-                <Typography variant="h5" fontWeight={500} marginBottom={1}>
-                    Projects
-                </Typography>
-
-                <Grid container spacing={2} >
-                    {Array.from({length: 8}).map((el, ind) => (
-                        <Grid item xs={3}>
-                            {/* <div style={{border: '3px solid blue', minHeight: 128, borderRadius: 8}}>
-                                HELLO!?
-                            </div> */}
-                            <SubjectEventCard src="/assets/SubjectTestPic.png"/>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box>
-        </>
+        </Box>
     )
 }
 

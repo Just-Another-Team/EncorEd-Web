@@ -55,21 +55,6 @@ function App() {
   const user = useAppSelector(state => state.authentication.data)
   const role = useAppSelector(state => state.assignRole.data)
 
-  useEffect(() => {
-    // console.log("Is Admin or Employee", roles.filter(role => role.admin || typeof role.employee === "object").length != 0)
-    // console.log("Is App Admin", roles.filter(role => role.appAdmin).length != 0)
-    // onAuthStateChanged(auth, (user) => {
-    //   if (!user) {
-    //     //dispatch(logOut())
-    //     console.log("Logged Out")
-    //     return
-    //   }
-
-    //   console.log("Logged In")
-    //   console.log("Roles", role)
-    // })
-  }, [])
-
   return (
     <Routes>
       <Route path='/' element={<LandingPage />}/>
@@ -78,7 +63,8 @@ function App() {
       <Route path='/login' element={<Login />}/>
       <Route path='/register' element={<UserInput />}>
         <Route path='user' element={<RegistrationUserForm />} />
-        <Route path='institution' element={Object.keys(user).length != 0 ? <RegistrationInstitutionForm /> : <Navigate replace to='/login' />}/> {/*  */}
+        {/* <Route path='institution' element={<RegistrationInstitutionForm />}/> */}
+        <Route path='institution' element={Object.keys(user).length != 0 ? <RegistrationInstitutionForm /> : <Navigate replace to='/login' />}/>
       </Route>
 
       {/* Authenticated Pages */}
