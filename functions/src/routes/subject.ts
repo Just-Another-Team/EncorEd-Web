@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import SubjectService from "../controller/subject.controller"
+import SubjectScheduleService from "../controller/subjectSchedule.controller"
 // import {
 //     addSubjectSchedule,
 //     deleteSubjectSchedule,
@@ -32,7 +33,7 @@ subjectRouter.get("/list/u/:institution", SubjectService.viewAllByInstitution)
 /* SUBJECT SCHEDULE */
 // subjectRouter.post("/schedule/add", addSubjectSchedule)
 // subjectRouter.put("/schedule/update/:id", updateSubjectSchedule)
-// subjectRouter.delete("/schedule/delete/:id", deleteSubjectSchedule)
+subjectRouter.delete("/schedule/delete/:id", SubjectScheduleService.delete)
 // subjectRouter.get("/schedule/list", viewAllSubjectSchedule)
 // subjectRouter.get("/schedule/list/:id", viewSubjectSchedule)
 

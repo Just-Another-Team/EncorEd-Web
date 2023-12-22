@@ -27,6 +27,7 @@ roleRouter.get("/list/u/:institution", role_controller_1.default.viewAllByInsitu
 // /* Assigning Roles */
 roleRouter.post("/assign", userRole_controller_1.default.assign);
 roleRouter.get("/assign/user/:id", userRole_controller_1.default.viewAssignedRoles);
+roleRouter.get("/debug/user/:id", userRole_controller_1.default.viewAssignedRolesDebug);
 roleRouter.get("/assign/role/:id", userRole_controller_1.default.viewAssignedUsers);
 exports.default = roleRouter;
 //# sourceMappingURL=role.js.map

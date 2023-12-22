@@ -9,12 +9,32 @@ import IService from '../interfaces/IBaseService';
 import ISubjectSchedule from "../models/subjectSchedule.model"
 import IBaseService from '../interfaces/IBaseService';
 import { converter } from '../models/converter';
+import ErrorController from '../types/ErrorController';
 
 const subjectScheduleCollection = db.collection('/subjectSchedules/').withConverter(converter<ISubjectSchedule>())
 
 class SubjectScheduleService implements IBaseService {
-    viewAll(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        throw new Error('Method not implemented.');
+    public async viewAll(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        try {
+            const subejctScheduleRef = await subjectScheduleCollection.get()
+
+            const subjects = subejctScheduleRef.docs.map(schedule => ({id: schedule.id, ...schedule.data()}))
+
+            res.status(200).json(subjects)
+
+        } catch (error) {
+            if (error instanceof Error) {
+                const subjectControllerError: ErrorController = {
+                    name: "Subject",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "View All",
+                    message: error.message
+                }
+                
+                res.status(400).json(subjectControllerError) //Get this outside of the if statement
+            }
+        } 
     }
     add(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         throw new Error('Method not implemented.');
@@ -22,8 +42,27 @@ class SubjectScheduleService implements IBaseService {
     update(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         throw new Error('Method not implemented.');
     }
-    delete(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        throw new Error('Method not implemented.');
+    public async delete(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const subjectId = req.params.id;
+
+        try {
+            await subjectScheduleCollection.doc(subjectId).delete();
+
+            res.status(200).json({ message: "Subject Schedule Deleted Successfully!" })
+
+        } catch (error) {
+            if (error instanceof Error) {
+                const subjectControllerError: ErrorController = {
+                    name: "Subject Schedule",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "Delete",
+                    message: error.message
+                }
+                
+                res.status(400).json(subjectControllerError) //Get this outside of the if statement
+            }
+        } 
     }
     view(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         throw new Error('Method not implemented.');
@@ -190,3 +229,5 @@ class SubjectScheduleService implements IBaseService {
 export {
     subjectScheduleCollection
 }
+
+export default new SubjectScheduleService;

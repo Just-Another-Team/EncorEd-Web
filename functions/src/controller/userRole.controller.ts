@@ -267,6 +267,8 @@ class UserRole implements IAssignService {
                 return Object.assign(result, current)
             })
 
+            console.log("Role: ", roles)
+
             res.status(200).json(roles)
         } catch(error) {
             console.error(error)

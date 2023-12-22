@@ -9,13 +9,15 @@ import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
 import { converter } from '../models/converter';
 import ErrorController from '../types/ErrorController';
+import ISubjectSchedule from '../models/subjectSchedule.model';
+import { subjectScheduleCollection } from './subjectSchedule.controller';
 // import { viewUser, userCollection } from './user.controller';
 
 export const subjectCollection = db.collection(`/subjects/`).withConverter(converter<ISubject | SubjectInput>())
 
 type SubjectInput = {
     details?: ISubject;
-    schedule?: object;
+    schedule?: ISubjectSchedule;
     assignedRoom?: object;
 
     createdBy?: string;
@@ -76,32 +78,46 @@ class SubjectService implements IBaseService {
             const batch = db.batch();
 
             reqSubject.map((el) => {
-                if (!!el.details) {
-                    const reqSubjectDetails = el.details! as ISubject
+                const reqSubjectDetails = el.details! as ISubject
 
-                    const subject: ISubject = {
-                        name: reqSubjectDetails.name,
-                        edpCode: reqSubjectDetails.edpCode,
-                        type: reqSubjectDetails.type,
-                        units: reqSubjectDetails.units,
-                        institution: el.institution!.toLowerCase().trim().replace(/\s/g, ''),
-                        
-                        creationDate: new Date().toISOString(),
-                        createdBy: el.createdBy!,
-                        
-                        updatedDate: new Date().toISOString(),
-                        updatedBy: el.createdBy!,
-        
-                        verifiedBy: null, //Soon
-                        status: "Open"
-                    }
-
-                    const subjectDetailRef = subjectCollection.doc(`${subject.institution}-${subject.type.substring(0, 3).toLowerCase()}-${subject.name.toLowerCase().trim().replace(/\s/g, '')}`)
-                    batch.create(subjectDetailRef, subject)
+                const subject: ISubject = {
+                    name: reqSubjectDetails.name,
+                    edpCode: reqSubjectDetails.edpCode,
+                    type: reqSubjectDetails.type,
+                    units: reqSubjectDetails.units,
+                    institution: el.institution!.toLowerCase().trim().replace(/\s/g, ''),
+                    
+                    creationDate: new Date().toISOString(),
+                    createdBy: el.createdBy!,
+                    
+                    updatedDate: new Date().toISOString(),
+                    updatedBy: el.createdBy!,
+    
+                    verifiedBy: null, //Soon
+                    status: "Open"
                 }
 
+                const subjectDetailRef = subjectCollection.doc(`${subject.institution}-${subject.type.substring(0, 3).toLowerCase()}-${subject.name.toLowerCase().trim().replace(/\s/g, '')}`)
+                batch.create(subjectDetailRef, subject)
+
                 if (!!el.schedule) {
-                    console.log("Schedule")
+                    const reqSubjectSchedule = el.schedule! as ISubjectSchedule
+
+                    console.log("Schedule Input:", el.schedule)
+
+                    const subjectSchedule: ISubjectSchedule = {
+                        subId: `${subject.institution}-${subject.type.substring(0, 3).toLowerCase()}-${subject.name.toLowerCase().trim().replace(/\s/g, '')}`,
+                        roomId: null,
+                        assignDays: reqSubjectSchedule.assignDays,
+                        startTime: new Date(reqSubjectSchedule.startTime).toISOString(),
+                        endTime: new Date(reqSubjectSchedule.endTime).toISOString(),
+                        createdBy: el.createdBy!,
+                        verifiedBy: el.createdBy!,
+                        status: "Open",
+                    }
+
+                    const subjectScheduleRef = subjectScheduleCollection.doc(`${subject.institution}-${subject.type.substring(0, 3).toLowerCase()}-${subject.name.toLowerCase().trim().replace(/\s/g, '')}`)
+                    batch.create(subjectScheduleRef, subjectSchedule)
                 }
 
                 if (!!el.assignedRoom) {
@@ -133,7 +149,6 @@ class SubjectService implements IBaseService {
         const reqSubject = req.body as ISubject;
 
         try{
-            
             const subjectDoc = subjectCollection.doc(subjectParamId);
 
             const oldSubject = await subjectDoc.get()
@@ -190,6 +205,7 @@ class SubjectService implements IBaseService {
         const subjectId = req.params.id;
 
         try {
+            await subjectScheduleCollection.doc(subjectId).delete();
             await subjectCollection.doc(subjectId).delete();
 
             res.status(200).json({ message: "Subject Deleted Successfully!" })
@@ -235,8 +251,21 @@ class SubjectService implements IBaseService {
     public async viewAll(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         try {
             const subjectRef = await subjectCollection.get()
+            const subjectScheduleRef = await subjectScheduleCollection.get();
 
-            const subjects = subjectRef.docs.map(subject => ({id: subject.id, ...subject.data()}))
+            console.log("Hello!");
+
+            const subjects = subjectRef.docs.map(subject => {
+                const schedule = subjectScheduleRef.docs.find(schedule => schedule.data().subId === subject.id);
+
+                console.log(schedule?.data());
+
+                return {
+                    id: subject.id,
+                    details: subject.data(),
+                    schedule: schedule?.data(),
+                }
+            })
 
             res.status(200).json(subjects)
 
@@ -262,12 +291,16 @@ class SubjectService implements IBaseService {
             const subjectRef = await subjectCollection.where('institution', '==', institutionId)
                                                         .where('status', '==', 'Open')
                                                         .get()
+            const subjectScheduleRef = await subjectScheduleCollection.get();
 
-            console.log("Is this being searched??")
+            const subjects = subjectRef.docs.map(subject => {
+                const schedule = subjectScheduleRef.docs.find(schedule => schedule.data().subId === subject.id);
 
-            const subjects = subjectRef.docs.map(subject => ({
-                details: {id: subject.id, ...subject.data() as ISubject},
-            }))
+                return {
+                    details: {id: subject.id, ...subject.data() as ISubject}, 
+                    schedule: schedule?.data() as ISubjectSchedule,
+                }
+            })
 
             // details?: ISubject;
             // schedule?: object;

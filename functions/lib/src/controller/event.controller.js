@@ -1,8 +1,65 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = require("../database");
 const converter_1 = require("../models/converter");
 const eventCollection = database_1.db.collection(`/events/`).withConverter((0, converter_1.converter)());
+class EventService {
+    add(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                // const { name, desc, creationDate, createdBy, verifiedBy, status } = req.body;
+                // let event = new Event(
+                //     name,
+                //     desc,
+                //     new Date(creationDate),
+                //     createdBy,
+                //     verifiedBy,
+                //     status
+                // )
+                // await db.collection(`/events/`).doc().withConverter(eventConverter).create(event)
+                //     .then((result) => {
+                //         res.status(200).json({message: "Event added successfully"})
+                //     })
+                //     .catch((err) => {
+                //         throw {message: err.message}
+                //     })
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    const eventControllerError = {
+                        name: "Event",
+                        error: true,
+                        errorType: "Controller Error",
+                        control: "Add",
+                        message: error.message
+                    };
+                    res.status(400).json(eventControllerError); //type: error.type, code: error.code
+                }
+            }
+        });
+    }
+    update(req, res) {
+        throw new Error('Method not implemented.');
+    }
+    delete(req, res) {
+        throw new Error('Method not implemented.');
+    }
+    view(req, res) {
+        throw new Error('Method not implemented.');
+    }
+    viewAll(req, res) {
+        throw new Error('Method not implemented.');
+    }
+}
 // const addEvent = async (req, res) => {
 //     try {
 //         const { name, desc, creationDate, createdBy, verifiedBy, status } = req.body;

@@ -1,8 +1,10 @@
-// const express = require('express')
+import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser';
 import { https } from 'firebase-functions'
+
+dotenv.config()
 /**
  * Import function triggers from their respective submodules:
  *
@@ -22,7 +24,7 @@ import { https } from 'firebase-functions'
 
 
 const app = express();
-const port: number = 4000;
+const port: string = process.env.RUNNING_PORT!;
 
 app.use(cors())
 // app.use(express.json())

@@ -191,7 +191,7 @@ class UserService {
                 const userId = req.params.id;
                 console.log("OI IS THIS GETTING ANYTHING?!");
                 const userDoc = yield exports.userCollection.doc(userId).get();
-                console.log(`User ${userId} exist?`, Object.assign({}, userDoc.data()));
+                console.log(`User ${userId} exist?`, !userDoc.exists);
                 if (!userDoc.exists)
                     throw new Error(`User with id: ${userId} does not exist.`);
                 res.status(200).json(Object.assign({ id: userDoc.id }, userDoc.data()));
@@ -206,7 +206,8 @@ class UserService {
                         control: "View",
                         message: error.message
                     };
-                    res.status(400).json(userControllerError); //type: error.type, code: error.code
+                    console.log("We got an error");
+                    res.status(404).json(userControllerError); //type: error.type, code: error.code
                 }
             }
         });
@@ -251,6 +252,31 @@ class UserService {
                     .get();
                 const users = userRef.docs.map(userRecord => (Object.assign({ id: userRecord.id }, userRecord.data())));
                 res.status(200).json(users);
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    const userControllerError = {
+                        name: "User",
+                        error: true,
+                        errorType: "Controller Error",
+                        control: "View",
+                        message: error.message
+                    };
+                    res.status(400).json(userControllerError); //type: error.type, code: error.code
+                }
+            }
+        });
+    }
+    viewUser(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            try {
+                const userRef = yield exports.userCollection.doc(id).get();
+                if (!userRef.exists)
+                    throw { code: 'firestore/missing-email', message: `User with id: ${id} does not exist.` };
+                //console.log(userRef.data())
+                //const userDoc = await getDoc(userRef);
+                res.status(200).json(Object.assign({ id: userRef.id }, userRef.data()));
             }
             catch (error) {
                 if (error instanceof Error) {

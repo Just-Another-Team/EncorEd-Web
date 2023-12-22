@@ -23,7 +23,7 @@ userRouter.get("/list/auth/:email", user_controller_1.default.viewAuth);
 userRouter.put("/delete/:id", user_controller_1.default.delete);
 //View
 userRouter.get("/list/u/:institution/:user", user_controller_1.default.viewAllByInstitution);
-// userRouter.get("/list/:id", viewUser)
+userRouter.get("/profile/:id", user_controller_1.default.viewUser);
 // userRouter.get("/profile/:userName", viewUserByName)
 //router.get("/list/:institution", <method for users based on institution>)
 exports.default = userRouter;

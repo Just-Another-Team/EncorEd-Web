@@ -223,7 +223,7 @@ class UserService implements IBaseService {
 
             const userDoc = await userCollection.doc(userId).get()
 
-            console.log(`User ${userId} exist?`, {...userDoc.data()})
+            console.log(`User ${userId} exist?`, !userDoc.exists)
 
             if (!userDoc.exists)
                 throw new Error(`User with id: ${userId} does not exist.`)
@@ -241,8 +241,10 @@ class UserService implements IBaseService {
                     control: "View",
                     message: error.message
                 }
+
+                console.log("We got an error")
                 
-                res.status(400).json(userControllerError) //type: error.type, code: error.code
+                res.status(404).json(userControllerError) //type: error.type, code: error.code
             }        
         }
     }
