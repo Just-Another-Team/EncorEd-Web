@@ -365,6 +365,65 @@ class UserService implements IBaseService {
             }        
         }
     }
+
+    public async editUserProfile(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        try {
+            const userId = req.params.id;
+            const firstName = req.body.firstName;
+            const lastName = req.body.lastName;
+
+            const userRef = await userCollection.doc(userId).update({firstName: firstName, 
+                                                                        lastName: lastName, 
+                                                                        userName: firstName + lastName})
+
+            res.status(200).json(userRef);   
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                const userControllerError: ErrorController = {
+                    name: "User",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "Edit",
+                    message: error.message
+                }
+                
+                res.status(400).json(userControllerError) //type: error.type, code: error.code
+            }        
+        }
+    }
+
+    public async userBanRestore(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        try {
+            const userId = req.params.id;
+            const userStatus = req.body.status;
+            const ban = "BANNED";
+            const restore = "Open";
+
+            if(userStatus === ban){
+                await userCollection.doc(userId).update({status: restore})
+                res.status(200).json("Restored Successfully");   
+            }
+            else if(userStatus === restore)
+            {
+                await userCollection.doc(userId).update({status: ban})
+                res.status(200).json("Banned Successfully"); 
+            }
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                const userControllerError: ErrorController = {
+                    name: "User",
+                    error: true,
+                    errorType: "Controller Error",
+                    control: "Edit",
+                    message: error.message
+                }
+                
+                res.status(400).json(userControllerError) //type: error.type, code: error.code
+            }        
+        }
+    }
 }
 
 class AdminService implements IBaseService {

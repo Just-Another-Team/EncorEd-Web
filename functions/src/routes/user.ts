@@ -7,6 +7,7 @@ const userRouter = Router();
 
 userRouter.post("/add", userService.add);
 userRouter.put("/update/:id", userService.update)
+userRouter.put("/edit/profile/:id", userService.editUserProfile)
 
 userRouter.get("/exist/:id", userService.isExist)
 userRouter.get("/list/", userService.viewAll)
@@ -24,6 +25,9 @@ userRouter.get("/list/auth/:email", userService.viewAuth)
 
 //Delete
 userRouter.put("/delete/:id", userService.delete)
+
+//Ban/Restore
+userRouter.put("/ban-restore/:id", userService.userBanRestore)
 
 //View
 userRouter.get("/list/u/:institution/:user", userService.viewAllByInstitution)
