@@ -53,7 +53,7 @@ class EncorEdRoleService {
     }
 
     getRolesByInstitution(institutionId: string) {
-        return http.get(`/role//list/u/${institutionId}`)
+        return http.get(`/role/list/u/${institutionId}`)
     }
 
     addRole(data: RoleInput) {

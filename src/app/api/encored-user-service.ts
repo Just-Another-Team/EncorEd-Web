@@ -9,6 +9,7 @@ import {
 } from "../firebase/authentication"
 import { RegisterFormCredential } from "../../types/RegisterFormCredential"
 import { FixMeLater } from "../../types/FixMeLater";
+import { userListObj } from "../../types/UserListObject";
 
 export type UserInput = {
     institution?: string,
@@ -39,15 +40,16 @@ class EncorEdUserService {
     //     return http.put(`/user/update/${id}`, {firstName, lastName, email, password})
     // }
 
-    // deleteUser(id) {
-    //     return http.put(`/user/delete/${id}`)
-    // }
+    deleteUser(id: any) {
+        return http.put(`/user/delete/${id}`)
+    }
 
     // getAll() {
     //     return http.get("/user/list")
     // }
     
-    getAllUsersByInstitution(institution: string | undefined, user: string | undefined) {
+    getAllUsersByInstitution(userList: userListObj) {
+        const {institution, user} = userList
         return http.get(`/user/list/u/${institution}/${user}` )
     }
 
@@ -75,18 +77,36 @@ class EncorEdUserService {
     //     return http.get(`/user/list/${email}`)
     // }
 
-    // viewUser(data) {
-    //     return http.get(`/user/profile/${data}`)
-    // }
+    viewUser(id: FixMeLater) {
+        return http.get(`/user/profile/${id}`)
+    }
 
-    // //password verification before action
-    // verifyPassword(data){
-    //     const { password } = data
+    viewUserRoles(id: string) {
+        return http.get(`/role/debug/user/${id}`)
+    }
 
-    //     const credentials = EmailAuthProvider.credential(auth.currentUser.email, password)
+    assignUserToRole(data: FixMeLater) {
+        return http.post(`/role/assign/`, data)
+    }
 
-    //     return reauthenticateWithCredential(auth.currentUser, credentials)
-    // }
+    //password verification before action
+    verifyPassword(data: FixMeLater){
+        const { password } = data
+        const userEmail: FixMeLater = auth.currentUser?.email
+        const currentUser: FixMeLater = auth.currentUser
+
+        const credentials = EmailAuthProvider.credential(userEmail, password)
+
+        return reauthenticateWithCredential(currentUser, credentials)
+    }
+
+    editUserProfile(data: FixMeLater) {
+        return http.put(`/user/edit/profile/${data.id}`, data)
+    }
+
+    userBanRestore(data: FixMeLater) {
+        return http.put(`/user/ban-restore/${data.id}`, data)
+    }
 }
 
 export default new EncorEdUserService()

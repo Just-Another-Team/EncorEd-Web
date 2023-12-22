@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit"
 import EncorEdAuthService, { UserInput } from "../../api/encored-auth-service"
+import EncorEdUserService from "../../api/encored-user-service"
 import { resetPage } from "../navigation/navigationSlice"
 import { RegisterFormCredential } from "../../../types/RegisterFormCredential"
 import { LoginFormCredential } from "../../../types/LoginFormCredential"
@@ -77,6 +78,68 @@ export const updateUser = createAsyncThunk(
         console.log("Auth Slice Data", data)
         return await EncorEdAuthService.updateUser(data)
                 .catch((error) => rejectWithValue(error))
+    }
+)
+
+/*
+    Things that will be persisted in the page:
+    - user (logged in)
+    - institution
+    - role
+    - pageSelect
+
+    Things that will not be persisted:
+    - authentication (Log in)
+    - subjects
+    - events
+    - groups
+    - roles
+    - users
+    - floor plans
+*/
+
+// export const assignInstitution = createAsyncThunk(
+//     "/user/institution/assign",
+//     async (data, {rejectWithValue}) => {
+//         return await EncorEdAuthService.assignInstitution(data)
+//             .then((res) => res)
+//             .catch((error) => rejectWithValue(error))
+//     }
+// )
+
+// export const logOutUser = createAsyncThunk(
+//     "user/signOut",
+//     async (_, {dispatch}) => {
+//         dispatch(resetPage())
+//         return await EncorEdAuthService.signOut();
+//     }
+// )
+
+// /* - - - - - CRUD - - - - - */
+
+// export const getUser = createAsyncThunk(
+//     "user/view",
+//     async (email, {rejectWithValue}) => {
+//         //console.log(credential.user.email)
+//         return await EncorEdAuthService.get(email)
+//             .then((res) => res.data)
+//             .catch((error) => rejectWithValue(error))
+//     }
+// )
+
+// export const updateUser = createAsyncThunk(
+//     "user/update",
+//     async (data, {rejectWithValue}) => {
+//         return await EncorEdAuthService.updateUser(data)
+//             .then((res) => res.data)
+//             .catch((error) => rejectWithValue(error))
+//     }
+// )
+
+export const verifyPassword = createAsyncThunk(
+    "user/verify",
+    async (data: any, {rejectWithValue}) => {
+        return await EncorEdUserService.verifyPassword(data)
     }
 )
 

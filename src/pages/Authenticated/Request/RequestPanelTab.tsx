@@ -6,7 +6,7 @@ import {
 import PropTypes from 'prop-types'
 import { FixMeLater } from "../../../types/FixMeLater";
 
-function SubjectTabPanel(props: FixMeLater) { //
+function RequestTabPanel(props: FixMeLater) { //props
     const { children, value, index, ...other } = props;
   
     return (
@@ -26,10 +26,10 @@ function SubjectTabPanel(props: FixMeLater) { //
     );
 }
   
-SubjectTabPanel.propTypes = {
+RequestTabPanel.propTypes = {
     children: PropTypes.node,
     index: PropTypes.number.isRequired,
     value: PropTypes.number.isRequired,
 };
 
-export default SubjectTabPanel
+export default RequestTabPanel

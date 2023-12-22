@@ -18,7 +18,6 @@ const Request = () => {
     const handleChange = (event: FixMeLater, newValue: FixMeLater) => {
         setPage(newValue);
     };
-
     return(
         <>
             <Typography variant="h4" fontWeight={700} marginBottom={1}>

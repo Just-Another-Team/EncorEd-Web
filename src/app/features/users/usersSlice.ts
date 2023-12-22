@@ -1,6 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import EncorEdUserService from "../../api/encored-user-service"
 import { FixMeLater } from "../../../types/FixMeLater"
+import { userListObj } from "../../../types/UserListObject"
 
 export type User = {
     id: string
@@ -28,9 +29,9 @@ const initialState: IUserInitialState = {
 }
 
 export const getUsers = createAsyncThunk(
-    "users/get/institution",
-    async ({institution, user}: FixMeLater, {rejectWithValue}) => {
-        return await EncorEdUserService.getAllUsersByInstitution(institution, user)
+    "/users/get/institution",
+    async (userList: userListObj , {rejectWithValue}) => {
+        return await EncorEdUserService.getAllUsersByInstitution(userList)
     }
 )
 
@@ -50,14 +51,30 @@ export const addUsers = createAsyncThunk(
     }
 )
 
-// export const deleteUser = createAsyncThunk(
-//     "/users/delete",
-//     async (id, {rejectWithValue}) => {
-//         return await EncorEdAuthService.deleteUser(id)
-//             .then((res) => console.log(res))
-//             .catch((error) => rejectWithValue(error))
-//     }
-// )
+export const deleteUser = createAsyncThunk(
+    "/users/delete",
+    async (id: FixMeLater, {rejectWithValue}) => {
+        return await EncorEdUserService.deleteUser(id)
+    }
+)
+
+export const assignUserToRole = createAsyncThunk(
+    "/users/assign/role",
+    async (data: FixMeLater, {rejectWithValue}) => {
+        return await EncorEdUserService.assignUserToRole(data)
+        .then((res) => res) 
+        .catch((error) => rejectWithValue(error))
+    }
+)
+
+export const userBanRestore = createAsyncThunk(
+    "/users/ban-restore",
+    async (data: FixMeLater, {rejectWithValue}) => {
+        return await EncorEdUserService.userBanRestore(data)
+        .then((res) => res) 
+        .catch((error) => rejectWithValue(error))
+    }
+)
 
 const usersSlice = createSlice({
     name: 'users',
