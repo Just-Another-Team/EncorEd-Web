@@ -1,4 +1,4 @@
-import React from "react"
+import React, {useEffect} from "react"
 import {
     Box,
     Button,
@@ -208,6 +208,7 @@ const AddRole = () => {
         viewInstitution: true,
     }
 
+   
     const {handleSubmit, reset, control, setValue, formState: {errors}} = useForm<RoleInput>({
         defaultValues: {
             name: "",
@@ -334,24 +335,25 @@ const AddRole = () => {
     ]
 
     const options = [
-        {label: "Choose user type", value: ""},
-        {label: "Employee", value: "employee"},
-        {label: "Teacher", value: "teacher"},
+        {label: "", value: ""},
         {label: "Student", value: "student"},
-        {label: "Visitor", value: "visitor"},
+        {label: "Teacher", value: "teacher"},
+        {label: "Employee", value: "employee"},
+        {label: "Custom", value: "custom"},
     ]
 
     const handleInput = (data: RoleInput) => {
-        dispatch(addRole(data)).unwrap()
-            .then(() => {
-                alert("Role added successfully!")
-                reset();
+        console.log(data)
+        // dispatch(addRole(data)).unwrap()
+        //     .then(() => {
+        //         alert("Role added successfully!")
+        //         reset();
 
-                navigate("/dashboard/list/roles/u/encored")
-            })
-            .catch((error) => {
-                alert(`Error Occured:\n${error.response.data.message}`)
-            })
+        //         navigate("/dashboard/list/roles/u/encored")
+        //     })
+        //     .catch((error) => {
+        //         alert(`Error Occured:\n${error.response.data.message}`)
+        //     }) 
     }
 
     return(
@@ -404,9 +406,9 @@ const AddRole = () => {
                             <Typography flex={0.5} variant="h6" color={"#4D4D4D"} fontWeight={300} marginBottom={2}>Map</Typography>
                             <Grid flex={1} container>
                                 {mapInputs.map(el => (
-                                    <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"} justifyContent={'space-between'}>
-                                        <Typography>{el.label}</Typography>
+                                    <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"}>
                                         <FormInputSwitch name={el.key} control={control}/>
+                                        <Typography>{el.label}</Typography>
                                     </Grid>
                                 ))}
                             </Grid>
@@ -427,11 +429,17 @@ const AddRole = () => {
                                         </Grid>
                                         {el.inputs.map((el, ind) => (
                                             <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"} justifyContent={'space-between'} marginTop={ind === 4 || ind === 5 ? 2 : 0}>
-                                                <Typography sx={{flex: 1}}>{el.label}</Typography>
                                                 {
                                                     el.type === "select" ? 
-                                                    <FormInputDropDown name={el.key} control={control} options={users} formControlProps={{flex: 1}} /> :
-                                                    <FormInputSwitch name={el.key} control={control}/>
+                                                    <>
+                                                        <Typography sx={{flex: 0.5}}>{el.label}</Typography>
+                                                        <FormInputDropDown name={el.key} control={control} options={users} formControlProps={{flex: 1}} /> 
+                                                    </>
+                                                     :
+                                                    <>
+                                                        <FormInputSwitch name={el.key} control={control}/>
+                                                        <Typography sx={{flex: 1}}>{el.label}</Typography>
+                                                    </>
                                                 }
                                             </Grid>
                                         ))}
@@ -456,11 +464,17 @@ const AddRole = () => {
                                         </Grid>
                                         {el.inputs.map((el, ind) => (
                                             <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"} justifyContent={'space-between'} marginTop={ind === 4 || ind === 5 ? 2 : 0}>
-                                                <Typography sx={{flex: 1}}>{el.label}</Typography>
                                                 {
                                                     el.type === "select" ? 
-                                                    <FormInputDropDown name={el.key} control={control} options={users} formControlProps={{flex: 1}} /> :
-                                                    <FormInputSwitch name={el.key} control={control}/>
+                                                    <>
+                                                        <Typography sx={{flex: 0.5}}>{el.label}</Typography>
+                                                        <FormInputDropDown name={el.key} control={control} options={users} formControlProps={{flex: 1}} /> 
+                                                    </>
+                                                     :
+                                                    <>
+                                                        <FormInputSwitch name={el.key} control={control}/>
+                                                        <Typography sx={{flex: 1}}>{el.label}</Typography>
+                                                    </>
                                                 }
                                             </Grid>
                                         ))}
@@ -479,11 +493,17 @@ const AddRole = () => {
                             <Grid flex={1} container>
                                 {userInputs.map((el, ind) => (
                                     <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"} justifyContent={'space-between'} marginTop={ind === 4 || ind === 5 ? 2 : 0}>
-                                        <Typography sx={{flex: 1}}>{el.label}</Typography>
                                         {
                                             el.type === "select" ? 
-                                            <FormInputDropDown name={el.key} control={control} options={users} formControlProps={{flex: 1}} /> :
-                                            <FormInputSwitch name={el.key} control={control}/>
+                                            <>
+                                                <Typography sx={{flex: 0.5}}>{el.label}</Typography>
+                                                <FormInputDropDown name={el.key} control={control} options={users} formControlProps={{flex: 1}} /> 
+                                            </>
+                                                :
+                                            <>
+                                                <FormInputSwitch name={el.key} control={control}/>
+                                                <Typography sx={{flex: 1}}>{el.label}</Typography>
+                                            </>
                                         }
                                     </Grid>
                                 ))}
@@ -499,11 +519,17 @@ const AddRole = () => {
                             <Grid flex={1} container>
                                 {groupInputs.map((el, ind) => (
                                     <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"} justifyContent={'space-between'} marginTop={ind === 4 || ind === 5 ? 2 : 0}>
-                                        <Typography sx={{flex: 1}}>{el.label}</Typography>
                                         {
                                             el.type === "select" ? 
-                                            <FormInputDropDown name={el.key} control={control} options={users} formControlProps={{flex: 1}} /> :
-                                            <FormInputSwitch name={el.key} control={control}/>
+                                            <>
+                                                <Typography sx={{flex: 0.5}}>{el.label}</Typography>
+                                                <FormInputDropDown name={el.key} control={control} options={users} formControlProps={{flex: 1}} /> 
+                                            </>
+                                                :
+                                            <>
+                                                <FormInputSwitch name={el.key} control={control}/>
+                                                <Typography sx={{flex: 1}}>{el.label}</Typography>
+                                            </>
                                         }
                                     </Grid>
                                 ))}
@@ -519,11 +545,17 @@ const AddRole = () => {
                             <Grid flex={1} container>
                                 {roleInputs.map(el => (
                                     <Grid key={el.key} xs={12} md={6} item display={'flex'} alignItems={"center"} justifyContent={'space-between'}>
-                                        <Typography sx={{flex: 1}}>{el.label}</Typography>
                                         {
                                             el.type === "select" ? 
-                                            <FormInputDropDown name={el.key} control={control} options={users} formControlProps={{flex: 1}} /> :
-                                            <FormInputSwitch name={el.key} control={control}/>
+                                            <>
+                                                <Typography sx={{flex: 0.5}}>{el.label}</Typography>
+                                                <FormInputDropDown name={el.key} control={control} options={users} formControlProps={{flex: 1}} /> 
+                                            </>
+                                                :
+                                            <>
+                                                <FormInputSwitch name={el.key} control={control}/>
+                                                <Typography sx={{flex: 1}}>{el.label}</Typography>
+                                            </>
                                         }
                                     </Grid>
                                 ))}

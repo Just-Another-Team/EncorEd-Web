@@ -49,7 +49,7 @@ const UserList = () => {
         handleOpenVerif()
     }
     
-    //user roles
+    //user profile
     const handleProfile = (data: FixMeLater) => {
         targetDispatch(targetUser(data))
         navigate(`/dashboard/profile/${data}`)
