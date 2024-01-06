@@ -12,6 +12,7 @@ import roleSlice from "./features/role/roleSlice";
 import targetSlice from "./features/users/targetSlice";
 import subjectSlice from "./features/subject/subjectSlice";
 import profileSlice from "./features/profile/profileSlice"
+import notifSlice from "./features/notification/notifSlice";
 
 // import subjectSlice from "./features/subject/subjectSlice";
 // import eventSlice from "./features/event/eventSlice";
@@ -19,7 +20,7 @@ import profileSlice from "./features/profile/profileSlice"
 const rootPersistConfig = {
     key: "root",
     storage,
-    blacklist: ['auth', 'institution', 'assignRole', 'role', 'users', 'target', 'profile', 'subject'], //'events', 'roles', 'floorPlan', 'reports', 'requests'
+    blacklist: ['auth', 'institution', 'assignRole', 'role', 'users', 'target', 'profile', 'subject', 'report'], //'events', 'roles', 'floorPlan', 'reports', 'requests'
 }
 
 /* ======== Session Storages ======== */
@@ -71,6 +72,12 @@ const targetPersistConfig = {
     blacklist: ['loading', 'error']
 }
 
+const notifPersistConfig = {
+    key: "report",
+    storage: sessionStorage,
+    blacklist: ['loading', 'error']
+}
+
 /* ======== Local Storages ======== */
 const navigationPersistConfig = {
     key: "navigation",
@@ -88,6 +95,7 @@ const combinedReducers = combineReducers({
     subject: persistReducer(subjectPersistConfig, subjectSlice),
     target: persistReducer(targetPersistConfig, targetSlice),
     profile: persistReducer(profilePersistConfig, profileSlice),
+    report: persistReducer(notifPersistConfig, notifSlice),
 });
 
 const persistedCombinedReducers = persistReducer(rootPersistConfig, combinedReducers)

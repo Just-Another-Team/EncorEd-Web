@@ -53,6 +53,7 @@ const AddRole = () => {
         value: user.id
     })))
 
+    //default permission
     const defaultPermission: Permission = {
         viewMap: true,
         addMap: false,
@@ -122,6 +123,162 @@ const AddRole = () => {
         viewEvent: {
             value: true,
             schedule: false,
+            participants: false,
+            attendance: false,
+            verify: {
+                value: false,
+                by: "" 
+            },
+        },
+        addEvent: {
+            value: false,
+            schedule: false,
+            participants: false,
+            attendance: {
+                value: false,
+                verifyAttendance: {
+                    value: false,
+                    by: "" 
+                },
+            },
+            verify: {
+                value: false,
+                by: "" 
+            },
+        },
+        editEvent: {
+            value: false,
+            schedule: false,
+            participants: false,
+            attendance: {
+                value: false,
+                verifyAttendance: {
+                    value: false,
+                    by: "" 
+                },
+            },
+            verify: {
+                value: false,
+                by: "" 
+            },
+        },
+        deleteEvent: {
+            value: false,
+            schedule: false,
+            participants: false,
+            attendance: {
+                value: false,
+                verifyAttendance: {
+                    value: false,
+                    by: "" 
+                },
+            },
+            verify: {
+                value: false,
+                by: "" 
+            },
+        },
+    
+        viewUser: true,
+        addUser: false,
+        editUser: false,
+        deleteUser: false,
+        verifyUser: {
+            value: false,
+            by: "" 
+        },
+    
+        viewGroup: true,
+        addGroup: false,
+        editGroup: false,
+        deleteGroup: false,
+        verifyGroup: {
+            value: false,
+            by: "" 
+        },
+    
+        viewRole: true,
+        addRole: false,
+        editRole: false,
+        deleteRole: false,
+        verifyRole: {
+            value: false,
+            by: "" 
+        },
+    
+        viewInstitution: true,
+    }
+
+    //default student permission
+    const defaultStudentPermission: Permission = {
+        viewMap: true,
+        addMap: false,
+        editMap: false,
+        deleteMap: false,
+        unlockMap: false,
+    
+        viewSubject: {
+            value: true,
+            schedule: true,
+            participants: false,
+            attendance: false,
+            verify: {
+                value: false,
+                by: "" 
+            },
+        },
+        addSubject: {
+            value: false,
+            schedule: false,
+            participants: false,
+            attendance: {
+                value: false,
+                verifyAttendance: {
+                    value: false,
+                    by: "" 
+                },
+            },
+            verify: {
+                value: false,
+                by: "" 
+            },
+        },
+        editSubject: {
+            value: false,
+            schedule: false,
+            participants: false,
+            attendance: {
+                value: false,
+                verifyAttendance: {
+                    value: false,
+                    by: "" 
+                },
+            },
+            verify: {
+                value: false,
+                by: "" 
+            },
+        },
+        deleteSubject: {
+            value: false,
+            schedule: false,
+            participants: false,
+            attendance: {
+                value: false,
+                verifyAttendance: {
+                    value: false,
+                    by: "" 
+                },
+            },
+            verify: {
+                value: false,
+                by: "" 
+            },
+        },
+    
+        viewEvent: {
+            value: true,
+            schedule: true,
             participants: false,
             attendance: false,
             verify: {
@@ -381,7 +538,6 @@ const AddRole = () => {
                                 flex={1}>
                                     {el.label}
                                 </Typography>
-
                                 <FormInputDropDown
                                 name={el.key}
                                 defaultValue=""
@@ -389,7 +545,8 @@ const AddRole = () => {
                                 control={control}
                                 options={options}
                                 rules={el.rules}
-                                formControlProps={{flex: 1}}/>
+                                formControlProps={{flex: 1}}
+                                />
                             </Stack>
                         </Grid>
                     ))}
