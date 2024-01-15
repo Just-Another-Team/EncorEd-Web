@@ -36,6 +36,7 @@ import userRouter from './routes/user'
 import institutionRouter from "./routes/institution"
 import roleRouter from "./routes/role"
 import subjectRouter from "./routes/subject"
+import navigationRouter from './routes/navigation';
 
 // import participantRouter from "./routes/participant"
 // import eventRouter from "./routes/event"
@@ -43,6 +44,7 @@ import subjectRouter from "./routes/subject"
 
 app.use("/user", userRouter)
 app.use("/institution", institutionRouter)
+app.use("/navigation", navigationRouter)
 app.use("/role", roleRouter)
 app.use("/subject", subjectRouter)
 // app.use("/participant", participantRouter)
