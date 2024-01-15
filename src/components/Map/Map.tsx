@@ -3,6 +3,9 @@ import { FillPaint, MapLayerMouseEvent } from 'mapbox-gl'
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FixMeLater } from '../../types/FixMeLater';
 
+//SHOULD HAVE BEEN A MAPBOX COMPONENT INSTEAD OF A TSX COMPONENT
+//SEE THIS ARTICLE https://www.lostcreekdesigns.co/writing/a-complete-guide-to-sources-and-layers-in-react-and-mapbox-gl-js/
+
 type DefaultSourceLayerType = {
     floor?: string | undefined;
     sourceId: string;
@@ -234,7 +237,7 @@ const CampusMap = ({
             [123.911200, 10.337970], //sw
             [123.912675, 10.339146], //ne
         ]}
-        interactiveLayerIds={['secondfloor_rooms_layer', 'mezzanine_rooms_layer', 'groundfloor_rooms_layer', 'basementfloor_rooms_layer']}
+        //interactiveLayerIds={['secondfloor_rooms_layer', 'mezzanine_rooms_layer', 'groundfloor_rooms_layer', 'basementfloor_rooms_layer']}
         style={{width: '100%', height: '100%'}}
         onMouseMove={handleMapHover}
         mapStyle="mapbox://styles/mapbox/streets-v9">

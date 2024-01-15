@@ -21,7 +21,7 @@ import { FixMeLater } from "../../types/FixMeLater";
 const drawerWidth = 240;
 
 const CustomListItemButton = <C extends React.ElementType>(props: ListItemButtonProps<C, { component?: C }>) => {
-    return (<ListItemButton {...props}>{props.children}</ListItemButton>)
+    return ( <ListItemButton {...props}>{props.children}</ListItemButton> )
 }
 
 const Sidebar = ({
