@@ -7,6 +7,7 @@ import {
     Typography
 } from '@mui/material'
 import CampusMap from "../../../components/Map/Map";
+import MapComponent from "../../../components/Map/MapComponent";
 
 type FloorType = {
     selected: boolean;
@@ -29,7 +30,8 @@ const MapList = () => {
 
     return(
         <Box position={"relative"} sx={{width: '100%', height: 620}}>
-            <CampusMap selectedFloor={selectedFloor} />
+            {/* <CampusMap selectedFloor={selectedFloor} /> */}
+            <MapComponent selectedFloor={selectedFloor} />
             <Box
             display={'flex'}
             gap={1}

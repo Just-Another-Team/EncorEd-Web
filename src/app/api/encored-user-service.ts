@@ -107,6 +107,10 @@ class EncorEdUserService {
     userBanRestore(data: FixMeLater) {
         return http.put(`/user/ban-restore/${data.id}`, data)
     }
+
+    viewAttendance(institution: string) {
+        return http.get(`/attendance/report/${institution}`)
+    }
 }
 
 export default new EncorEdUserService()

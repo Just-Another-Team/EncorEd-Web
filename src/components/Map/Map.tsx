@@ -1,7 +1,19 @@
 import Map, { Layer, Source } from 'react-map-gl';
-import { FillPaint, MapLayerMouseEvent } from 'mapbox-gl'
+import { CirclePaint, FillPaint, LinePaint, MapLayerMouseEvent } from 'mapbox-gl'
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FixMeLater } from '../../types/FixMeLater';
+import { DefaultSourceLayerType } from '../../types/DefaultSourceLayerType';
+
+// type DefaultSourceLayerType = {
+//     floor?: string | undefined;
+//     sourceId: string;
+//     tilesetId: string;
+//     layerId: string;
+//     sourceLayer: string;
+//     paint: FillPaint;
+//     beforeLayer?: string;
+//     visible: mapboxgl.Visibility;
+// }
 
 //SHOULD HAVE BEEN A MAPBOX COMPONENT INSTEAD OF A TSX COMPONENT
 //SEE THIS ARTICLE https://www.lostcreekdesigns.co/writing/a-complete-guide-to-sources-and-layers-in-react-and-mapbox-gl-js/
@@ -28,7 +40,8 @@ const DefaultSourceLayer = ({
     sourceLayer,
     paint,
     beforeLayer,
-    visible
+    visible,
+    type,
 }: DefaultSourceLayerType) => {
 
     return (
@@ -37,15 +50,40 @@ const DefaultSourceLayer = ({
         type="vector"
         url={`mapbox://${tilesetId}`}>
             <Layer
-            id={layerId}
-            type='fill'
-            source={sourceId}
-            source-layer={sourceLayer}
-            beforeId={beforeLayer}
-            layout={{
-                visibility: visible
-            }}
-            paint={paint} />
+                id={layerId}
+                type='fill'
+                source={sourceId}
+                source-layer={sourceLayer}
+                beforeId={beforeLayer}
+                layout={{
+                    visibility: visible
+                }}
+                paint={paint as FillPaint} 
+            />
+            
+            <Layer
+                id={layerId}
+                type='line'
+                source={sourceId}
+                source-layer={sourceLayer}
+                beforeId={beforeLayer}
+                layout={{
+                    visibility: visible
+                }}
+                paint={paint as LinePaint} 
+            />
+
+            <Layer
+                id={layerId}
+                type='circle'
+                source={sourceId}
+                source-layer={sourceLayer}
+                beforeId={beforeLayer}
+                layout={{
+                    visibility: visible
+                }}
+                paint={paint as CirclePaint} 
+            />
         </Source>
     )
 }
@@ -83,6 +121,7 @@ const CampusMap = ({
             },
             beforeLayer: undefined,
             visible: selectedFloor === '2' ? 'visible' : 'none',
+            type:'fill',
         },
         {
             floor: 'second',
@@ -95,6 +134,7 @@ const CampusMap = ({
             },
             beforeLayer:'secondfloor_rooms_layer',
             visible: selectedFloor === '2' ? 'visible' : 'none',
+            type:'fill',
         },
         //Mezzanine
         {
@@ -109,6 +149,7 @@ const CampusMap = ({
             },
             beforeLayer: 'secondfloor_roombase_layer',
             visible: selectedFloor === 'M' ? 'visible' : 'none',
+            type:'fill',
         },  
         {
             floor: 'mezzanine',
@@ -121,6 +162,7 @@ const CampusMap = ({
             },
             beforeLayer: 'mezzanine_rooms_layer',
             visible: selectedFloor === 'M' ? 'visible' : 'none',
+            type:'fill',
         },
         {
             floor: 'mezzanine',
@@ -133,6 +175,7 @@ const CampusMap = ({
             },
             beforeLayer: 'mezzanine_roombase_layer',
             visible: selectedFloor === 'M' ? 'visible' : 'none',
+            type:'fill',
         },
         //Upperfloor Base
         {
@@ -146,8 +189,23 @@ const CampusMap = ({
             },
             beforeLayer: 'mezzanine_base_layer',
             visible: (selectedFloor !== 'G' && selectedFloor !== 'B') ? 'visible' : 'none',
+            type:'fill',
         },
         //Ground
+        {
+            floor: 'ground',
+            sourceId: 'groundfloor_path_source',
+            tilesetId: 'amarilloshinlee.84l8ltuy',
+            layerId: 'groundfloor_path_layer',
+            sourceLayer: 'Groundfloor_path-175ufm',
+            paint: {
+                "line-color" : "#fcba03",
+                "line-width" : 3
+            },
+            beforeLayer: 'upperfloor_base_layer',
+            visible: selectedFloor === 'G' ? 'visible' : 'none',
+            type: "line",
+        },
         {
             floor: 'ground',
             sourceId: 'groundfloor_rooms_source',
@@ -160,6 +218,7 @@ const CampusMap = ({
             },
             beforeLayer: 'upperfloor_base_layer',
             visible: selectedFloor === 'G' ? 'visible' : 'none',
+            type:'fill',
         },
         {
             floor: 'ground',
@@ -172,6 +231,7 @@ const CampusMap = ({
             },
             beforeLayer:'groundfloor_rooms_layer',
             visible: selectedFloor === 'G' ? 'visible' : 'none',
+            type:'fill',
         },
         {
             floor: 'ground',
@@ -184,6 +244,7 @@ const CampusMap = ({
             },
             beforeLayer: 'groundfloor_roombase_layer',
             visible: selectedFloor === 'G' ? 'visible' : 'none',
+            type:'fill',
         },
         //Basement
         {
@@ -198,6 +259,7 @@ const CampusMap = ({
             },
             beforeLayer: 'groundfloor_base_layer',
             visible: selectedFloor === 'B' ? 'visible' : 'none',
+            type:'fill',
         },
         {
             floor: 'basement',
@@ -210,6 +272,7 @@ const CampusMap = ({
             },
             beforeLayer:'basementfloor_rooms_layer',
             visible: selectedFloor === 'B' ? 'visible' : 'none',
+            type:'fill',
         },
         {
             floor: 'basement',
@@ -222,6 +285,7 @@ const CampusMap = ({
             },
             beforeLayer: 'basementfloor_roombase_layer',
             visible: 'visible',
+            type:'fill',
         },
     ]
 
@@ -251,7 +315,8 @@ const CampusMap = ({
                 sourceLayer={el.sourceLayer}
                 beforeLayer={el.beforeLayer}
                 visible={el.visible}
-                paint={el.paint}/>
+                paint={el.paint}
+                type={el.type}/>
             ))}
             {hoverInfo && (
             <div className="tooltip" style={{left: hoverInfo.x, top: hoverInfo.y}}>
