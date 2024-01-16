@@ -27,10 +27,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { resetSubjects } from "../../app/features/subject/subjectSlice";
 
 import { viewAttendance } from "../../app/features/attendance/attendanceSlice";
-import LoadingRowsDataGridOverlay from "../Overlay/LoadingRowsOverlay/LoadingRowsOverlay";
-import { Console } from "console";
-import { NoBackpackSharp } from "@mui/icons-material";
-
 
 const Navbar = ({
     openSidebar,
