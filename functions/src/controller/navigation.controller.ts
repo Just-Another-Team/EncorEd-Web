@@ -77,19 +77,9 @@ class Navigation {
         try {
             const graphData = req.body as PathInputType;
 
-            console.log(graphData)
-
             let shortestPath = dijkstra(graphData.graph!, graphData.origin, graphData.destination);
 
-            //console.log(shortestPath)
-
-            // let lineIds = lineSource.filter((features) => {
-            //     let points = JSON.parse(features.properties!.points) //2 Id points
-            //     return points.every(point => shortestPath.path.includes(point));
-            // }).map((features) => features.properties!.id)
-
             let routeIds = graphData.edges.filter((edge) => {
-                //let points = JSON.parse(features.properties!.points) //2 Id points
                 return edge.points.every(point => shortestPath.path.includes(point));
             }).map((edge) => edge.id)
             
