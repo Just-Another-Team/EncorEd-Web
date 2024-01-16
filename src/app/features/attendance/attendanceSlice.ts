@@ -8,8 +8,9 @@ export type Attendance = {
     roomName: string;
     submitBy: string;
     submitAt: Date | string;
-    verifyBy: string;
-    verifyAt: Date | string;
+    verifyBy?: string;
+    verifyAt?: Date | string;
+    status: string;
 }
 
 interface IAttendanceInitialState {

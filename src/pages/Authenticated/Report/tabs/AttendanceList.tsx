@@ -38,33 +38,43 @@ const AttendanceList = () => {
     const columns: GridColDef[] = [
         { field: 'id', headerName: 'ID', minWidth: 70, sortingOrder: ['asc','desc'], },
         { field: 'roomName', headerName: 'Room', width: 130, sortingOrder: ['asc', 'desc'], },
-        { field: 'submitBy', headerName: 'Name', width: 130, sortingOrder: ['asc', 'desc'], },
-        { field: 'submitAt', headerName: 'Date and Time', width: 220, sortingOrder: ['asc', 'desc'], 
+        { field: 'submitBy', headerName: 'Submitted By', width: 150, sortingOrder: ['asc', 'desc'], },
+        { field: 'submitAt', headerName: 'Date and Time', width: 200, sortingOrder: ['asc', 'desc'], 
           sortable: true,
           valueGetter: (params: GridValueGetterParams) => {
-            return dayjs.unix(params.row.submitAt._seconds).toDate()
+            return dayjs(params.row.submitAt).toDate()
           },
           valueFormatter: (params: GridValueFormatterParams) => {
             return dayjs(params.value).format('MMM DD, YYYY h:mm:ss A')
           }
         },
         { field: 'verifyBy', headerName: 'Verified By', width: 160, sortingOrder: ['asc', 'desc'], },
-        { field: 'verifyAt', headerName: 'Verified Date', width: 220, sortingOrder: ['asc', 'desc'],
+        { field: 'verifyAt', headerName: 'Date Verified', width: 200, sortingOrder: ['asc', 'desc'],
           sortable: true,
           valueGetter: (params: GridValueGetterParams) => {
-            return dayjs.unix(params.row.verifyAt._seconds).toDate()
+            return dayjs(params.row.verifyAt).toDate()
           },
           valueFormatter: (params: GridValueFormatterParams) => {
             return dayjs(params.value).format('MMM DD, YYYY h:mm:ss A')
           },
           renderCell: (params: GridRenderCellParams) => (
             <Typography variant="body2">
-                {params.formattedValue != "Invalid Date" && (
+                {params.formattedValue !== "Invalid Date" && (
                     <Typography variant="body2">
                         {params.formattedValue}
                     </Typography>
                 )}
-                {params.formattedValue == "Invalid Date" && (
+                {params.formattedValue === "Invalid Date" && (
+                    <Typography variant="body2">
+                        
+                    </Typography>
+                )}
+                {params.formattedValue === null && (
+                    <Typography variant="body2">
+                        
+                    </Typography>
+                )}
+                {params.formattedValue === undefined && (
                     <Typography variant="body2">
                         
                     </Typography>
@@ -78,17 +88,17 @@ const AttendanceList = () => {
             flex: 0.4,
             renderCell: (params: GridRenderCellParams) => (
                 <Typography variant="body2">
-                    {params.row.status == "Rejected" && (
+                    {params.row.status === "Rejected" && (
                         <Typography color={"red"} variant="body2">
                             <UnpublishedOutlinedIcon/> Rejected
                         </Typography>
                     )}
-                    {params.row.status == "Approved" && (
+                    {params.row.status === "Approve" && (
                         <Typography color={"green"} variant="body2">
                             <TaskAltIcon/> Approved
                         </Typography>
                     )}
-                    {params.row.status == "Pending" && (
+                    {params.row.status === "Pending" && (
                         <Typography color={"black"} variant="body2">
                             <HourglassBottomIcon/> Pending
                         </Typography>
@@ -106,9 +116,51 @@ const AttendanceList = () => {
                     <TextField onChange={handleSearch} label="Search Attendance" fullWidth/>
                 </Grid>
             </Box>   
-
             <Box height={560} marginBottom={2}>
-                <DataGrid
+                {attendanceLoading === true ? (
+                    <LoadingRowsDataGridOverlay/>
+                ) : (
+                    <DataGrid
+                        autoHeight
+                        hideFooterSelectedRowCount
+                        rows={searchedAttendance}
+                        columns={columns}
+                        slots={{
+                            noRowsOverlay: attendanceLoading ? LoadingRowsDataGridOverlay : NoRowsDataGridOverlay,
+                        }}
+                        initialState={{
+                            pagination: {
+                                paginationModel: { page: 0, pageSize: 10},
+                            },
+                        }}
+                        
+                        onRowDoubleClick={(e) => {
+                            console.log(e.row)
+                        }}
+                        pageSizeOptions={[10]}
+                        //disableRowSelectionOnClick
+                        sx={{
+                            '&.MuiDataGrid-root': {
+                                border: '1px solid #EFEEFB'
+                            },
+                            '.MuiDataGrid-columnHeaders': {
+                                backgroundColor: '#D0E7FF;',
+                                color: '#296EB4',   
+                                fontSize: 16,
+                            },
+                            '.MuiTablePagination-displayedRows': {
+                                marginTop: '1em',
+                                marginBottom: '1em'
+                            },
+                            '.MuiTablePagination-displayedRows, .MuiTablePagination-selectLabel': {
+                                marginTop: '1em',
+                                marginBottom: '1em'
+                            }
+                        }}
+                    />
+                )}
+                
+                {/* <DataGrid
                     autoHeight
                     hideFooterSelectedRowCount
                     rows={searchedAttendance}
@@ -145,7 +197,7 @@ const AttendanceList = () => {
                             marginBottom: '1em'
                         }
                     }}
-                />
+                /> */}
             </Box>
 
             {/* <Box marginBottom={2}>
