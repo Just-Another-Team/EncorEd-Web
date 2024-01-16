@@ -36,7 +36,7 @@ import userRouter from './routes/user'
 import institutionRouter from "./routes/institution"
 import roleRouter from "./routes/role"
 import subjectRouter from "./routes/subject"
-import notificationRouter from "./routes/notification"
+import attendanceRouter from "./routes/attendance"
 
 // import participantRouter from "./routes/participant"
 // import eventRouter from "./routes/event"
@@ -46,7 +46,7 @@ app.use("/user", userRouter)
 app.use("/institution", institutionRouter)
 app.use("/role", roleRouter)
 app.use("/subject", subjectRouter)
-app.use("/notification", notificationRouter)
+app.use("/attendance", attendanceRouter)
 // app.use("/participant", participantRouter)
 // app.use("/event", eventRouter)
 // app.use("/attendees", attendeeRouter)

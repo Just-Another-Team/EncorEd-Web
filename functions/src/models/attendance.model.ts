@@ -1,4 +1,4 @@
-export default interface INotification {
+export default interface IAttendance {
     id?: string;
     institution: string;
     roomName: string;
@@ -6,4 +6,5 @@ export default interface INotification {
     submitAt: Date | string;
     verifyBy: string;
     verifyAt: Date | string;
+    status: string;
 }
