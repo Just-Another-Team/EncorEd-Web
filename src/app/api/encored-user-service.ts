@@ -108,8 +108,8 @@ class EncorEdUserService {
         return http.put(`/user/ban-restore/${data.id}`, data)
     }
 
-    viewNotification(institution: string) {
-        return http.get(`/notification/report/${institution}`)
+    viewAttendance(institution: string) {
+        return http.get(`/attendance/report/${institution}`)
     }
 }
 

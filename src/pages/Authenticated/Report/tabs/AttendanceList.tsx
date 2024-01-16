@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { 
-    Box, Button, Grid, TextField,
+    Box, Button, Grid, TextField, Typography,
 } from "@mui/material";
-import { DataGrid, GridColDef, GridValueFormatterParams, GridValueGetterParams } from '@mui/x-data-grid'
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
+import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
+import UnpublishedOutlinedIcon from '@mui/icons-material/UnpublishedOutlined';
+import { DataGrid, GridColDef, GridRenderCellParams, GridValueFormatterParams, GridValueGetterParams, GridValueSetterParams } from '@mui/x-data-grid'
 import { targetUser } from "../../../../app/features/users/targetSlice";
-import { viewNotif } from "../../../../app/features/notification/notifSlice";
+import { viewAttendance } from "../../../../app/features/attendance/attendanceSlice";
 import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-hooks";
 import { FixMeLater } from "../../../../types/FixMeLater";
 import { useNavigate } from "react-router-dom";
@@ -16,24 +19,24 @@ const AttendanceList = () => {
     const navigate = useNavigate()
 
     const institution = useAppSelector(state => state.institution.data.id)
-    const notifLoading = useAppSelector(state => state.report.loading)
-    const notifications = useAppSelector(state => state.report.data)
+    const attendanceLoading = useAppSelector(state => state.report.loading)
+    const attendances = useAppSelector(state => state.report.data)
 
-    const notifDispatch = useAppDispatch()
+    const attendanceDispatch = useAppDispatch()
     const targetDispatch = useAppDispatch()
 
     useEffect(()=>{
-        notifDispatch(viewNotif(institution))
+        attendanceDispatch(viewAttendance(institution))
     }, [])
 
-    const [searchedNotif, setSearchedNotif] = useState(notifications)
+    const [searchedAttendance, setSearchedAttendance] = useState(attendances)
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const searchResult =  notifications.filter((val) => val.submitBy.toUpperCase().includes(e.currentTarget.value.toUpperCase()) || val.submitBy.toUpperCase().includes(e.currentTarget.value.toUpperCase()))
-        setSearchedNotif(searchResult)
+        const searchResult =  attendances.filter((val) => val.submitBy.toUpperCase().includes(e.currentTarget.value.toUpperCase()) || val.submitBy.toUpperCase().includes(e.currentTarget.value.toUpperCase()))
+        setSearchedAttendance(searchResult)
     }
 
     const columns: GridColDef[] = [
-        { field: 'id', headerName: 'ID', width: 70, sortingOrder: ['asc','desc'], },
+        { field: 'id', headerName: 'ID', minWidth: 70, sortingOrder: ['asc','desc'], },
         { field: 'roomName', headerName: 'Room', width: 130, sortingOrder: ['asc', 'desc'], },
         { field: 'submitBy', headerName: 'Name', width: 130, sortingOrder: ['asc', 'desc'], },
         { field: 'submitAt', headerName: 'Date and Time', width: 220, sortingOrder: ['asc', 'desc'], 
@@ -53,7 +56,45 @@ const AttendanceList = () => {
           },
           valueFormatter: (params: GridValueFormatterParams) => {
             return dayjs(params.value).format('MMM DD, YYYY h:mm:ss A')
-          }
+          },
+          renderCell: (params: GridRenderCellParams) => (
+            <Typography variant="body2">
+                {params.formattedValue != "Invalid Date" && (
+                    <Typography variant="body2">
+                        {params.formattedValue}
+                    </Typography>
+                )}
+                {params.formattedValue == "Invalid Date" && (
+                    <Typography variant="body2">
+                        
+                    </Typography>
+                )}
+            </Typography>
+          )
+        },
+        {
+            field: 'status',
+            headerName: 'Status',
+            flex: 0.4,
+            renderCell: (params: GridRenderCellParams) => (
+                <Typography variant="body2">
+                    {params.row.status == "Rejected" && (
+                        <Typography color={"red"} variant="body2">
+                            <UnpublishedOutlinedIcon/> Rejected
+                        </Typography>
+                    )}
+                    {params.row.status == "Approved" && (
+                        <Typography color={"green"} variant="body2">
+                            <TaskAltIcon/> Approved
+                        </Typography>
+                    )}
+                    {params.row.status == "Pending" && (
+                        <Typography color={"black"} variant="body2">
+                            <HourglassBottomIcon/> Pending
+                        </Typography>
+                    )}
+                </Typography>
+            )
         },
     ];
 
@@ -70,10 +111,10 @@ const AttendanceList = () => {
                 <DataGrid
                     autoHeight
                     hideFooterSelectedRowCount
-                    rows={searchedNotif}
+                    rows={searchedAttendance}
                     columns={columns}
                     slots={{
-                        noRowsOverlay: notifLoading ? LoadingRowsDataGridOverlay : NoRowsDataGridOverlay,
+                        noRowsOverlay: attendanceLoading ? LoadingRowsDataGridOverlay : NoRowsDataGridOverlay,
                     }}
                     initialState={{
                         pagination: {

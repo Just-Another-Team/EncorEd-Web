@@ -2,7 +2,7 @@ import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import EncorEdUserService from "../../api/encored-user-service"
 import { FixMeLater } from "../../../types/FixMeLater";
 
-export type Notification = {
+export type Attendance = {
     id: string;
     instution: string;
     roomName: string;
@@ -12,41 +12,41 @@ export type Notification = {
     verifyAt: Date | string;
 }
 
-interface INotificationInitialState {
+interface IAttendanceInitialState {
     loading: boolean,
-    data: Array<Notification>,
+    data: Array<Attendance>,
     error: any
 }
 
-const initialState: INotificationInitialState = {
+const initialState: IAttendanceInitialState = {
     loading: false,
     data: [],
     error: null
 }
 
-export const viewNotif = createAsyncThunk(
-    "/notification/report",
+export const viewAttendance = createAsyncThunk(
+    "/attendance/report",
     async (institution: FixMeLater, {rejectWithValue}) => {
-        return await EncorEdUserService.viewNotification(institution).catch((error) => rejectWithValue(error))
+        return await EncorEdUserService.viewAttendance(institution).catch((error) => rejectWithValue(error))
     }
 )
-const notifSlice = createSlice ({
+const attendanceSlice = createSlice ({
 name: 'report',
 initialState,
 reducers: {},
 extraReducers: (builder) => {
     {
-        builder.addCase(viewNotif.pending, (state, action) => {
+        builder.addCase(viewAttendance.pending, (state, action) => {
             state.loading = true
             state.data = []
             state.error = null
         })
-        builder.addCase(viewNotif.fulfilled, (state, action: PayloadAction<FixMeLater>) => {
+        builder.addCase(viewAttendance.fulfilled, (state, action: PayloadAction<FixMeLater>) => {
             state.loading = false
             state.data = action.payload.data
             state.error = null
         })
-        builder.addCase(viewNotif.rejected, (state, action: PayloadAction<FixMeLater>) => {
+        builder.addCase(viewAttendance.rejected, (state, action: PayloadAction<FixMeLater>) => {
             state.loading = false
             state.data = []
             state.error = action.payload
@@ -55,4 +55,4 @@ extraReducers: (builder) => {
 }
 })
 
-export default notifSlice.reducer
+export default attendanceSlice.reducer

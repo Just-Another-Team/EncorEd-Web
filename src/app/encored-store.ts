@@ -12,7 +12,7 @@ import roleSlice from "./features/role/roleSlice";
 import targetSlice from "./features/users/targetSlice";
 import subjectSlice from "./features/subject/subjectSlice";
 import profileSlice from "./features/profile/profileSlice"
-import notifSlice from "./features/notification/notifSlice";
+import notifSlice from "./features/attendance/attendanceSlice";
 
 // import subjectSlice from "./features/subject/subjectSlice";
 // import eventSlice from "./features/event/eventSlice";
