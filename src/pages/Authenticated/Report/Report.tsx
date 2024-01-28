@@ -6,7 +6,8 @@ import {
     Tab,
     Button,
     TextField,
-    Grid
+    Grid,
+    Container
 } from "@mui/material";
 import { Outlet, useLocation, Link, } from 'react-router-dom'
 import { FixMeLater } from "../../../types/FixMeLater";
@@ -42,15 +43,12 @@ const Report = () => {
             <Typography variant="h4" fontWeight={700} marginBottom={1}>
                 Report
             </Typography>
-            
-            <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} marginBottom={1}>
-                <Button variant="contained" size="large">DOWNLOAD REPORT</Button>
-            </Box>
 
             {/* Tabs */}
             <Box marginBottom={2} sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={page} onChange={handleChange} aria-label="basic tabs example">
-                    <CustomTab label="Attendance" component={Link} to={`attendance/${institution}`}/>
+                    <CustomTab label="Summary" component={Link} to={`summary`}/>
+                    <CustomTab label="Attendance" component={Link} to={`attendance`}/>
                     {/* <CustomTab label="Events" component={Link} to={`events/${institution}`}/> */}
                     {/* <CustomTab label="Subjects" component={Link} to={`subjects/${institution}`}/> */}
                 </Tabs>

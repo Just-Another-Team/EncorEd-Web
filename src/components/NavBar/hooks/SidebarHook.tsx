@@ -34,7 +34,7 @@ const ConnectedSideBar = ({
 
     const navigations: Array<LinkType> = [
         {key: "home", name: "Home", icon: <HomeOutline />, href: "/dashboard/home"},
-        {key: "reports", name: "Reports", icon: <ReportOutline />, href: `/dashboard/report/attendance/${institution}`},
+        {key: "reports", name: "Reports", icon: <ReportOutline />, href: `/dashboard/report/attendance`},
         {key: "subject", name: "Subject", icon: <BookOutline />, href: `/dashboard/subject/${institution}`},
         {key: "maps", name: "Maps", icon: <MapOutline />, href: "/dashboard/map/list"},
         {key: "events", name: "Events", icon: <EventOutline />, href: `/dashboard/event/${institution}`},

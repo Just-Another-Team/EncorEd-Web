@@ -48,6 +48,7 @@ import UsersLayout from './pages/Admin/Users/UsersLayout';
 import { logOutRoles } from './app/features/role/authRoleSlice';
 import AddSubject from './pages/Authenticated/Subject/pages/AddSubject';
 import AttendanceList from './pages/Authenticated/Report/tabs/AttendanceList';
+import ReportSummary from './pages/Authenticated/Report/tabs/ReportSummary';
 
 function App() {
   const dispatch = useAppDispatch()
@@ -110,7 +111,8 @@ function App() {
         <Route path='profile/:id' element={<UsersProfile />}/>
 
         <Route path='report' element={<Report />}>
-          <Route index path='attendance/:institution' element={<AttendanceList/>}/>
+          <Route index path='summary' element={<ReportSummary/>}/>
+          <Route index path='attendance' element={<AttendanceList/>}/>
         </Route>
 
         <Route path='request' element={<Request />}/>
