@@ -18,17 +18,6 @@ import { DefaultSourceLayerType } from '../../types/DefaultSourceLayerType';
 //SHOULD HAVE BEEN A MAPBOX COMPONENT INSTEAD OF A TSX COMPONENT
 //SEE THIS ARTICLE https://www.lostcreekdesigns.co/writing/a-complete-guide-to-sources-and-layers-in-react-and-mapbox-gl-js/
 
-type DefaultSourceLayerType = {
-    floor?: string | undefined;
-    sourceId: string;
-    tilesetId: string;
-    layerId: string;
-    sourceLayer: string;
-    paint: FillPaint;
-    beforeLayer?: string;
-    visible: mapboxgl.Visibility;
-}
-
 type CampusMapType = {
     selectedFloor: string;
 }
@@ -121,7 +110,7 @@ const CampusMap = ({
             },
             beforeLayer: undefined,
             visible: selectedFloor === '2' ? 'visible' : 'none',
-            type:'fill',
+            type: 'fill',
         },
         {
             floor: 'second',

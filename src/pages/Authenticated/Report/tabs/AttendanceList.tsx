@@ -18,6 +18,7 @@ import NoRowsDataGridOverlay from "../../../../components/Overlay/NoRows/NowRows
 const AttendanceList = () => {
     const navigate = useNavigate()
 
+    const users = useAppSelector(state => state.users)
     const institution = useAppSelector(state => state.institution.data.id)
     const attendanceLoading = useAppSelector(state => state.report.loading)
     const attendances = useAppSelector(state => state.report.data)
@@ -38,7 +39,9 @@ const AttendanceList = () => {
     const columns: GridColDef[] = [
         { field: 'id', headerName: 'ID', minWidth: 70, sortingOrder: ['asc','desc'], },
         { field: 'roomName', headerName: 'Room', width: 130, sortingOrder: ['asc', 'desc'], },
-        { field: 'submitBy', headerName: 'Submitted By', width: 150, sortingOrder: ['asc', 'desc'], },
+        { field: 'submitBy', headerName: 'Submitted By', width: 150, sortingOrder: ['asc', 'desc'],
+            
+        },
         { field: 'submitAt', headerName: 'Date and Time', width: 200, sortingOrder: ['asc', 'desc'], 
           sortable: true,
           valueGetter: (params: GridValueGetterParams) => {
@@ -48,7 +51,9 @@ const AttendanceList = () => {
             return dayjs(params.value).format('MMM DD, YYYY h:mm:ss A')
           }
         },
-        { field: 'verifyBy', headerName: 'Verified By', width: 160, sortingOrder: ['asc', 'desc'], },
+        { field: 'verifyBy', headerName: 'Verified By', width: 160, sortingOrder: ['asc', 'desc'],
+            
+        },
         { field: 'verifyAt', headerName: 'Date Verified', width: 200, sortingOrder: ['asc', 'desc'],
           sortable: true,
           valueGetter: (params: GridValueGetterParams) => {

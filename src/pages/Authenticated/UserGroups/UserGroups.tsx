@@ -24,7 +24,7 @@ const UserGroups = () => {
 
     const userGroupsTabs: Array<TabType> = [
         {key: "user", label: "User", to: `users/u/${institution}`},
-        {key: "groups", label: "Groups", to: `groups/u/${institution}`},
+        // {key: "groups", label: "Groups", to: `groups/u/${institution}`},
         {key: "roles", label: "Roles", to: `roles/u/${institution}`}
     ]
 
@@ -43,7 +43,7 @@ const UserGroups = () => {
             <Box marginBottom={2} sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={page} onChange={handleChange} aria-label="basic tabs example">
                     <CustomTab label="User" component={Link} to={`users/u/${institution}`}/>
-                    <CustomTab label="Groups" component={Link} to={`groups/u/${institution}`}/>
+                    {/* <CustomTab label="Groups" component={Link} to={`groups/u/${institution}`}/> */}
                     <CustomTab label="Roles" component={Link} to={`roles/u/${institution}`}/>
                 </Tabs>
             </Box>
