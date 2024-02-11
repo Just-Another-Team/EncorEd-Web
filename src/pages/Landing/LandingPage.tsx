@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
     Container,
     Typography,
@@ -7,7 +5,7 @@ import {
     Button,
     Stack
 } from '@mui/material'
-import {LandingPagePrimaryButton, LandingPageSecondaryButton} from "../components/Buttons/LandingPageButton"
+import {LandingPagePrimaryButton, LandingPageSecondaryButton} from "../../components/Buttons/LandingPageButton"
 
 const LandingPage = () => {
     return (

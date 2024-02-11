@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider } from '@emotion/react';
-import { defaultTheme } from './styles/defaultTheme';
+import { defaultTheme } from './assets/themes/defaultTheme';
 import store, { persistor } from './app/encored-store';
 import { PersistGate } from 'redux-persist/integration/react';
 import { LocalizationProvider } from '@mui/x-date-pickers';
