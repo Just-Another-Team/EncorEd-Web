@@ -62,7 +62,8 @@ function App() {
         <Route path='profile/:id' element={<UsersProfile />}/>
 
         <Route path='report' element={<Report />}>
-          <Route index path='attendance/:institution' element={<AttendanceList/>}/>
+          <Route index path='summary' element={<ReportSummary/>}/>
+          <Route index path='attendance' element={<AttendanceList/>}/>
         </Route>
 
         <Route path='request' element={<Request />}/>
