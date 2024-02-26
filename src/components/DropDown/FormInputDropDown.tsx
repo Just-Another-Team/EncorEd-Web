@@ -1,7 +1,6 @@
 import React from 'react'
 import { FormControl, MenuItem, InputLabel, Select } from '@mui/material'
 import { Control, Controller, FieldValue, FieldValues } from 'react-hook-form' 
-import { FixMeLater } from '../../types/FixMeLater'
 import { FormPropsInput } from '../../types/FormPropsInput'
 
 // type InputDropDownType = {
@@ -10,6 +9,8 @@ import { FormPropsInput } from '../../types/FormPropsInput'
 //     label: string;
 //     rules?: 
 // }
+
+
 
 const FormInputDropDown: React.FC<FormPropsInput> = ({
     name,
@@ -24,7 +25,9 @@ const FormInputDropDown: React.FC<FormPropsInput> = ({
 }) => {
 
     return(
-        <FormControl fullWidth={fullWidth} sx={formControlProps}>
+        <FormControl
+        fullWidth={fullWidth}
+        sx={formControlProps}>
             <InputLabel>{label}</InputLabel>
             <Controller
             name={name}
@@ -47,8 +50,7 @@ const FormInputDropDown: React.FC<FormPropsInput> = ({
                         )
                     })}
                 </Select>
-            )}
-            />
+            )}/>
         </FormControl>
     )
 }

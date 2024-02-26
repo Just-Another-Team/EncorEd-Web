@@ -24,7 +24,7 @@ import { getUser, register, signIn, updateUser } from "../../../app/features/aut
 import { getInstitution } from "../../../app/features/institution/authInstitutionSlice";
 import { getAssignedRoles } from "../../../app/features/role/authRoleSlice";
 import { auth } from "../../../app/firebase/authentication";
-import LoadingDialog from "../../../components/Dialog/LoadingDialog/LoadingDialog";
+import LoadingDialog from "../../../components/DialogLoading";
 
 const Profile = () => {
     const [page, setPage] = React.useState(0);

@@ -31,7 +31,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { Role } from "../../../../app/features/role/authRoleSlice"
 import { VerificationPermission } from "../../../../types/RoleTypes/VerificationPermission"
 import { AttendancePermissions } from "../../../../types/RoleTypes/AttendancePermission"
-import LoadingDialog from "../../../../components/Dialog/LoadingDialog/LoadingDialog"
+import LoadingDialog from "../../../../components/DialogLoading"
 
 type SwitchInputs = {
     key: string

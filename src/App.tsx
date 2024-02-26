@@ -1,18 +1,43 @@
 import './App.css';
 import {Routes, Route, Navigate, useLocation, useNavigate} from 'react-router-dom';
 
-import Login from './pages/Login/Login';
+import Login from './pages/Login';
 import LandingPage from './pages/Landing/LandingPage';
 
 import { useAppDispatch, useAppSelector } from './app/encored-store-hooks';
+import Layout from './pages/_Layout';
+import Home from './pages/Home';
+import Report from './pages/Report';
+import QRCodes from './pages/QRCode';
+import SelectedRoom from './pages/QRCodeViewRoom';
+import NotificationList from './pages/Notifications';
+import NotificationItem from './pages/Notification';
 
 function App() {
   return (
     <Routes>
-      <Route path='/' element={<LandingPage />}/>
+      
 
       {/* Public pages */}
-      <Route path='/login' element={<Login />}/>
+      <Route path='/' element={<Login />}/>
+
+      <Route path='/dashboard' element={<Layout />}>
+        <Route index path='home' element={<Home />}  />
+
+        <Route path='report' element={<Report />} />
+
+        <Route path='rooms'>
+          <Route element={<QRCodes />} index/>
+          <Route path=':roomId' element={<SelectedRoom />}/>
+        </Route>
+
+        <Route path='notifications'>
+          <Route element={<NotificationList />} index/>
+          <Route path=':notificationId' element={<NotificationItem />}/>
+        </Route>
+        {/* <Route path='subject' />
+        <Route path='users' /> */}
+      </Route>
 
       {/* <Route path='/register' element={<UserInput />}> Registration is not needed
         <Route path='user' element={<RegistrationUserForm />} />

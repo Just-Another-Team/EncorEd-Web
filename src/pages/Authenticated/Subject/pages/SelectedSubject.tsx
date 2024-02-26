@@ -33,7 +33,7 @@ import { FixMeLater } from "../../../../types/FixMeLater";
 import InputTimePicker from "../../../../components/Timepicker/Timepicker";
 import FormInputMultiCheckbox from "../../../../components/Checkbox/FormInputMultiCheckbox";
 import { ErrorMessage } from "@hookform/error-message";
-import UpdateSubjectDialog from "../../../../components/Dialog/FormDialog/UpdateSubjectDialog";
+// import UpdateSubjectDialog from "../../../../components/Dialog/FormDialog/UpdateSubjectDialog";
 
 const SelectedSubject = () => {
     const src = "/assets/SubjectTestPic.png"
@@ -151,11 +151,11 @@ const SelectedSubject = () => {
                 </Grid>
             </Grid>
 
-            <UpdateSubjectDialog
+            {/* <UpdateSubjectDialog
             selectedSubject={selectedSubject!}
             updateDialogSwitch={updateDialogSwitch}
             closeUpdateDialog={closeUpdateDialog}
-            weeks={weeks}/>
+            weeks={weeks}/> */}
             
         </>
     )

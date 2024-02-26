@@ -28,7 +28,7 @@ import { useAppDispatch, useAppSelector } from "../../../../app/encored-store-ho
 import { addRole } from "../../../../app/features/role/roleSlice"
 import { RoleInput } from "../../../../app/api/encored-role-service"
 import { useNavigate } from "react-router-dom"
-import LoadingDialog from "../../../../components/Dialog/LoadingDialog/LoadingDialog"
+import LoadingDialog from "../../../../components/DialogLoading"
 
 type SwitchInputs = {
     key: string
