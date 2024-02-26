@@ -2,8 +2,8 @@ import { TextFieldProps } from "@mui/material";
 import { FieldValues, RegisterOptions } from "react-hook-form";
 
 export type LoginDataType = {
-    email: string | null;
-    password: string | null;
+    email: string;
+    password: string;
 }
 
 export type LoginTextFieldType = {

@@ -8,6 +8,7 @@ import { useState } from "react";
 import Menu from "@mui/icons-material/Menu";
 import { Search } from "@mui/icons-material";
 import { NotificationStatusEnum, Notifications } from "../../data/notificationData";
+import { getAuth, signOut } from "firebase/auth";
 
 //-------------------------------------------------
 // useNavBar
@@ -35,9 +36,11 @@ const AuthenticatedNavbar = ({
     }
 
     const handleLogout = () => {
-        //Logging out
-        setAuthenticated(false)
-        navigate("/")
+        const auth = getAuth();
+        signOut(auth)
+            .then(() => {
+                navigate("/")
+            })
     }
 
     const newNotifications = Notifications.filter(notification => notification.notfStatus === NotificationStatusEnum.Unread).length;

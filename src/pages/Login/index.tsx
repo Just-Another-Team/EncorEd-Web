@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import ControlledTextField from "../../components/TextFieldControlled/input";
 import { LoginDataType, LoginTextFieldType } from "../../types/InputLoginType";
 import LoadingDialog from "../../components/DialogLoading";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 const inputs: Array<LoginTextFieldType> = [
     {
@@ -43,15 +44,20 @@ const Login = () => {
     });
 
     const navigate = useNavigate();
+    const auth = getAuth();
 
     const handleLogin = (loginData: LoginDataType) => {
-        // TO-DO:
-        // Check login credentials
-        // if login credentials valid -> Load the screen. Move to home page
-        // navigate("/dashboard/home");
-        // else -> provide error message
-
-        return;
+        signInWithEmailAndPassword(auth, loginData.email, loginData.password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                console.log(user);
+                navigate("/dashboard");
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorCode, errorMessage);
+            })
     }
 
     return (
