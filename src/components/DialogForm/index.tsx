@@ -11,10 +11,10 @@ type DialogFormType = {
     title?: string;
     maxWidth?: "xs" | "sm" | "md" | "lg" | "xl"
     
-    onSubmitForm: (event: React.FormEvent<HTMLFormElement>) => void;
-    onClose: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+    onSubmitForm?: (event: React.FormEvent<HTMLFormElement>) => void;
+    onClose?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
 
-    children: React.ReactNode;
+    children?: React.ReactNode;
 }
 
 const DialogForm = ({
@@ -42,8 +42,16 @@ const DialogForm = ({
             </DialogContent>
 
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button type="submit">Subscribe</Button>
+                <Button
+                onClick={onClose}
+                variant='outlined'>
+                    Cancel
+                </Button>
+                <Button
+                type="submit"
+                variant='contained'>
+                    Subscribe
+                </Button>
             </DialogActions>
         </Dialog>
     )

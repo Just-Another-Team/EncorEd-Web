@@ -120,6 +120,12 @@ const Login = () => {
 
             {/* Error Dialog */}
 
+            {/* Form Dialog */}
+            <DialogForm
+            open={true}>
+                
+            </DialogForm>
+
         </Container>
     )
 }
