@@ -1,18 +1,21 @@
 import { Box, Typography } from "@mui/material"
-import { useEffect, useRef } from "react"
+import { LegacyRef, useEffect, useRef } from "react"
 import QRCode from "react-qr-code"
 import { FixMeLater } from "../../types/FixMeLater"
+import { RoomType } from "../../data/roomData"
 
-const room = {
-    roomId: "1_room101",
-    roomName: "Room 101",
-    floor: "1st"
+type QRImageType = {
+    QRSize?: number;
+    setImgSrc: React.Dispatch<React.SetStateAction<string | null>>;
+    room: RoomType;
 }
 
-const TestQR = () => {
-
+const QRImage = ({
+    QRSize = 256,
+    setImgSrc,
+    room
+}: QRImageType) => {
     const divRef = useRef<ReactDOM.Container>();
-    const image = useRef<FixMeLater>();
 
     useEffect(() => {
         const divCurrent = divRef.current;
@@ -21,36 +24,20 @@ const TestQR = () => {
         const serializer = new XMLSerializer();
         const svgStr = serializer.serializeToString(svgQuery as Node);
 
-        const imgCurrent = image.current;
-        imgCurrent.src = `data:image/svg+xml;base64,${window.btoa(svgStr)}`//'data:image/svg+xml;base64,'+ window.btoa(svgStr);
-        svgQuery?.parentNode?.removeChild(svgQuery)
+        setImgSrc(`data:image/svg+xml;base64,${window.btoa(svgStr)}`)
+
+        // const imgCurrent = image.current;
+        // imgCurrent!.src = `data:image/svg+xml;base64,${window.btoa(svgStr)}`; //The string value is the output
     }, [])
 
-    return( 
-        <Box>
-            <Box ref={divRef}>
-                <QRCode
-                size={256}
-                value={JSON.stringify(room)}/>
-            </Box>
-            <Box>
-                <Typography>Image</Typography>
-                <img />
-            </Box>
+    return(
+        <Box ref={divRef}>
+            <QRCode
+            size={QRSize}
+            value={JSON.stringify(room)}/>
         </Box>
     )
 }
 
-const TestQRCodeImage = () => {
 
-    
-
-    const serialized = new XMLSerializer();
-    //const svgStr = serialized.serializeToString(TestQR);
-
-    return (
-        <img />
-    )
-}
-
-export default TestQR;
+export default QRImage;

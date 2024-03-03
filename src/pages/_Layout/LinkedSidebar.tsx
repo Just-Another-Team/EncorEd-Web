@@ -8,6 +8,7 @@ import OrganizationOutline from '@mui/icons-material/PieChartOutlined'
 import ReportOutline from '@mui/icons-material/AssessmentOutlined';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import Sidebar from '../../components/NavSidebar'
+import { HowToReg, QrCode } from '@mui/icons-material'
 
 //LinkListItemType
 export type LinkType = {
@@ -34,15 +35,15 @@ const LinkedSideBar = ({
             href: "/dashboard/home"//"/dashboard/home"
         },
         {
-            key: "reports",
-            name: "Reports",
-            icon: <ReportOutline />,
-            href: "/dashboard/report"//`/dashboard/report/attendance`
+            key: "attendances",
+            name: "Attendances",
+            icon: <HowToReg />,
+            href: "/dashboard/attendances"//`/dashboard/report/attendance`
         },
         {
             key: "rooms",
             name: "Room QR Code",
-            icon: <ReportOutline />,
+            icon: <QrCode />,
             href: "/dashboard/rooms"//`/dashboard/report/attendance`
         },
         // {

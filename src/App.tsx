@@ -7,11 +7,11 @@ import LandingPage from './pages/Landing/LandingPage';
 import { useAppDispatch, useAppSelector } from './app/encored-store-hooks';
 import Layout from './pages/_Layout';
 import Home from './pages/Home';
-import Report from './pages/Report';
 import QRCodes from './pages/QRCode';
 import SelectedRoom from './pages/QRCodeViewRoom';
 import NotificationList from './pages/Notifications';
 import NotificationItem from './pages/Notification';
+import Attendances from './pages/Attendances';
 
 function App() {
   return (
@@ -24,7 +24,7 @@ function App() {
       <Route path='/dashboard' element={<Layout />}>
         <Route index path='home' element={<Home />}  />
 
-        <Route path='report' element={<Report />} />
+        <Route path='attendances' element={<Attendances />} />
 
         <Route path='rooms'>
           <Route element={<QRCodes />} index/>

@@ -11,10 +11,17 @@ import { Rooms } from "../../data/roomData";
 import QRCode from "react-qr-code";
 import { Subjects } from "../../data/subjectData";
 import RoomSubjectList from "./ListRoomSubject";
-import TestQR from "./QRCodeToImage";
+import QRImage from "./QRCodeToImage";
+import { useState } from "react";
 
 const SelectedRoom = () => {
     const { roomId } = useParams<RoomParams>();
+
+    const [imgSrc, setImgSrc] = useState<string | null>(null);
+
+    const handleQRPrint = () => {
+        return;
+    }
 
     const room = Rooms.find(room => room.roomId === roomId)
     const subjects = Subjects.filter(subject => subject.roomId === roomId)
@@ -40,11 +47,11 @@ const SelectedRoom = () => {
                     </Typography>
                 </Box>
 
-                {/* <Box
+                <Box
                 height={512}>
                     <RoomSubjectList
                     subjects={subjects}/>
-                </Box> */}
+                </Box>
             </Box>
 
             {/* Maybe separate with another component? */}
@@ -66,12 +73,12 @@ const SelectedRoom = () => {
                             Room QR Code
                         </Typography>
 
-                        {/* <QRCode
-                        size={256}
-                        value={JSON.stringify(room)}/> */}
-                        <TestQR />
+                        <QRImage
+                        setImgSrc={setImgSrc}
+                        room={room!}/>
 
                         <Button
+                        onClick={handleQRPrint}
                         variant="contained">
                             Print QR Code
                         </Button>

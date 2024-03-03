@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import ControlledTextField from "../../components/TextFieldControlled/input";
 import { LoginDataType, LoginTextFieldType } from "../../types/InputLoginType";
 import LoadingDialog from "../../components/DialogLoading";
+import DialogForm from "../../components/DialogForm";
 
 const inputs: Array<LoginTextFieldType> = [
     {
@@ -116,6 +117,9 @@ const Login = () => {
             <LoadingDialog
             open={false}
             text="Logging in to EncorEd"/>
+
+            {/* Error Dialog */}
+
         </Container>
     )
 }

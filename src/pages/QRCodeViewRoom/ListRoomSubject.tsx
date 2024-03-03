@@ -31,6 +31,13 @@ const RoomSubjectList = ({ subjects }: RoomSubjectListType) => {
     return(
         <DataGrid
         getRowId={(row) => row.subId}
+        initialState={{
+            pagination: {
+                paginationModel: {
+                    pageSize: 10,
+                }
+            }
+        }}
         columns={columns}
         rows={subjects}
         pageSizeOptions={[10]}/>
