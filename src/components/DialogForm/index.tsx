@@ -6,6 +6,14 @@ import {
     DialogTitle,
 } from '@mui/material'
 
+// Within the children node
+// It must be a Grid component. See this documentation: https://mui.com/material-ui/react-grid/
+
+// Each Grid Cell must contain input components. Make sure input components
+// are wrapped in a Controller component. See https://blog.logrocket.com/using-material-ui-with-react-hook-form/
+
+// Note: Most of the custom input components in this project are all wrapped with the Controller component
+
 type DialogFormType = {
     open: boolean;
     title?: string;
