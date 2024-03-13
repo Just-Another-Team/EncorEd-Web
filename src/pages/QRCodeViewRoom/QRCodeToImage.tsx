@@ -2,12 +2,12 @@ import { Box, Typography } from "@mui/material"
 import { LegacyRef, useEffect, useRef } from "react"
 import QRCode from "react-qr-code"
 import { FixMeLater } from "../../types/FixMeLater"
-import { RoomType } from "../../data/roomData"
+import IRoom from "../../types/IRoom"
 
 type QRImageType = {
     QRSize?: number;
     setImgSrc: React.Dispatch<React.SetStateAction<string | null>>;
-    room: RoomType;
+    room: IRoom | undefined;
 }
 
 const QRImage = ({
@@ -25,16 +25,13 @@ const QRImage = ({
         const svgStr = serializer.serializeToString(svgQuery as Node);
 
         setImgSrc(`data:image/svg+xml;base64,${window.btoa(svgStr)}`)
-
-        // const imgCurrent = image.current;
-        // imgCurrent!.src = `data:image/svg+xml;base64,${window.btoa(svgStr)}`; //The string value is the output
     }, [])
 
     return(
         <Box ref={divRef}>
             <QRCode
             size={QRSize}
-            value={JSON.stringify(room)}/>
+            value={`encored://app/attendance/${room?.ROOM_ID}`}/>
         </Box>
     )
 }

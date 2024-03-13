@@ -36,6 +36,7 @@ const Layout = () => {
                 sx={{
                     marginY: 1,
                 }}>
+                    {/* Do the thing that allow roles */}
                     <Outlet />
                 </Container>
             </Stack>

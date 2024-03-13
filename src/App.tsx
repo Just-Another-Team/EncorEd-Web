@@ -21,7 +21,8 @@ function App() {
       {/* Public pages */}
       <Route path='/' element={<Login />}/>
 
-      <Route path='/dashboard' element={<Layout />}>
+      {/* All Users */}
+      <Route path='/dashboard' element={<Layout />}> 
         <Route index path='home' element={<Home />}  />
 
         <Route path='attendances' element={<Attendances />} />
@@ -38,7 +39,8 @@ function App() {
         {/* <Route path='subject' />
         <Route path='users' /> */}
       </Route>
-
+      
+      
       {/* <Route path='/register' element={<UserInput />}> Registration is not needed
         <Route path='user' element={<RegistrationUserForm />} />
         <Route path='institution' element={<RegistrationInstitutionForm />}/>

@@ -6,11 +6,12 @@ import {
     Stack,
     Typography
 } from "@mui/material"
-import QRCode from "react-qr-code"
-import { Rooms } from "../../data/roomData"
 import CardQR from "../../components/CardQR"
+import { useRooms } from "../../hooks/useRooms"
 
 const QRCodes = () => {
+
+    const { rooms } = useRooms();
 
     return(
         <Box>
@@ -37,18 +38,17 @@ const QRCodes = () => {
             <Grid
             spacing={2}
             container>
-                {Rooms.map(room => (
+                {rooms.map(room => (
                     <Grid
-                    key={room.roomId}
+                    key={room?.ROOM_ID}
                     item
                     xs={12}
                     sm={6}
                     lg={4}>
                         <CardQR
-                        key={room.roomId}
-                        roomId={room.roomId}
-                        roomName={room.roomName}
-                        floor={room.floor}/>
+                        key={room?.ROOM_ID}
+                        room={room}
+                        qrValue={`encored://app/attendance/${room?.ROOM_ID}`}/>
                     </Grid>
                 ))}
             </Grid>

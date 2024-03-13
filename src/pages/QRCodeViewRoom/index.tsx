@@ -7,14 +7,15 @@ import {
 } from "@mui/material"
 import { useParams } from "react-router-dom"
 import { RoomParams } from "../../types/Params";
-import { Rooms } from "../../data/roomData";
 import QRCode from "react-qr-code";
 import { Subjects } from "../../data/subjectData";
 import RoomSubjectList from "./ListRoomSubject";
 import QRImage from "./QRCodeToImage";
 import { useState } from "react";
+import { useRooms } from "../../hooks/useRooms";
 
 const SelectedRoom = () => {
+    const { rooms } = useRooms();
     const { roomId } = useParams<RoomParams>();
 
     const [imgSrc, setImgSrc] = useState<string | null>(null);
@@ -23,7 +24,7 @@ const SelectedRoom = () => {
         return;
     }
 
-    const room = Rooms.find(room => room.roomId === roomId)
+    const room = rooms.find(room => room.ROOM_ID === roomId)
     const subjects = Subjects.filter(subject => subject.roomId === roomId)
 
     return(
@@ -38,12 +39,12 @@ const SelectedRoom = () => {
                     <Typography
                     variant="h3"
                     fontWeight={700}>
-                        {room?.roomName}
+                        {room?.ROOM_NAME}
                     </Typography>
 
                     <Typography
                     variant="h6">
-                        Floor Location: <span style={{ fontWeight: 700 }}>{room?.floor}</span>
+                        Floor Location: <span style={{ fontWeight: 700 }}>{room?.FLR_ID.FLR_NAME}</span>
                     </Typography>
                 </Box>
 
@@ -75,7 +76,7 @@ const SelectedRoom = () => {
 
                         <QRImage
                         setImgSrc={setImgSrc}
-                        room={room!}/>
+                        room={room}/>
 
                         <Button
                         onClick={handleQRPrint}
