@@ -28,7 +28,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.admin = exports.clientApp = exports.adminApp = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config(); //{ path: './.env' }
+dotenv_1.default.config();
 const admin = __importStar(require("firebase-admin"));
 exports.admin = admin;
 const app_1 = require("firebase-admin/app");

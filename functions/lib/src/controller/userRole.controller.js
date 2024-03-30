@@ -82,7 +82,7 @@ class UserRole {
                     current.appAdmin = result.appAdmin || current.appAdmin;
                     current.admin = result.admin || current.admin;
                     // Employee
-                    if (typeof current.teacher === "boolean")
+                    if (typeof current.employee === "boolean")
                         current.employee = result.employee || current.employee;
                     else {
                         const currentEmployee = current.employee;
@@ -97,7 +97,6 @@ class UserRole {
                             currentEmployee.addSubject = setPermission(resultEmployee === null || resultEmployee === void 0 ? void 0 : resultEmployee.addSubject, currentEmployee === null || currentEmployee === void 0 ? void 0 : currentEmployee.addSubject);
                             currentEmployee.editSubject = setPermission(resultEmployee === null || resultEmployee === void 0 ? void 0 : resultEmployee.editSubject, currentEmployee === null || currentEmployee === void 0 ? void 0 : currentEmployee.editSubject);
                             currentEmployee.deleteSubject = setPermission(resultEmployee === null || resultEmployee === void 0 ? void 0 : resultEmployee.deleteSubject, currentEmployee === null || currentEmployee === void 0 ? void 0 : currentEmployee.deleteSubject);
-                            4;
                             currentEmployee.viewEvent = setPermission(resultEmployee === null || resultEmployee === void 0 ? void 0 : resultEmployee.viewEvent, currentEmployee === null || currentEmployee === void 0 ? void 0 : currentEmployee.viewEvent);
                             currentEmployee.addEvent = setPermission(resultEmployee === null || resultEmployee === void 0 ? void 0 : resultEmployee.addEvent, currentEmployee === null || currentEmployee === void 0 ? void 0 : currentEmployee.addEvent);
                             currentEmployee.editEvent = setPermission(resultEmployee === null || resultEmployee === void 0 ? void 0 : resultEmployee.editEvent, currentEmployee === null || currentEmployee === void 0 ? void 0 : currentEmployee.editEvent);

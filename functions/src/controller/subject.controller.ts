@@ -8,461 +8,269 @@ import { Request, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
 import { converter } from '../models/converter';
-import ErrorController from '../types/ErrorController';
-import ISubjectSchedule from '../models/subjectSchedule.model';
-import { subjectScheduleCollection } from './subjectSchedule.controller';
+import ISchedule from '../models/schedule.model';
+import { DocumentReference } from 'firebase-admin/firestore';
+import IRoom from '../models/room.model';
+import IUser from '../models/user.model';
+import { viewUserHelper } from './user.controller';
+import { viewRoomHelper } from './room.controller';
+import { schedule } from 'firebase-functions/v1/pubsub';
+
 // import { viewUser, userCollection } from './user.controller';
 
-export const subjectCollection = db.collection(`/subjects/`).withConverter(converter<ISubject | SubjectInput>())
-
-type SubjectInput = {
-    details?: ISubject;
-    schedule?: ISubjectSchedule;
-    assignedRoom?: object;
-
-    createdBy?: string;
-    creationDate?: string;
-    updatedBy?: string;
-    updatedDate?: string;
-
-    institution?: string;
-}
+export const subjectCollection = db.collection(`/Subject/`).withConverter(converter<ISubject>())
+export const scheduleCollection = db.collection(`/Schedule/`).withConverter(converter<ISchedule>())
 
 class SubjectService implements IBaseService {
-    public async add(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        const reqSubject = req.body as ISubject;
+    public async add(req: Request<ParamsDictionary, any, ISubject, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
 
-        try {
-            const subject: ISubject = {
-                name: reqSubject.name,
-                edpCode: reqSubject.edpCode,
-                type: reqSubject.type,
-                units: reqSubject.units,
-                institution: reqSubject.institution!.toLowerCase().trim().replace(/\s/g, ''),
-                
-                creationDate: new Date().toISOString(),
-                createdBy: reqSubject.createdBy,
-                
-                updatedDate: new Date().toISOString(),
-                updatedBy: reqSubject.createdBy,
+        if (req.body.SCHED_ID !== null) 
+            req.body.SCHED_ID = await scheduleCollection.add(req.body.SCHED_ID as ISchedule).then((result) => result.id)
+                                        .catch((error) => {
+                                            console.error(error)
+                                            return Promise.reject(error)
+                                        })
 
-                verifiedBy: null, //Soon
-                status: "Open"
-            }
-
-            // const subjectDocRef = await subjectCollection
-            await subjectCollection.doc(`${subject.institution}-${subject.type.substring(0, 3).toLowerCase()}-${subject.name.toLowerCase().trim().replace(/\s/g, '')}`).create(subject)
-
-            res.status(200).json({message: "Subject added successfully"})
-
-        } catch (error) {
-            if (error instanceof Error) {
-                const subjectControllerError: ErrorController = {
-                    name: "Subject",
-                    error: true,
-                    errorType: "Controller Error",
-                    control: "Add",
-                    message: error.message
-                }
-                
-                res.status(400).json(subjectControllerError) //Get this outside of the if statement
-            }
+        const subject: ISubject = {
+            SUB_CODE: req.body.SUB_CODE,
+            SUB_DESCRIPTION: req.body.SUB_DESCRIPTION,
+            ROOM_ID: null,
+            SCHED_ID: req.body.SCHED_ID !== null ? db.doc(`Schedule/${req.body.SCHED_ID}`) : null,
+            USER_ID: req.body.USER_ID !== null ? db.doc(`User/${req.body.USER_ID}`) : null,
+            SUB_ISDELETED: false, //Must be isDeleted
         }
 
-    }
-
-    public async addAll(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        const reqSubject = req.body as Array<SubjectInput>
-
-        try {
-            const batch = db.batch();
-
-            reqSubject.map((el) => {
-                const reqSubjectDetails = el.details! as ISubject
-
-                const subject: ISubject = {
-                    name: reqSubjectDetails.name,
-                    edpCode: reqSubjectDetails.edpCode,
-                    type: reqSubjectDetails.type,
-                    units: reqSubjectDetails.units,
-                    institution: el.institution!.toLowerCase().trim().replace(/\s/g, ''),
-                    
-                    creationDate: new Date().toISOString(),
-                    createdBy: el.createdBy!,
-                    
-                    updatedDate: new Date().toISOString(),
-                    updatedBy: el.createdBy!,
-    
-                    verifiedBy: null, //Soon
-                    status: "Open"
-                }
-
-                const subjectDetailRef = subjectCollection.doc(`${subject.institution}-${subject.type.substring(0, 3).toLowerCase()}-${subject.name.toLowerCase().trim().replace(/\s/g, '')}`)
-                batch.create(subjectDetailRef, subject)
-
-                if (!!el.schedule) {
-                    const reqSubjectSchedule = el.schedule! as ISubjectSchedule
-
-                    console.log("Schedule Input:", el.schedule)
-
-                    const subjectSchedule: ISubjectSchedule = {
-                        subId: `${subject.institution}-${subject.type.substring(0, 3).toLowerCase()}-${subject.name.toLowerCase().trim().replace(/\s/g, '')}`,
-                        roomId: null,
-                        assignDays: reqSubjectSchedule.assignDays,
-                        startTime: new Date(reqSubjectSchedule.startTime).toISOString(),
-                        endTime: new Date(reqSubjectSchedule.endTime).toISOString(),
-                        createdBy: el.createdBy!,
-                        verifiedBy: el.createdBy!,
-                        status: "Open",
-                    }
-
-                    const subjectScheduleRef = subjectScheduleCollection.doc(`${subject.institution}-${subject.type.substring(0, 3).toLowerCase()}-${subject.name.toLowerCase().trim().replace(/\s/g, '')}`)
-                    batch.create(subjectScheduleRef, subjectSchedule)
-                }
-
-                if (!!el.assignedRoom) {
-                    console.log("Assigned Room")
-                }
+        await subjectCollection.add(subject)
+            .then(() => {
+                res.status(200).json(subject)
             })
-    
-            await batch.commit();
-
-            res.status(200).json("Subjects added successfully!")
-        } catch (error) {
-            console.log(error)
-            if (error instanceof Error) {
-                const subjectControllerError: ErrorController = {
-                    name: "Subject",
-                    error: true,
-                    errorType: "Controller Error",
-                    control: "Add Bulk",
-                    message: error.message
-                }
-                
-                res.status(400).json(subjectControllerError) //Get this outside of the if statement
-            }
-        }
-    }
-
-    public async update(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        const subjectParamId = req.params.id;
-        const reqSubject = req.body as ISubject;
-
-        try{
-            const subjectDoc = subjectCollection.doc(subjectParamId);
-
-            const oldSubject = await subjectDoc.get()
-                                                .then(subject => ({id: subject.id, ...subject.data()} as ISubject))
-                                                .catch(error => { throw new Error(error) })
-
-            const newSubject: ISubject = {
-                name: reqSubject.name !== undefined ? reqSubject.name : oldSubject.name,
-
-                edpCode: reqSubject.edpCode !== undefined ? reqSubject.edpCode : oldSubject.edpCode,
-                type: reqSubject.type !== undefined ? reqSubject.type : oldSubject.type,
-                units: reqSubject.units !== undefined ? reqSubject.units : oldSubject.units,
-
-                institution: reqSubject.institution !== undefined ? reqSubject.institution.toLowerCase().trim().replace(/\s/g, '') : oldSubject.institution,
-                
-                creationDate: oldSubject.creationDate,
-                createdBy: oldSubject.createdBy,
-                
-                updatedDate: reqSubject.updatedDate,
-                updatedBy: reqSubject.updatedBy,
-
-                verifiedBy: reqSubject.verifiedBy !== undefined ? reqSubject.verifiedBy : oldSubject.verifiedBy,
-                status: oldSubject.status
-            }
-
-            const newSubId = `${newSubject.institution}-${newSubject.type.substring(0, 3).toLowerCase()}-${newSubject.name.toLowerCase().trim().replace(/\s/g, '')}`;
-
-            if (oldSubject.id !== newSubId) {
-                await subjectDoc.delete().then(() => { console.log("Successfully Updated Subject - Firestore (Delete Old)") }).catch(error => { throw new Error(error) })
-                await subjectCollection.doc(newSubId).set(newSubject)
-            }
-            else await subjectCollection.doc(newSubId).update(newSubject)
-
-            res.status(200).json({ message: "Subject updated successfully" })
-        }
-        catch(error) {
-            if (error instanceof Error) {
-                const subjectControllerError: ErrorController = {
-                    name: "Subject",
-                    error: true,
-                    errorType: "Controller Error",
-                    control: "Update",
-                    message: error.message,
-                    stack: error.stack
-                }
+            .catch((error) => {
                 console.error(error)
-                
-                res.status(400).json(subjectControllerError) //type: error.type, code: error.code
-            }
+                res.status(400).json(error)
+            })
+    }
+    public async addMultiple(req: Request<ParamsDictionary, any, Array<ISubject>, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const subjectBatch = db.batch();
+
+        //Promise.all
+        
+        // await addSubjectHelper(req.body)
+        //     .then(() => {
+        //         res.status(200).json("Subject added successfully!")
+        //     })
+        //     .catch((error) => {
+        //         console.error(error)
+        //         res.status(400).json(error)
+        //     })
+    }
+    public async update(req: Request<ParamsDictionary, any, ISubject, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const { id } = req.params
+
+        const reqSubject: ISubject = {
+            SUB_CODE: req.body.SUB_CODE,
+            SUB_DESCRIPTION: req.body.SUB_DESCRIPTION,
         }
-    }
 
+        //Assigning to a different user, that is okay, it's just replacing the UserID
+        //Assigning to a different room, that is okay, it's just replacing the RoomID
+        //Assigning to a different schedule, that is a different ball game
+
+        await subjectCollection.doc(id).update(reqSubject)
+            .then(() => {
+                res.status(200).json("Subject is updated successfully!")
+            })
+            .catch((error) => {
+                res.status(400).json(error)
+            })
+
+        //View all of the schedules first <- CHECK
+        //Find the schedule that has the same startTime, endTime, and weekAssigned <- CHECK
+        //Get the schedule ID <- CHECK
+        //Get the subjects based on the schedule ID <- CHECK
+
+        //THIS IS A LONG ARSE PROCESS JUST TO ASSIGN A SUBJECT TO A SCHEDULE THAT EXISTS
+
+        // const schedules = scheduleCollection.get()
+        //     .then((scheduleDoc) => {
+        //         const schedule = scheduleDoc.docs.map((doc):ISchedule => ({
+        //             SCHED_ID: doc.id,
+        //             ...doc.data() as ISchedule
+        //         }))
+
+        //         return Promise.all(schedule)
+        //             .then((result => result))
+        //             .catch((error) => Promise.reject(error))
+        //     })
+        //     .catch((error) => Promise.reject(error))
+
+        // const scheduleIDs = await schedules
+        //     .then((result) => {
+        //         const filteredResult = result.filter((schedule) => {
+
+        //             const reqStartTimeFormat = dayjs(req.body.SCHED_STARTTIME).format("HH:mm:ss")
+        //             const reqEndTimeFormat = dayjs(req.body.SCHED_ENDTIME).format("HH:mm:ss")
+
+        //             const startTimeFormat = dayjs(schedule.SCHED_STARTTIME).format("HH:mm:ss")
+        //             const endTimeFormat = dayjs(schedule.SCHED_ENDTIME).format("HH:mm:ss")
+
+        //             const reqStartTime = dayjs(`2001-01-01 ${reqStartTimeFormat}`)
+        //             const reqEndTime = dayjs(`2001-01-01 ${reqEndTimeFormat}`)
+
+        //             const startTime = dayjs(`2001-01-01 ${startTimeFormat}`)
+        //             const endTime = dayjs(`2001-01-01 ${endTimeFormat}`)
+
+        //             return schedule.SCHED_WEEKASSIGNED.some((day) => req.body.SCHED_WEEKASSIGNED.includes(day)) && (reqStartTime.isSame(startTime) && reqEndTime.isSame(endTime))
+        //         })
+
+        //         return filteredResult.map((schedule) => schedule.SCHED_ID)
+        //     })
+        //     // .catch((error) => {
+        //     //     res.status(400).json(error)
+        //     // })
+
+        // await viewAllSubjectHelper()
+        //     .then((data) => {
+        //         const subjects = data.filter((subject) => scheduleIDs.includes((subject.SCHED_ID as ISchedule).SCHED_ID))
+        //         res.status(200).json(subjects)
+        //     })
+        //     .catch((error) => {
+        //         res.status(400).json(error)
+        //     })
+    }
+    public async assignRoom(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const { subId } = req.params
+
+        const roomId = (req.body as IRoom).ROOM_ID as string
+
+        await subjectCollection.doc(subId).update({
+            ROOM_ID: db.doc(`Room/${roomId}`),
+        })
+            .then(() => {
+                res.status(200).json("Subject name is assigned to Room name")
+            })
+            .catch((error) => {
+                res.status(400).json(error)
+            })
+    }
     public async delete(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        const subjectId = req.params.id;
+        const { id } = req.params
 
-        try {
-            await subjectScheduleCollection.doc(subjectId).delete();
-            await subjectCollection.doc(subjectId).delete();
-
-            res.status(200).json({ message: "Subject Deleted Successfully!" })
-
-        } catch (error) {
-            if (error instanceof Error) {
-                const subjectControllerError: ErrorController = {
-                    name: "Subject",
-                    error: true,
-                    errorType: "Controller Error",
-                    control: "View",
-                    message: error.message
-                }
-                
-                res.status(400).json(subjectControllerError) //Get this outside of the if statement
-            }
-        } 
+        await subjectCollection.doc(id).update({
+            SUB_ISDELETED: true,
+        })
+            .then(() => {
+                res.status(200).json("Subject name is deleted successfully!")
+            })
+            .catch((error) => {
+                res.status(400).json(error)
+            })
     }
-
     public async view(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        const subjectId = req.params.id;
-
-        try {
-            const subjectRef = await subjectCollection.doc(subjectId).get()
-
-            res.status(200).json({id: subjectRef.id, ...subjectRef.data()})
-
-        } catch (error) {
-            if (error instanceof Error) {
-                const subjectControllerError: ErrorController = {
-                    name: "Subject",
-                    error: true,
-                    errorType: "Controller Error",
-                    control: "View",
-                    message: error.message
-                }
-                
-                res.status(400).json(subjectControllerError) //Get this outside of the if statement
-            }
-        } 
+        throw new Error('Method not implemented.');
     }
+    public async viewBySchedule(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        let currentTime = req.query.currentTime as string
 
+        await viewAllSubjectHelper()
+            .then((result) => {
+                const currentSubject = (result as Array<ISubject>).filter((subject) => {
+                    const schedule = subject.SCHED_ID as ISchedule
+        
+                    const currentTimeFormat = dayjs(currentTime).format("HH:mm:ss")
+                    const startTimeFormat = dayjs(schedule.SCHED_STARTTIME).format("HH:mm:ss")
+                    const endTimeFormat = dayjs(schedule.SCHED_ENDTIME).format("HH:mm:ss")
+        
+                    const currentTimeVal = dayjs(`2001-01-01 ${currentTimeFormat}`)
+                    const startTime = dayjs(`2001-01-01 ${startTimeFormat}`)
+                    const endTime = dayjs(`2001-01-01 ${endTimeFormat}`)
+        
+                    return schedule.SCHED_WEEKASSIGNED.find((week) => week.toLowerCase() === dayjs(currentTime).format("dddd").toLowerCase()) && (currentTimeVal.isAfter(startTime) && currentTimeVal.isBefore(endTime))
+                })
+        
+                res.status(200).json(currentSubject)
+            })
+            .catch((error) => {
+                console.error(error)
+                res.status(400).json(error)
+            })
+    }
     public async viewAll(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        try {
-            const subjectRef = await subjectCollection.get()
-            const subjectScheduleRef = await subjectScheduleCollection.get();
-
-            console.log("Hello!");
-
-            const subjects = subjectRef.docs.map(subject => {
-                const schedule = subjectScheduleRef.docs.find(schedule => schedule.data().subId === subject.id);
-
-                console.log(schedule?.data());
-
-                return {
-                    id: subject.id,
-                    details: subject.data(),
-                    schedule: schedule?.data(),
-                }
+        await viewAllSubjectHelper()
+            .then((result) => {
+                res.status(200).json(result)
             })
-
-            res.status(200).json(subjects)
-
-        } catch (error) {
-            if (error instanceof Error) {
-                const subjectControllerError: ErrorController = {
-                    name: "Subject",
-                    error: true,
-                    errorType: "Controller Error",
-                    control: "View All",
-                    message: error.message
-                }
-                
-                res.status(400).json(subjectControllerError) //Get this outside of the if statement
-            }
-        } 
-    }
-
-    public async viewAllByInstitution(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        const institutionId = req.params.institution;
-
-        try {
-            const subjectRef = await subjectCollection.where('institution', '==', institutionId)
-                                                        .where('status', '==', 'Open')
-                                                        .get()
-            const subjectScheduleRef = await subjectScheduleCollection.get();
-
-            const subjects = subjectRef.docs.map(subject => {
-                const schedule = subjectScheduleRef.docs.find(schedule => schedule.data().subId === subject.id);
-
-                return {
-                    details: {id: subject.id, ...subject.data() as ISubject}, 
-                    schedule: schedule?.data() as ISubjectSchedule,
-                }
+            .catch((error) => {
+                res.status(400).json(error)
             })
-
-            // details?: ISubject;
-            // schedule?: object;
-            // assignedRoom?: object;
-
-            // createdBy?: string;
-            // creationDate?: string;
-            // updatedBy?: string;
-            // updatedDate?: string;
-
-            // institution?: string;
-
-            res.status(200).json(subjects)
-
-        } catch (error) {
-            if (error instanceof Error) {
-                const subjectControllerError: ErrorController = {
-                    name: "Subject",
-                    error: true,
-                    errorType: "Controller Error",
-                    control: "View All",
-                    message: error.message
-                }
-                
-                res.status(400).json(subjectControllerError) //Get this outside of the if statement
-            }
-        } 
     }
 }
 
-// const addSubject = async (req, res) => {
-//     try {
-//         let subject = new Subject(
-//             req.body.name,
-//             req.body.edpCode,
-//             req.body.type,
-//             req.body.units,
-//             new Date(req.body.creationDate),
-//             req.body.createdBy,
-//             req.body.verifiedBy,
-//             req.body.status
-//         )
+export const viewSubjectHelper = (id: string, subject: ISubject) => {
+    //Result Subject Type
+    type SubjectReference = {
+        SCHED_ID?: DocumentReference | ISchedule | string | null;
+        USER_ID?: DocumentReference | IUser | string | null;
+        ROOM_ID?: DocumentReference | IRoom | string | null;
+    }
 
-//         const subjectDocRef = await db.doc(`/subjects/`).withConverter(subjectConverter)
+    return (subject.SCHED_ID as DocumentReference<ISchedule>).get()
+            //get schedule <- scheduleHelper
+            .then((schedule): SubjectReference => ({
+                SCHED_ID: {
+                    SCHED_ID: schedule.id,
+                    SCHED_STARTTIME: schedule.data()?.SCHED_STARTTIME as string,
+                    SCHED_ENDTIME: schedule.data()?.SCHED_ENDTIME as string,
+                    SCHED_WEEKASSIGNED: schedule.data()?.SCHED_WEEKASSIGNED as Array<string>,
+                }
+            }))
+            .then(async (scheduleRes): Promise<SubjectReference> => {
+                //Get all users from firestore and auth ASSIGNED
+                return await (subject.USER_ID as DocumentReference<IUser>).get()
+                    .then((user) => {
+                        return viewUserHelper(user.id, user.data() as IUser)
+                    })
+                    .then((user) => ({
+                        ...scheduleRes,
+                        USER_ID: user as IUser
+                    }))
+                    .catch((error) => Promise.reject(error))
+            })
+            .then(async (schedUserRes): Promise<SubjectReference> => {
+                return subject.ROOM_ID === null ? ({
+                    ...schedUserRes,
+                    ROOM_ID: null,
+                }) : (subject.ROOM_ID as DocumentReference<IRoom>).get()
+                    .then((room) => {
+                        return viewRoomHelper(room.id, room.data() as IRoom)
+                    })
+                    .then((result) => ({
+                        ...schedUserRes,
+                        ROOM_ID: result,
+                    }))
+                    .catch((error) => Promise.reject(error))
+            })
+            .then((schedUserRoomRes): ISubject => ({
+                ...subject,
+                SUB_ID: id,
+                ROOM_ID: schedUserRoomRes.ROOM_ID,
+                SCHED_ID: schedUserRoomRes.SCHED_ID,
+                USER_ID: schedUserRoomRes.USER_ID,
+            }))
+            .catch((error) => Promise.reject(error))
+}
 
-//         await subjectDocRef.create(subject)
-//             .then((result) => {
-//                 res.status(200).json({message: "Subject added successfully"})
-//             })
-//             .catch((err) => {
-//                 throw {message: err.message}
-//             })
+const viewAllSubjectHelper = () => {
+    return subjectCollection.get()
+        .then((subjectDoc) => {
+            const subjects = subjectDoc.docs.map((doc) => {
+                return viewSubjectHelper(doc.id, doc.data() as ISubject)
+            })
 
-//     } catch (e) {
-//         res.status(400).json({name: "Subject", type: "Add", error: e.message})
-//     }
-// }
-
-// const viewAllSubject = async (req, res) => {
-    
-//     //const subjects = []
-
-//     try {
-//         const getSubjectDocs = await subjectCollection.get();
-
-//         if (getSubjectDocs.empty)
-//             throw new Error("Subject collection is empty");
-
-//         const subjects = await Promise.all(getSubjectDocs.docs.map(async (subject) => {
-//             const {creationDate, createdBy} = subject.data()
-
-//             const user = await userCollection.doc(createdBy).get()
-//                 .then(res => res.data())
-//                 .catch((error) => {throw error}) // "Throw is expensive"
-
-//             return ({
-//                 id: subject.id, //This should have been an edp code
-//                 ...subject.data(),
-//                 createdBy: user,
-//                 creationDate: dayjs(new Timestamp(creationDate.seconds, creationDate.nanoseconds).toDate()).format("MMMM DD, YYYY"),
-//             })
-//         }))
-
-//         res.status(200).json(subjects)
-//     }
-//     catch(e) {
-//         res.status(400).json({error: e.message})
-//     }
-// }
-
-// const viewSubject = async (req, res) => {
-//     const id = req.params.id
-
-//     try {
-//         const subjectRef = db.doc(`/subjects/${id}`).withConverter(subjectConverter)
-//         const subjectDoc = await subjectRef.get();
-
-//         res.status(200).json(subjectDoc.data())
-//     }
-//     catch (e) {
-//         res.status(400).json({error: "Error", message: e.message})
-//     }
-// }
-
-// const updateSubject = async (req, res) => {
-//     const id = req.params.id;
-
-//     try {
-//         const subjectDocRef = await db.doc(`/subjects/${id}`).withConverter(subjectConverter);
-
-//         let subject = new Subject(
-//             req.body.name,
-//             req.body.edpCode,
-//             req.body.type,
-//             req.body.units,
-//             new Date(req.body.creationDate),
-//             req.body.createdBy,
-//             req.body.verifiedBy,
-//             req.body.status
-//         );
-
-//         await subjectDocRef.update(Object.create({}, subject))
-//             .then((result) => {
-//                 res.status(200).json({message: "Data updated successfully!"})
-//             })
-//             .catch((err) => {
-//                 throw {message: err.message}
-//             })
-
-//         // await updateDoc(subjectSnapshot, {
-//         //     name: subject.getName,
-//         //     edpCode: subject.getEdpCode,
-//         //     type: subject.getType,
-//         //     units: subject.getUnits,
-//         //     creationDate: subject.getCreationDate,
-//         //     createdBy: subject.getCreatedBy,
-//         //     verifiedBy: subject.getVerifiedBy,
-//         //     status: subject.getStatus,
-//         // })
-//     } catch (e) {
-//         res.status(400).json({name: "Subject", type: "Update", error: e.message})
-//     }
-// }
-
-// const deleteSubject = async (req, res) => {
-//     const id = req.params.id;
-
-//     try {
-//         const subjectDocRef = db.doc(`/subjects/${id}`).withConverter(subjectConverter);
-
-//         await subjectDocRef.delete()
-//             .then((result) => {
-//                 res.status(200).json("Data deleted successfully.")
-//             })
-//             .catch((err) => {
-//                 throw {message: err.message}
-//             })
-//     } catch (e) {
-//         res.status(400).json({name: "Subject", type: "Delete", error: e.message})
-//     }
-// }
-
-// module.exports = {addSubject, viewAllSubject, viewSubject, updateSubject, deleteSubject}
+            return Promise.all(subjects)
+                .then((result => result.filter(subject => !subject.SUB_ISDELETED)))
+                .catch((error) => Promise.reject(error))
+        })
+        .catch((error) => Promise.reject(error))
+}
 
 export default new SubjectService;

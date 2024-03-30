@@ -6,33 +6,7 @@ const userRouter = Router();
 //If user exists
 
 userRouter.post("/add", userService.add);
-userRouter.put("/update/:id", userService.update)
-userRouter.put("/edit/profile/:id", userService.editUserProfile)
-
-userRouter.get("/exist/:id", userService.isExist)
-userRouter.get("/list/", userService.viewAll)
-userRouter.get("/list/:id", userService.view)
-userRouter.get("/list/auth/:email", userService.viewAuth)
-
-//Add
-//router.post("/add", isAuthentication, isAuthorized(['superadmin', 'admin']), addUser);
-// userRouter.post("/signUp", signUp);
-// userRouter.post("/admin/add", addAppAdmin)
-
-// //Update
-
-// userRouter.patch("/institution/assign", assignInstitution)
-
-//Delete
-userRouter.put("/delete/:id", userService.delete)
-
-//Ban/Restore
-userRouter.put("/ban-restore/:id", userService.userBanRestore)
-
-//View
-userRouter.get("/list/u/:institution/:user", userService.viewAllByInstitution)
-userRouter.get("/profile/:id", userService.viewUser)
-// userRouter.get("/profile/:userName", viewUserByName)
-//router.get("/list/:institution", <method for users based on institution>)
+userRouter.get("/view/s/:id", userService.view)
+userRouter.get("/view/all", userService.viewAll)
 
 export default userRouter

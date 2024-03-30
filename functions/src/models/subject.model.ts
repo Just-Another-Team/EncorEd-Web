@@ -1,20 +1,14 @@
+import { DocumentReference } from "firebase-admin/firestore";
+import ISchedule from "./schedule.model";
+import IUser from "./user.model";
+import IRoom from "./room.model";
 
 export default interface ISubject {
-    id?: string;
-    name: string; 
-    edpCode: string; 
-    type: string; 
-    units: number;
-
-    institution?: string; //Not important to update (unless admin)
-
-    creationDate: Date | string; //Not important to update
-    createdBy: string; //Not important to update
-
-    updatedDate?: Date | string; 
-    updatedBy?: string; 
-
-    verifiedBy?: string | null;
-
-    status?: string; //Not important to update (unless delete) -- I'm on a limbo for this
+    SUB_ID?: string;
+    SUB_CODE: string;
+    SUB_DESCRIPTION: string;
+    SCHED_ID?: DocumentReference | ISchedule | string | null;
+    USER_ID?: DocumentReference | IUser | string | null;
+    ROOM_ID?: DocumentReference | IRoom | string | null;
+    SUB_ISDELETED?: boolean
 }

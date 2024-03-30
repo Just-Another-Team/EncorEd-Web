@@ -32,16 +32,20 @@ app.use((0, cors_1.default)());
 app.use(body_parser_1.default.urlencoded({ extended: false }));
 app.use(body_parser_1.default.json());
 const user_1 = __importDefault(require("./routes/user"));
-const institution_1 = __importDefault(require("./routes/institution"));
 const role_1 = __importDefault(require("./routes/role"));
 const subject_1 = __importDefault(require("./routes/subject"));
+const attendance_1 = __importDefault(require("./routes/attendance"));
+const floor_1 = __importDefault(require("./routes/floor"));
+const room_1 = __importDefault(require("./routes/room"));
 // import participantRouter from "./routes/participant"
 // import eventRouter from "./routes/event"
 // import attendeeRouter from "./routes/attendees"
 app.use("/user", user_1.default);
-app.use("/institution", institution_1.default);
 app.use("/role", role_1.default);
 app.use("/subject", subject_1.default);
+app.use("/attendance", attendance_1.default);
+app.use("/floor", floor_1.default);
+app.use("/room", room_1.default);
 // app.use("/participant", participantRouter)
 // app.use("/event", eventRouter)
 // app.use("/attendees", attendeeRouter)
