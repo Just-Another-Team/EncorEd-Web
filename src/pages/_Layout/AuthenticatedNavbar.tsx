@@ -1,13 +1,12 @@
-import { Stack, Box, Typography, TextField, IconButton, Icon, useTheme, useMediaQuery, InputAdornment } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Stack, Box, TextField, IconButton, useTheme, useMediaQuery, InputAdornment } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import AccountMenuButton from "../../components/ButtonAccountMenu";
 import NotificationButton from "../../components/ButtonNotification";
 import Navbar from "../../components/NavBar"
-import LinkButton from "../../components/ButtonLink";
-import { useState } from "react";
 import Menu from "@mui/icons-material/Menu";
 import { Search } from "@mui/icons-material";
 import { NotificationStatusEnum, Notifications } from "../../data/notificationData";
+import { useAuth } from "../../hooks/useAuth";
 
 //-------------------------------------------------
 // useNavBar
@@ -23,9 +22,8 @@ type AuthenticatedNavbarProps = {
 const AuthenticatedNavbar = ({
     onOpenDrawer
 }: AuthenticatedNavbarProps) => {
+    const { user, signOut } = useAuth();
     const navigate = useNavigate();
-
-    const [isAuthenticated, setAuthenticated] = useState<boolean>(true);
 
     const theme = useTheme()
     const belowMid = useMediaQuery(theme.breakpoints.down("md"))
@@ -34,10 +32,14 @@ const AuthenticatedNavbar = ({
         navigate("/dashboard/notifications")
     }
 
-    const handleLogout = () => {
-        //Logging out
-        setAuthenticated(false)
-        navigate("/")
+    const handleLogout = async () => {
+        await signOut()
+            .then(() => {
+                navigate('/')
+            })
+            .catch((error) => {
+                console.error(error)
+            })
     }
 
     const newNotifications = Notifications.filter(notification => notification.notfStatus === NotificationStatusEnum.Unread).length;
@@ -45,22 +47,6 @@ const AuthenticatedNavbar = ({
     return (
         <Navbar
         childrenDirection="space-between">
-            {/* {isAuthenticated ?
-                <Box>
-                    <NotificationButton />
-                    <AccountMenuButton onLogout={handleLogout}/>
-                </Box>
-            : 
-                <Stack direction="row">
-                    <LinkButton
-                    to={"/home"}
-                    component={Link}
-                    variant="contained"
-                    color="secondary">
-                        SIGN IN
-                    </LinkButton>
-                </Stack>
-            } */}
             <Stack
             direction={"row"}
             gap={2}>
@@ -91,7 +77,9 @@ const AuthenticatedNavbar = ({
                 <NotificationButton
                 newNotificationLength={newNotifications}
                 onClick={notificationOnClick}/>
-                <AccountMenuButton onLogout={handleLogout}/>
+                <AccountMenuButton
+                fullName={user?.USER_FULLNAME}
+                onLogout={handleLogout}/>
             </Box>
         </Navbar>
     )

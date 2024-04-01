@@ -16,7 +16,6 @@ import {
     SxProps,
     Theme
 } from '@mui/material'
-import { nextPage } from "../../app/features/navigation/navigationSlice";
 import { Link, useLocation } from "react-router-dom";
 import { FixMeLater } from "../../types/FixMeLater";
 import LinkListItem from "./LinkListItem";

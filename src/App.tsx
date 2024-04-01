@@ -4,7 +4,6 @@ import {Routes, Route, Navigate, useLocation, useNavigate} from 'react-router-do
 import Login from './pages/Login';
 import LandingPage from './pages/Landing/LandingPage';
 
-import { useAppDispatch, useAppSelector } from './app/encored-store-hooks';
 import Layout from './pages/_Layout';
 import Home from './pages/Home';
 import QRCodes from './pages/QRCode';
@@ -12,17 +11,22 @@ import SelectedRoom from './pages/QRCodeViewRoom';
 import NotificationList from './pages/Notifications';
 import NotificationItem from './pages/Notification';
 import Attendances from './pages/Attendances';
+import { useAuth } from './hooks/useAuth';
+import Department from './pages/Department';
+import Users from './pages/Users';
+import Subjects from './pages/Subject';
+import Kiosks from './pages/Kiosks';
 
 function App() {
+  const { user } = useAuth()
+
   return (
     <Routes>
-      
-
       {/* Public pages */}
-      <Route path='/' element={<Login />}/>
+      <Route path='/' element={ user ? <Navigate replace to="/dashboard/home" /> : <Login />}/>
 
       {/* All Users */}
-      <Route path='/dashboard' element={<Layout />}> 
+      <Route path='/dashboard' element={ !user ? <Navigate replace to="/" /> : <Layout />  }> 
         <Route index path='home' element={<Home />}  />
 
         <Route path='attendances' element={<Attendances />} />
@@ -36,9 +40,30 @@ function App() {
           <Route element={<NotificationList />} index/>
           <Route path=':notificationId' element={<NotificationItem />}/>
         </Route>
-        {/* <Route path='subject' />
-        <Route path='users' /> */}
+
+        <Route path='department' element={<Department />} />
+        <Route path='subject' element={<Subjects />}/>
+        <Route path='users' element={<Users />}/>
+
+        <Route path='kiosk' element={<Kiosks />}/>
       </Route>
+
+      {/* Campus Director */}
+      <Route path='/admin/dashboard' element={ !user ? <Navigate replace to="/" /> : <Layout />  }> 
+        <Route index path='home' element={<Home />}  />
+
+        <Route path='attendances' element={<Attendances />} />
+
+        <Route path='notifications'>
+          <Route element={<NotificationList />} index/>
+          <Route path=':notificationId' element={<NotificationItem />}/>
+        </Route>
+
+        <Route path='department' element={<Department />} />
+        <Route path='users' element={<Users />}/>
+      </Route>
+
+      
       
       
       {/* <Route path='/register' element={<UserInput />}> Registration is not needed

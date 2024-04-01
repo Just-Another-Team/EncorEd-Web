@@ -1,14 +1,13 @@
 import { TextField, TextFieldProps } from "@mui/material"
-import { Control, Controller, FieldValues, RegisterOptions } from "react-hook-form"
-import { LoginDataType } from "../../types/InputLoginType"
+import { Control, Controller, FieldValues, RegisterOptions, UseFormSetValue } from "react-hook-form"
 
-type ControlledTextFieldType = {
+type ControlledTextFieldType<T extends FieldValues> = {
     name: string,
-    control: Control<LoginDataType>,
-    rules: Omit<RegisterOptions<LoginDataType, any>, "valueAsNumber" | "valueAsDate" | "setValueAs" | "disabled">
+    control: Control<T, any>;
+    rules: Omit<RegisterOptions<T, any>, "valueAsNumber" | "valueAsDate" | "setValueAs" | "disabled">
 } & TextFieldProps
 
-const ControlledTextField = (props: ControlledTextFieldType) => {
+const ControlledTextField = <T extends FieldValues>(props: ControlledTextFieldType<T>) => {
     return(
         <Controller
         name={props.name}

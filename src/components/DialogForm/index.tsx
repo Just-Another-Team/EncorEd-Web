@@ -58,7 +58,7 @@ const DialogForm = ({
                 <Button
                 type="submit"
                 variant='contained'>
-                    Subscribe
+                    Submit
                 </Button>
             </DialogActions>
         </Dialog>
