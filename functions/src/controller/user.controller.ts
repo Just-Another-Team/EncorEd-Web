@@ -36,12 +36,16 @@ class UserService implements IBaseService {
     }
     public async add(req: Request<ParamsDictionary, any, IUser, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         const user: IUser = {
+            USER_FNAME: req.body.USER_FNAME,
+            USER_MNAME: req.body.USER_MNAME,
+            USER_LNAME: req.body.USER_LNAME,
             USER_USERNAME: req.body.USER_USERNAME,
-            USER_PASSWORD: req.body.USER_PASSWORD, //Should not have include this in the Firestore
             ROLE_ID: db.doc(`Role/${req.body.ROLE_ID}`),
-            DEPT_ID: db.doc(`Department/${req.body.DEPT_ID}`),
-            USER_ISDELETED: req.body.USER_ISDELETED,
+            DEPT_ID: req.body.DEPT_ID ? db.doc(`Department/${req.body.DEPT_ID}`) : null,
+            USER_ISDELETED: false,
         }
+
+        //Firestore first before Auth or Auth before Firestore?
 
         await adminAuth.createUser({
             email: req.body.USER_EMAIL,
@@ -51,16 +55,57 @@ class UserService implements IBaseService {
             return userCollection.doc(result.uid).set(user)
                 .catch((error) => Promise.reject(error))
         }).then(() => {
-            res.status(200).json("User successfully added!")
+            res.status(200).json("User added successfully!")
         }).catch((error) => {
+            console.error(error)
             res.status(400).json(error)
         })
     }
-    update(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        throw new Error('Method not implemented.');
+    public async update(req: Request<ParamsDictionary, any, IUser, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const { id } = req.params
+
+        await userCollection.doc(id).update({
+            USER_FNAME: req.body.USER_FNAME,
+            USER_MNAME: req.body.USER_MNAME,
+            USER_LNAME: req.body.USER_LNAME,
+            USER_USERNAME: req.body.USER_USERNAME,
+            ROLE_ID: db.doc(`Role/${req.body.ROLE_ID}`),
+            DEPT_ID: db.doc(`Department/${req.body.DEPT_ID}`),
+        })
+            .then(() => {
+                return adminAuth.updateUser(id, {
+                    email: req.body.USER_EMAIL,
+                    displayName: `${req.body.USER_FNAME} ${req.body.USER_MNAME} ${req.body.USER_LNAME}`,    
+                })
+            })
+            .then(() => {
+                res.status(200).json("User updated successfully!")
+            })
+            .catch((error) => {
+                console.error(error)
+                res.status(400).json(error)
+            })
     }
-    delete(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        throw new Error('Method not implemented.');
+    public async delete(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const { id } = req.params
+
+        //Delete user and disable user from logging in
+
+        await userCollection.doc(id).update({
+            USER_ISDELETED: true,
+        })
+            .then(() => {
+                res.status(200).json("User is deleted successfully!")
+            })
+            .catch((error) => {
+                console.error(error)
+                res.status(400).json(error)
+            })
+    }
+    public async assignDepartment(req: Request<ParamsDictionary, any, IDepartment, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const { id } = req.params
+
+
     }
     public async view(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         const { id } = req.params
@@ -93,7 +138,7 @@ class UserService implements IBaseService {
 
                 return Promise.all(users)
                     .then((result => {
-                        res.status(200).json(result)
+                        res.status(200).json(result.filter(user => !user.USER_ISDELETED))
                     }))
                     .catch((error) => Promise.reject(error))
             })
@@ -124,7 +169,7 @@ export const viewUserHelper = (id: string, user: IUser) => {
                         ...result,
                         DEPT_ID: department.id,
                         DEPT_NAME: department.data()!.DEPT_NAME,
-                        DEPT_STATUS: department.data()!.DEPT_STATUS
+                        DEPT_ISDELETED: department.data()!.DEPT_ISDELETED
                     }))
                     .catch((error) => Promise.reject(error))
             })
@@ -140,7 +185,7 @@ export const viewUserHelper = (id: string, user: IUser) => {
                 DEPT_ID: {
                     DEPT_ID: result.DEPT_ID,
                     DEPT_NAME: result.DEPT_NAME,
-                    DEPT_STATUS: result.DEPT_STATUS
+                    DEPT_ISDELETED: result.DEPT_ISDELETED
                 } as IDepartment
             }))
             .catch((error) => Promise.reject(error))

@@ -15,8 +15,8 @@ export interface IUserAuth {
 export interface IUserFireStore {
     USER_USERNAME: string;
     ROLE_ID: DocumentReference | IRole | string;
-    DEPT_ID: DocumentReference | IDepartment | string;
-    USER_ISDELETED: string;
+    DEPT_ID: DocumentReference | IDepartment | string | null;
+    USER_ISDELETED: boolean;
 }
 
 export default interface IUser extends IUserAuth, IUserFireStore {

@@ -38,7 +38,7 @@ import subjectRouter from "./routes/subject"
 import attendanceRouter from "./routes/attendance"
 import floorRouter from './routes/floor';
 import roomRouter from './routes/room';
-
+import departmentRouter from './routes/department';
 // import participantRouter from "./routes/participant"
 // import eventRouter from "./routes/event"
 // import attendeeRouter from "./routes/attendees"
@@ -49,6 +49,7 @@ app.use("/subject", subjectRouter)
 app.use("/attendance", attendanceRouter)
 app.use("/floor", floorRouter)
 app.use("/room", roomRouter)
+app.use("/department", departmentRouter)
 // app.use("/participant", participantRouter)
 // app.use("/event", eventRouter)
 // app.use("/attendees", attendeeRouter)
