@@ -17,6 +17,9 @@ const Layout = () => {
         setSidebarOpen(false);
     }
 
+    //Fixes:
+    // - Use a react-pro-sidebar for the sidebar
+
     return (
         <Box sx={{ display: 'flex' }}>
             {/* Prop drilled 2 layered components: AuthenticatedNavbar and NavBar */}
@@ -36,6 +39,7 @@ const Layout = () => {
                 sx={{
                     marginY: 1,
                 }}>
+                    {/* Do the thing that allow roles */}
                     <Outlet />
                 </Container>
             </Stack>

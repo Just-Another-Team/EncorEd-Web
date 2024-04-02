@@ -8,15 +8,23 @@ import {
     Typography
 } from "@mui/material"
 import QRCode from "react-qr-code"
-import { RoomType } from "../../data/roomData"
 import { useNavigate } from "react-router-dom"
+import IRoom from "../../types/IRoom"
 
-const CardQR = (room: RoomType) => {
+type CardQRType = {
+    room: IRoom,
+    qrValue: string,
+}
+
+const CardQR = ({
+    room,
+    qrValue
+}: CardQRType) => {
 
     const navigate = useNavigate();
 
     const handleCardClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        navigate(`/dashboard/rooms/${room.roomId}`)
+        navigate(`/dashboard/rooms/${room.ROOM_ID}`)
     }
 
     return( 
@@ -35,18 +43,18 @@ const CardQR = (room: RoomType) => {
                         <Typography
                         variant="h5"
                         textAlign="left">
-                            {room.roomName}
+                            {room.ROOM_NAME}
                         </Typography>
                         <Typography
                         variant="h6"
                         textAlign="left">
-                            Floor: {room.floor}
+                            Floor: {room.FLR_ID.FLR_NAME}
                         </Typography>
                     </Box>
 
                     <QRCode
                     size={96}
-                    value={JSON.stringify(room)}/>
+                    value={qrValue}/>
                 </Stack>
             </Paper>
         </ButtonBase>

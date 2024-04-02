@@ -1,56 +1,73 @@
 import { Box, Typography } from "@mui/material"
-import { useEffect, useRef } from "react"
+import { forwardRef, MutableRefObject, Ref, RefObject, useEffect, useRef } from "react"
 import QRCode from "react-qr-code"
 import { FixMeLater } from "../../types/FixMeLater"
+import IRoom from "../../types/IRoom"
 
-const room = {
-    roomId: "1_room101",
-    roomName: "Room 101",
-    floor: "1st"
+type QRImageType = {
+    QRSize?: number;
+    setImgSrc: React.Dispatch<React.SetStateAction<string | null>>;
+    room: IRoom | undefined;
+    display: 'none' | 'block';
+    displayTitle?: boolean;
+    displayLogo?: boolean;
 }
 
-const TestQR = () => {
-
-    const divRef = useRef<ReactDOM.Container>();
-    const image = useRef<FixMeLater>();
+const QRImage = forwardRef<HTMLDivElement, QRImageType>(({
+    QRSize = 256,
+    setImgSrc,
+    room,
+    display,
+    displayLogo,
+    displayTitle,
+}: QRImageType, ref) => {
+    //const divRef = useRef<ReactDOM.Container>();
 
     useEffect(() => {
-        const divCurrent = divRef.current;
+        const divCurrent = (ref as MutableRefObject<HTMLDivElement>).current;
         const svgQuery = divCurrent?.querySelector("svg")
 
         const serializer = new XMLSerializer();
         const svgStr = serializer.serializeToString(svgQuery as Node);
 
-        const imgCurrent = image.current;
-        imgCurrent.src = `data:image/svg+xml;base64,${window.btoa(svgStr)}`//'data:image/svg+xml;base64,'+ window.btoa(svgStr);
-        svgQuery?.parentNode?.removeChild(svgQuery)
+        setImgSrc(`data:image/svg+xml;base64,${window.btoa(svgStr)}`)
     }, [])
 
-    return( 
-        <Box>
-            <Box ref={divRef}>
+    return(
+        <Box display={display}>
+            <Box ref={ref}> 
+                <Typography
+                display={displayTitle ? 'block' : 'none'}
+                variant="h4"
+                marginBottom={12}
+                fontWeight={700}>
+                    {room?.ROOM_NAME}
+                </Typography>
+
                 <QRCode
-                size={256}
-                value={JSON.stringify(room)}/>
-            </Box>
-            <Box>
-                <Typography>Image</Typography>
-                <img />
+                size={QRSize}
+                value={`encored://app/attendance/${room?.ROOM_ID}`}/>
+
+                <Box
+                marginTop={12}
+                display={displayLogo ? "flex" : "none"}
+                flexDirection="row"
+                justifyContent="center"
+                alignItems="center"
+                alignContent="center"
+                gap={2}>
+                    <img width={64} src="/assets/Logo.png"/>
+                    <Typography
+                    variant="h5"
+                    fontWeight={700}
+                    noWrap>
+                        Encor<span>Ed</span>
+                    </Typography>
+                </Box>
             </Box>
         </Box>
     )
-}
+})
 
-const TestQRCodeImage = () => {
 
-    
-
-    const serialized = new XMLSerializer();
-    //const svgStr = serialized.serializeToString(TestQR);
-
-    return (
-        <img />
-    )
-}
-
-export default TestQR;
+export default QRImage;

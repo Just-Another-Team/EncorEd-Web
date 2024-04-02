@@ -7,7 +7,10 @@ import GroupsOutline from '@mui/icons-material/GroupsOutlined'
 import OrganizationOutline from '@mui/icons-material/PieChartOutlined'
 import ReportOutline from '@mui/icons-material/AssessmentOutlined';
 import PostAddIcon from '@mui/icons-material/PostAdd';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import LanOutlinedIcon from '@mui/icons-material/LanOutlined';
 import Sidebar from '../../components/NavSidebar'
+import { DesktopWindowsOutlined, HowToReg, QrCode } from '@mui/icons-material'
 
 //LinkListItemType
 export type LinkType = {
@@ -34,30 +37,41 @@ const LinkedSideBar = ({
             href: "/dashboard/home"//"/dashboard/home"
         },
         {
-            key: "reports",
-            name: "Reports",
-            icon: <ReportOutline />,
-            href: "/dashboard/report"//`/dashboard/report/attendance`
+            key: "attendances",
+            name: "Attendances",
+            icon: <HowToReg />,
+            href: "/dashboard/attendances"//`/dashboard/report/attendance`
         },
         {
             key: "rooms",
             name: "Room QR Code",
-            icon: <ReportOutline />,
+            icon: <QrCode />,
             href: "/dashboard/rooms"//`/dashboard/report/attendance`
         },
-        // {
-        //     key: "subject",
-        //     name: "Subject",
-        //     icon: <BookOutline />,
-        //     href: "/subject"//`/dashboard/subject/`
-        // },
-        // {
-        //     key: "employees",
-        //     name: "Employees",
-        //     icon: <GroupsOutline />,
-        //     href: "/users"//`/dashboard/list/users/u/`
-        // },
-
+        {
+            key: "subject",
+            name: "Subject",
+            icon: <BookOutline />,
+            href: "/dashboard/subject"//`/dashboard/subject/`
+        },
+        {
+            key: "departments",
+            name: "Departments",
+            icon: <LanOutlinedIcon />,
+            href: "/dashboard/department"//`/dashboard/subject/`
+        },
+        {
+            key: "users",
+            name: "Employees",
+            icon: <PersonOutlinedIcon />,
+            href: "/dashboard/users"//`/dashboard/list/users/u/`
+        },
+        {
+            key: "kiosk",
+            name: "Kiosks",
+            icon: <DesktopWindowsOutlined />,
+            href: "/dashboard/kiosk"//"/dashboard/institution"
+        }
 
         // {
         //     key: "institution",

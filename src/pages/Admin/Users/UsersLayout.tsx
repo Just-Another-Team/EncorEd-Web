@@ -32,7 +32,7 @@ const UsersLayout = () => {
             </Box>
 
             <UsersLayoutTab value={page} index={0}>
-                <UserList />
+                {/* <UserList /> */}
             </UsersLayoutTab>
 
             {/* 

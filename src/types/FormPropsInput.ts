@@ -1,12 +1,8 @@
-import { Control, FieldValues, RegisterOptions } from 'react-hook-form'
+import { Control, FieldValues, RegisterOptions, UseControllerProps } from 'react-hook-form'
 import { FilledInputProps, InputProps, OutlinedInputProps, SxProps, TextFieldPropsColorOverrides, TextFieldVariants, Theme } from '@mui/material'
 import { OverridableStringUnion } from '@mui/types/index'
 
-export type FormPropsInput = {
-    name: any,
-    control?: Control<FieldValues> | undefined,
-    rules?: Omit<RegisterOptions<FieldValues, any>, "valueAsNumber" | "valueAsDate" | "setValueAs" | "disabled"> | undefined,
-
+export type FormPropsInput<T extends FieldValues> = {
     label?: React.ReactNode,
     rows?: string | number | undefined,
     variant?: TextFieldVariants | undefined,
@@ -27,4 +23,4 @@ export type FormPropsInput = {
     InputProps?: Partial<OutlinedInputProps> | Partial<InputProps> | Partial<FilledInputProps> | undefined
 
     setValue?: any
-}
+} & UseControllerProps<T>

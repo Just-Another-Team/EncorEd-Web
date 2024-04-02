@@ -6,14 +6,15 @@ import {
     Button,
     Paper,
 } from "@mui/material";
-// import LoginUserForm from "../../components/Forms/Formhooks/UserForm-Login-Hooks";
-import { useAppSelector } from "../../app/encored-store-hooks";
-import { Link, useNavigate } from "react-router-dom";
 import Form from "../../components/Form";
-import { useForm } from "react-hook-form";
+import { useForm, FieldValues } from "react-hook-form";
 import ControlledTextField from "../../components/TextFieldControlled/input";
 import { LoginDataType, LoginTextFieldType } from "../../types/InputLoginType";
 import LoadingDialog from "../../components/DialogLoading";
+import { AuthErrorCodes } from "firebase/auth"
+import { FirebaseError } from "firebase/app";
+import { useState } from "react";
+import { useAuth } from "../../hooks/useAuth";
 
 const inputs: Array<LoginTextFieldType> = [
     {
@@ -35,23 +36,39 @@ const inputs: Array<LoginTextFieldType> = [
 ]
 
 const Login = () => {
-    const {handleSubmit, control} = useForm<LoginDataType>({
+    const { load, login } = useAuth();
+    const [openLoading, setOpenLoading] = useState<boolean>(false);
+
+    const {handleSubmit, setError, control} = useForm<LoginDataType>({
         defaultValues: {
-            email: "",
-            password: "",
+            email: null,
+            password: null,
         }
     });
 
-    const navigate = useNavigate();
+    const handleLoginError = (error: any) => {
+        setOpenLoading(false);
 
-    const handleLogin = (loginData: LoginDataType) => {
-        // TO-DO:
-        // Check login credentials
-        // if login credentials valid -> Load the screen. Move to home page
-        // navigate("/dashboard/home");
-        // else -> provide error message
+        if (error instanceof FirebaseError) {
+            console.error(error)
 
-        return;
+            if (error.code === AuthErrorCodes.INVALID_PASSWORD) setError('password', { type: "Firebase Auth", message: "Invalid Password" } )
+            else if (error.code === AuthErrorCodes.USER_DELETED) setError('email', { type: "Firebase Auth", message: "Invalid email" } )
+        }
+    }
+
+    const handleLogin = async (loginData: LoginDataType) => {
+        setOpenLoading(true);
+        // await signInWithEmailAndPassword(getAuth(), loginData.email!, loginData.password!)
+        //     .then(() => {
+        //         setOpenLoading(false);
+        //     })
+        //     .catch(handleLoginError)
+        await login(loginData.email!, loginData.password!)
+            .then(() => {
+                setOpenLoading(false);
+            })
+            .catch(handleLoginError)
     }
 
     return (
@@ -114,8 +131,11 @@ const Login = () => {
             It must be connected to the MAC Address so that it wouldn't repeat itself! */}
 
             <LoadingDialog
-            open={false}
+            open={openLoading || load}
             text="Logging in to EncorEd"/>
+
+            {/* Error Dialog */}
+
         </Container>
     )
 }
