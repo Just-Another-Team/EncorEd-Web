@@ -10,7 +10,6 @@ const FormInputSwitch = <T extends FieldValues>({name, control}: FormPropsInput<
         <Controller
         name={name}
         control={control}
-        //rules={rules} //-Give each controller the error
         render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
             <Switch
             checked={value}
