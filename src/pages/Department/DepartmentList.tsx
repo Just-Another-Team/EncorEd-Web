@@ -1,6 +1,6 @@
 import { DeleteOutlineOutlined, UpdateOutlined } from "@mui/icons-material";
 import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
-import IDepartment from "../../types/IDepartment";
+import IDepartment from "../../data/IDepartment";
 import { useState } from "react";
 import { useModal } from "../../hooks/useModal";
 import useLoading from "../../hooks/useLoading";

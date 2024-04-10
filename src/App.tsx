@@ -16,6 +16,7 @@ import Department from './pages/Department';
 import Users from './pages/Users';
 import Subjects from './pages/Subject';
 import Kiosks from './pages/Kiosks';
+import { UserRole } from './data/IUser';
 
 function App() {
   const { user } = useAuth()
@@ -23,10 +24,10 @@ function App() {
   return (
     <Routes>
       {/* Public pages */}
-      <Route path='/' element={ user ? <Navigate replace to="/dashboard/home" /> : <Login />}/>
+      <Route path='/' element={ user ? (user.ROLE_ID as UserRole).admin ? <Navigate replace to="/admin/home" /> : (user.ROLE_ID as UserRole).campusDirector ? <Navigate replace to="/campusDirector/home" /> : (user.ROLE_ID as UserRole).dean ? <Navigate replace to="/dean/home" /> : <Login /> : <Login />}/>
 
       {/* All Users */}
-      <Route path='/dashboard' element={ !user ? <Navigate replace to="/" /> : <Layout />  }> 
+      <Route path='/admin' element={ !user ? <Navigate replace to="/" /> : <Layout />  }> 
         <Route index path='home' element={<Home />}  />
 
         <Route path='attendances' element={<Attendances />} />
@@ -48,19 +49,42 @@ function App() {
         <Route path='kiosk' element={<Kiosks />}/>
       </Route>
 
-      {/* Campus Director */}
-      <Route path='/admin/dashboard' element={ !user ? <Navigate replace to="/" /> : <Layout />  }> 
+      {/* Dean */}
+      <Route path='/dean' element={ !user ? <Navigate replace to="/" /> : <Layout />  }> 
         <Route index path='home' element={<Home />}  />
 
         <Route path='attendances' element={<Attendances />} />
+
+        <Route path='rooms'>
+          <Route element={<QRCodes />} index/>
+          <Route path=':roomId' element={<SelectedRoom />}/>
+        </Route>
+
+        <Route path='users' element={<Users />}/>
+
+        <Route path='kiosk' element={<Kiosks />}/>
 
         <Route path='notifications'>
           <Route element={<NotificationList />} index/>
           <Route path=':notificationId' element={<NotificationItem />}/>
         </Route>
+      </Route>
+
+      {/* Campus Director */}
+      <Route path='/campusDirector' element={ !user ? <Navigate replace to="/" /> : <Layout />  }> 
+        <Route index path='home' element={<Home />}  />
+
+        <Route path='attendances' element={<Attendances />} />
 
         <Route path='department' element={<Department />} />
         <Route path='users' element={<Users />}/>
+
+        <Route path='kiosk' element={<Kiosks />}/>
+
+        <Route path='notifications'>
+          <Route element={<NotificationList />} index/>
+          <Route path=':notificationId' element={<NotificationItem />}/>
+        </Route>
       </Route>
 
       

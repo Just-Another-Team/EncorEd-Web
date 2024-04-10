@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import IDepartment from "../types/IDepartment";
+import IDepartment from "../data/IDepartment";
 import departmentService from "../app/api/department-service";
 import { AxiosResponse } from "axios";
 

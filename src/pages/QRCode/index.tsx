@@ -13,7 +13,7 @@ import { useMemo, useState } from "react";
 import AddQRCodeForm from "./AddQRCodeForm";
 import { useSubject } from "../../hooks/useSubject";
 import LoadingDialog from "../../components/DialogLoading";
-import IRoom from "../../types/IRoom";
+import IRoom from "../../data/IRoom";
 
 
 const QRCodes = () => {

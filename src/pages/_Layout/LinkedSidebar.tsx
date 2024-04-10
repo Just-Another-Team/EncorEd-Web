@@ -11,6 +11,8 @@ import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import LanOutlinedIcon from '@mui/icons-material/LanOutlined';
 import Sidebar from '../../components/NavSidebar'
 import { DesktopWindowsOutlined, HowToReg, QrCode } from '@mui/icons-material'
+import { useAuth } from '../../hooks/useAuth'
+import { UserRole } from '../../data/IUser'
 
 //LinkListItemType
 export type LinkType = {
@@ -29,67 +31,136 @@ const LinkedSideBar = ({
     isDrawerOpen,
     onCloseDrawer
 }: LinkedSideBarProps) => {
-    const links: Array<LinkType> = [
+    const { user } = useAuth();
+
+    const deanlinkCommon = '/dean'
+    const campusDirectorCommon = '/campusDirector'
+    const adminCommon = `/admin`
+
+    const adminlinks: Array<LinkType> = [
         {
             key: "home",
             name: "Home",
             icon: <HomeOutline />,
-            href: "/dashboard/home"//"/dashboard/home"
+            href: `${adminCommon}/home`
         },
         {
             key: "attendances",
             name: "Attendances",
             icon: <HowToReg />,
-            href: "/dashboard/attendances"//`/dashboard/report/attendance`
+            href: `${adminCommon}/attendances`
         },
         {
             key: "rooms",
             name: "Room QR Code",
             icon: <QrCode />,
-            href: "/dashboard/rooms"//`/dashboard/report/attendance`
+            href: `${adminCommon}/rooms`
         },
         {
             key: "subject",
             name: "Subject",
             icon: <BookOutline />,
-            href: "/dashboard/subject"//`/dashboard/subject/`
+            href: `${adminCommon}/subject`
         },
         {
             key: "departments",
             name: "Departments",
             icon: <LanOutlinedIcon />,
-            href: "/dashboard/department"//`/dashboard/subject/`
+            href: `${adminCommon}/department`
         },
         {
             key: "users",
             name: "Employees",
             icon: <PersonOutlinedIcon />,
-            href: "/dashboard/users"//`/dashboard/list/users/u/`
+            href: `${adminCommon}/users`
         },
         {
             key: "kiosk",
             name: "Kiosks",
             icon: <DesktopWindowsOutlined />,
-            href: "/dashboard/kiosk"//"/dashboard/institution"
+            href: `${adminCommon}//dashboard/kiosk`
         }
-
+    ]
+    const deanLinks: Array<LinkType> = [
+        {
+            key: "home",
+            name: "Home",
+            icon: <HomeOutline />,
+            href: `${deanlinkCommon}/home`
+        },
+        {
+            key: "attendances",
+            name: "Attendances",
+            icon: <HowToReg />,
+            href: `${deanlinkCommon}/attendances`
+        },
+        {
+            key: "rooms",
+            name: "Room QR Code",
+            icon: <QrCode />,
+            href: `${deanlinkCommon}/rooms`
+        },
+        {
+            key: "subject",
+            name: "Subject",
+            icon: <BookOutline />,
+            href: `${deanlinkCommon}/subject`
+        },
+        {
+            key: "users",
+            name: "Employees",
+            icon: <PersonOutlinedIcon />,
+            href: `${deanlinkCommon}/users`
+        },
+        {
+            key: "kiosk",
+            name: "Kiosks",
+            icon: <DesktopWindowsOutlined />,
+            href: `${deanlinkCommon}/kiosk`
+        }
+    ]
+    const campusDirectorLinks: Array<LinkType> = [
+        {
+            key: "home",
+            name: "Home",
+            icon: <HomeOutline />,
+            href: `${campusDirectorCommon}/home`
+        },
+        {
+            key: "attendances",
+            name: "Attendances",
+            icon: <HowToReg />,
+            href: `${campusDirectorCommon}/attendances`
+        },
+        {
+            key: "departments",
+            name: "Departments",
+            icon: <LanOutlinedIcon />,
+            href: `${campusDirectorCommon}/department`
+        },
         // {
-        //     key: "institution",
-        //     name: "Institution",
-        //     icon: <OrganizationOutline />,
-        //     href: "#"//"/dashboard/institution"
+        //     key: "subject",
+        //     name: "Subject",
+        //     icon: <BookOutline />,
+        //     href: `${campusDirectorCommon}/subject`
         // },
-        // {
-        //     key: "request",
-        //     name: "Request",
-        //     icon: <PostAddIcon />,
-        //     href: "#"//"/dashboard/request"
-        // },
+        {
+            key: "users",
+            name: "Employees",
+            icon: <PersonOutlinedIcon />,
+            href: `${campusDirectorCommon}/users`
+        },
+        {
+            key: "kiosk",
+            name: "Kiosks",
+            icon: <DesktopWindowsOutlined />,
+            href: `${campusDirectorCommon}/kiosk`
+        }
     ]
 
     return (
         <Sidebar
-        links={links}
+        links={user !== null ? (user?.ROLE_ID as UserRole).campusDirector ? campusDirectorLinks : (user?.ROLE_ID as UserRole).dean ? deanLinks : (user?.ROLE_ID as UserRole).admin ? adminlinks : [] : []}
         isDrawerOpen={isDrawerOpen}
         onCloseDrawer={onCloseDrawer}
         />

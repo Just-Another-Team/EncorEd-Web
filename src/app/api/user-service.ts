@@ -1,5 +1,5 @@
 import http from "./http-common"
-import IUser from "../../types/IUser";
+import IUser from "../../data/IUser";
 
 export type UserInput = {
     institution?: string,
@@ -27,8 +27,10 @@ class UserService {
         return http.get<IUser>(`${this.userCommon}/view/s/${uid}`)
     }
 
-    getAllUsers() {
-        return http.get<Array<IUser>>(`${this.userCommon}/view/all`)
+    getAllUsers(userArray: Array<IUser>) {
+        return http.get<Array<IUser>>(`${this.userCommon}/view/all`, {
+            data: userArray
+        })
     }
 
     deleteUser(id: string) {

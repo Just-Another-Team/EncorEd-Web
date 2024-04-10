@@ -1,9 +1,9 @@
 import { SubjectType } from "../../data/subjectData"
 import { DataGrid, GridColDef } from "@mui/x-data-grid"
-import ISubject from "../../types/ISubject"
-import IRoom from "../../types/IRoom"
+import ISubject from "../../data/ISubject"
+import IRoom from "../../data/IRoom"
 import dayjs from "dayjs"
-import ISchedule from "../../types/ISchedule"
+import ISchedule from "../../data/ISchedule"
 
 // Datagrid for QRCodeViewRoom
 

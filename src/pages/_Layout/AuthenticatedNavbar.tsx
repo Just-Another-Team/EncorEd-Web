@@ -7,6 +7,8 @@ import Menu from "@mui/icons-material/Menu";
 import { Search } from "@mui/icons-material";
 import { NotificationStatusEnum, Notifications } from "../../data/notificationData";
 import { useAuth } from "../../hooks/useAuth";
+import { commonLink } from "../../data/commonLink";
+import { UserRole } from "../../data/IUser";
 
 //-------------------------------------------------
 // useNavBar
@@ -29,7 +31,7 @@ const AuthenticatedNavbar = ({
     const belowMid = useMediaQuery(theme.breakpoints.down("md"))
 
     const notificationOnClick = () => {
-        navigate("/dashboard/notifications")
+        navigate(`${user ? (user.ROLE_ID as UserRole).campusDirector ? commonLink.campusDirector : (user.ROLE_ID as UserRole).dean ? commonLink.dean : commonLink.admin : commonLink.admin}/notifications`)
     }
 
     const handleLogout = async () => {

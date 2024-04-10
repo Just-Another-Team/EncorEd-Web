@@ -4,10 +4,10 @@ import {
     GridColDef,
 } from "@mui/x-data-grid"
 import dayjs from "dayjs"
-import IUser from "../../types/IUser"
-import ISubject from "../../types/ISubject"
+import IUser from "../../data/IUser"
+import ISubject from "../../data/ISubject"
 import { useSubject } from "../../hooks/useSubject"
-import ISchedule from "../../types/ISchedule"
+import ISchedule from "../../data/ISchedule"
 import { DeleteOutlineOutlined, UpdateOutlined } from "@mui/icons-material"
 import { useState } from "react"
 import { useModal } from "../../hooks/useModal"

@@ -1,5 +1,5 @@
-import IFloor from "../../types/IFloor";
-import IRoom from "../../types/IRoom";
+import IFloor from "../../data/IFloor";
+import IRoom from "../../data/IRoom";
 import http from "./http-common";
 
 class RoomService {

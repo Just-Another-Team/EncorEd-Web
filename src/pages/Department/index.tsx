@@ -7,7 +7,7 @@ import { useModal } from "../../hooks/useModal";
 import useLoading from "../../hooks/useLoading";
 import DepartmentList from "./DepartmentList";
 import DepartmentForm from "./DepartmentForm";
-import IDepartment from "../../types/IDepartment";
+import IDepartment from "../../data/IDepartment";
 import useDepartment from "../../hooks/useDepartment";
 
 const Department = () => {

@@ -16,7 +16,7 @@ const AccountMenuButton = ({
 }: AccountMenuButtonType) => {
 
     const theme = useTheme()
-    const belowSm = useMediaQuery(theme.breakpoints.down("sm"))
+    const belowMd = useMediaQuery(theme.breakpoints.down("md"))
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -48,7 +48,7 @@ const AccountMenuButton = ({
                     <Avatar 
                     src={avatarSrc} //src asset needs to be connected to authenticated user
                     />
-                    { !belowSm ? fullName : null }
+                    { !belowMd ? fullName : null }
                 </Box>
             </Button>
 
@@ -66,7 +66,7 @@ const AccountMenuButton = ({
                 vertical: 'top',
                 horizontal: 'right'
             }}>
-                { belowSm ?
+                { belowMd ?
                     <MenuItem>
                         <Typography>Firstname Lastname</Typography>
                     </MenuItem> : undefined

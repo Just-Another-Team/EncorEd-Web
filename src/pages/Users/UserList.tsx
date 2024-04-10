@@ -3,15 +3,15 @@ import {
     GridActionsCellItem,
     GridColDef,
 } from "@mui/x-data-grid"
-import IUser from "../../types/IUser"
+import IUser, { UserRole } from "../../data/IUser"
 import { DeleteOutlineOutlined, UpdateOutlined } from "@mui/icons-material"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useModal } from "../../hooks/useModal"
 import { useUsers } from "../../hooks/useUsers"
 import { useAuth } from "../../hooks/useAuth"
 import DeleteDialog from "../../components/DialogDelete"
-import IDepartment from "../../types/IDepartment"
-import IRole from "../../types/IRole"
+import IDepartment from "../../data/IDepartment"
+import IRole from "../../data/IRole"
 import UserForm from "./UserForm"
 import useLoading from "../../hooks/useLoading"
 
@@ -21,6 +21,8 @@ const UsersList = () => {
         users,
         updateUser,
         deleteUser,
+        setLoad,
+        load,
     } = useUsers();
 
     const { 
@@ -38,6 +40,11 @@ const UsersList = () => {
     const { loading, openLoading, closeLoading } = useLoading();
 
     const [ user, setUser ] = useState<IUser>();
+
+    useEffect(() => {
+        console.log(users)
+        setLoad(true)
+    }, [])
 
     const handleClear = () => {
         setUser(undefined)
@@ -92,11 +99,13 @@ const UsersList = () => {
             minWidth: 256
         },
         {
-            field: "ROLE_ID.ROLE_LABEL",
+            field: "ROLE_ID",
             headerName: "Role",
             minWidth: 256,
             renderCell: (params) => {
-                return (params.row.ROLE_ID as IRole).ROLE_LABEL
+                const role = params.row.ROLE_ID as UserRole
+
+                return role.campusDirector ? "Campus Director" : role.dean ? "Dean" : role.attendanceChecker ? "Attendance Checker" : role.teacher ? "Teacher" : role.kiosk 
             }
         },
         {
@@ -145,11 +154,12 @@ const UsersList = () => {
         },
     ]
 
-    const filteredUsers = users?.filter((user) => user.USER_ID !== account?.USER_ID)
+    const filteredUsers = users?.filter((user) => user.USER_ID !== account?.USER_ID && !(user.ROLE_ID as UserRole).admin && !user.USER_ISDELETED)
 
     return (
         <>
             <DataGrid
+            loading={users?.length! > 0 ? false : true}
             initialState={{
                 columns: {
                     columnVisibilityModel: {

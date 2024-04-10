@@ -5,11 +5,11 @@ import { useForm } from "react-hook-form";
 import { FixMeLater } from "../../types/FixMeLater";
 import TimePickerControlled from "../../components/TimePickerControlled";
 import { ArrowForwardOutlined } from "@mui/icons-material";
-import ISubject from "../../types/ISubject";
+import ISubject from "../../data/ISubject";
 import DropDown from "../../components/DropDown";
 import { useUsers } from "../../hooks/useUsers";
 import ControlledTextField from "../../components/TextFieldControlled/input";
-import ISchedule from "../../types/ISchedule";
+import ISchedule from "../../data/ISchedule";
 import dayjs from "dayjs";
 import { useSubject } from "../../hooks/useSubject";
 
@@ -22,7 +22,7 @@ const AddDialog = ({
     addModal,
     closeAddModal
 }: AddDialogType) => {
-    const { users } = useUsers();
+    const { getTeachers } = useUsers();
     const { addSubject } = useSubject();
 
     const { control, handleSubmit, setValue, reset } = useForm<ISubject>({
@@ -58,7 +58,7 @@ const AddDialog = ({
         reset()
     }
 
-    const instructors = users?.map((el): {label: string; value: string} => ({
+    const instructors = getTeachers().map((el): {label: string; value: string} => ({
         label: el.USER_FULLNAME!,
         value: el.USER_ID!
     }))

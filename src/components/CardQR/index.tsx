@@ -9,7 +9,8 @@ import {
 } from "@mui/material"
 import QRCode from "react-qr-code"
 import { useNavigate } from "react-router-dom"
-import IRoom from "../../types/IRoom"
+import IRoom from "../../data/IRoom"
+import { useAuth } from "../../hooks/useAuth"
 
 type CardQRType = {
     room: IRoom,
@@ -20,11 +21,12 @@ const CardQR = ({
     room,
     qrValue
 }: CardQRType) => {
+    // const { user } = useAuth()
 
     const navigate = useNavigate();
 
     const handleCardClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        navigate(`/dashboard/rooms/${room.ROOM_ID}`)
+        navigate(`${room.ROOM_ID}`)
     }
 
     return( 

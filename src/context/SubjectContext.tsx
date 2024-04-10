@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import subjectService from "../app/api/subject-service";
-import ISubject from "../types/ISubject";
-import IRoom from "../types/IRoom";
+import ISubject from "../data/ISubject";
+import IRoom from "../data/IRoom";
 import { QRCodeType } from "../types/QRCodeType";
 import { AxiosResponse } from "axios";
 
@@ -51,7 +51,7 @@ export const SubjectProvider = ({ children }: SubjectProviderType) => {
 
     useEffect(() => {
         const fetchSubjects = async () => {
-            const subjectResponse = await subjectService.view()
+            const subjectResponse = await subjectService.viewAll()
             const subjectData = subjectResponse.data;
 
             setSubjects(subjectData)

@@ -1,5 +1,14 @@
 import IDepartment from "./IDepartment";
-import IRole from "./IRole";
+
+export type UserRole = {
+    admin?: boolean,
+    campusDirector?: boolean
+    dean?: boolean
+    attendanceChecker?: boolean
+    teacher?: boolean
+    kiosk?: boolean
+}
+
 
 export default interface IUser {
     USER_ID?: string;
@@ -12,7 +21,7 @@ export default interface IUser {
 
     USER_USERNAME: string | null;
     USER_PASSWORD: string | null;
-    ROLE_ID: IRole | string | null;
+    ROLE_ID: UserRole | string | null;
     DEPT_ID: IDepartment | string | null;
     USER_ISDELETED?: boolean;
 }

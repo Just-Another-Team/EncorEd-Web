@@ -6,7 +6,7 @@ import {
 import UsersList from "./UserList"
 import { useModal } from "../../hooks/useModal"
 import UserForm from "./UserForm";
-import IUser from "../../types/IUser";
+import IUser from "../../data/IUser";
 import useLoading from "../../hooks/useLoading";
 import { useUsers } from "../../hooks/useUsers";
 

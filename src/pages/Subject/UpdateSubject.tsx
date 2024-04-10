@@ -1,6 +1,6 @@
 import { Box, Button, CircularProgress, Stack } from "@mui/material";
 import DialogMessage from "../../components/DialogMessage";
-import ISubject from "../../types/ISubject";
+import ISubject from "../../data/ISubject";
 import { useSubject } from "../../hooks/useSubject";
 import { useAuth } from "../../hooks/useAuth";
 import useLoading from "../../hooks/useLoading";
@@ -9,9 +9,9 @@ import { useForm } from "react-hook-form";
 import { useEffect, useMemo } from "react";
 import { FirebaseError } from "firebase/app";
 import { AuthErrorCodes } from "firebase/auth";
-import IUser from "../../types/IUser";
-import ISchedule from "../../types/ISchedule";
-import IRoom from "../../types/IRoom";
+import IUser from "../../data/IUser";
+import ISchedule from "../../data/ISchedule";
+import IRoom from "../../data/IRoom";
 
 type UpdateInputs = {
     password: string | null;

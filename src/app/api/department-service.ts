@@ -1,4 +1,4 @@
-import IDepartment from "../../types/IDepartment";
+import IDepartment from "../../data/IDepartment";
 import http from "./http-common"
 
 
@@ -15,6 +15,10 @@ class DepartmentService {
 
     delete(departmentID: string) {
         return http.delete(`${this.departmentComment}/delete/${departmentID}`)
+    }
+
+    view(departmentID: string) {
+        return http.get<IDepartment>(`${this.departmentComment}/view/s/${departmentID}`)
     }
 
     viewAll() {

@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import IRole from "../types/IRole";
+import IRole from "../data/IRole";
 import roleService from "../app/api/role-service";
 
 type RoleContextType = {

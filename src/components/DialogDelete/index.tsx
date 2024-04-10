@@ -7,10 +7,10 @@ import { useSubject } from "../../hooks/useSubject";
 import { FirebaseError } from "firebase/app";
 import { AuthErrorCodes } from "firebase/auth";
 import { useAuth } from "../../hooks/useAuth";
-import ISubject from "../../types/ISubject";
+import ISubject from "../../data/ISubject";
 import { AxiosResponse } from "axios";
-import IUser from "../../types/IUser";
-import IDepartment from "../../types/IDepartment";
+import IUser from "../../data/IUser";
+import IDepartment from "../../data/IDepartment";
 
 type DeleteType = {
     password: string | null;

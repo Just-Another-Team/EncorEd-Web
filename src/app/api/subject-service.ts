@@ -1,4 +1,4 @@
-import ISubject from "../../types/ISubject";
+import ISubject from "../../data/ISubject";
 import { QRCodeType } from "../../types/QRCodeType";
 import http from "./http-common";
 
@@ -17,7 +17,11 @@ class SubjectService {
         return http.patch(`${this.subjectCommon}/assign/${data.SUB_ID}/room`, data)
     }
 
-    public view() {
+    public view(id: string) {
+        return http.get<ISubject>(`${this.subjectCommon}/view/s/${id}`)
+    }
+
+    public viewAll() {
         return http.get<Array<ISubject>>(`${this.subjectCommon}/view/all`)
     }
 

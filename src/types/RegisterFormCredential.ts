@@ -1,4 +1,4 @@
-import { Institution } from "./InstitutionInput";
+import { Institution } from "../data/InstitutionInput";
 
 export type RegisterFormCredential = {
     id?: string,

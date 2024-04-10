@@ -1,14 +1,14 @@
 import { Button, CircularProgress, Grid, Stack } from "@mui/material"
 import DialogMessage from "../../components/DialogMessage"
 import { RegisterOptions, useForm } from "react-hook-form";
-import IUser from "../../types/IUser";
+import IUser from "../../data/IUser";
 import ControlledTextField from "../../components/TextFieldControlled/input";
 import DropDown from "../../components/DropDown";
 import useDepartment from "../../hooks/useDepartment";
 import useRole from "../../hooks/useRole";
 import { useEffect } from "react";
-import IDepartment from "../../types/IDepartment";
-import IRole from "../../types/IRole";
+import IDepartment from "../../data/IDepartment";
+import IRole from "../../data/IRole";
 
 type AddUserType = {
     selectedUser?: IUser | undefined;
@@ -139,7 +139,7 @@ const UserForm = ({
             setValue('USER_USERNAME', selectedUser?.USER_USERNAME)
             setValue('USER_PASSWORD', selectedUser?.USER_PASSWORD)
             setValue('DEPT_ID', (selectedUser?.DEPT_ID as IDepartment).DEPT_ID!)
-            setValue('ROLE_ID', (selectedUser?.ROLE_ID as IRole).ROLE_ID!)
+            // setValue('ROLE_ID', (selectedUser?.ROLE_ID as IRole).ROLE_ID!)
         }
     }, [selectedUser])
 

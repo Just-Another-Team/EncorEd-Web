@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
-import IUser from "../types/IUser";
-import authService from "../app/api/auth-service";
+import IUser from "../data/IUser";
+import authService from "../app/api/user-service";
 import { EmailAuthProvider, UserCredential, onAuthStateChanged, reauthenticateWithCredential, signInWithEmailAndPassword } from "firebase/auth";
 import { getAuth } from '../app/firebase/config'
 
@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }: AuthProviderType) => {
             if (userAuth) {
                 const userSnapshot = await authService.getUser(userAuth.uid);
                 const userData = userSnapshot.data;
-
+                
                 setUser({
                     USER_ID: userData.USER_ID,
                     USER_FULLNAME: userAuth.displayName as string,

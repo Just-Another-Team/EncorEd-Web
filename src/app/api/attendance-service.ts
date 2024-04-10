@@ -1,5 +1,5 @@
 import http from "./http-common"
-import IAttendance from "../../types/IAttendance";
+import IAttendance from "../../data/IAttendance";
 
 class AttendanceService {
     private commonUrl: string = "attendance";

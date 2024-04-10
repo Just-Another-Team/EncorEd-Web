@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material"
 import { forwardRef, MutableRefObject, Ref, RefObject, useEffect, useRef } from "react"
 import QRCode from "react-qr-code"
 import { FixMeLater } from "../../types/FixMeLater"
-import IRoom from "../../types/IRoom"
+import IRoom from "../../data/IRoom"
 
 type QRImageType = {
     QRSize?: number;

@@ -1,4 +1,4 @@
-import IRole from "../../types/IRole";
+import IRole from "../../data/IRole";
 import http from "./http-common"
 
 

@@ -7,7 +7,7 @@ import { useSubject } from "../../hooks/useSubject";
 import { FirebaseError } from "firebase/app";
 import { AuthErrorCodes } from "firebase/auth";
 import { useAuth } from "../../hooks/useAuth";
-import ISubject from "../../types/ISubject";
+import ISubject from "../../data/ISubject";
 import DeleteDialog from "../../components/DialogDelete";
 import { useModal } from "../../hooks/useModal";
 

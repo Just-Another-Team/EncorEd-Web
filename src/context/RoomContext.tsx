@@ -1,6 +1,6 @@
 import { createContext, useEffect, useMemo, useState } from "react";
 import roomService from "../app/api/room-service";
-import IRoom from "../types/IRoom";
+import IRoom from "../data/IRoom";
 import { useSubject } from "../hooks/useSubject";
 
 type AttendanceContextType = {
