@@ -5,8 +5,8 @@ import ISubject from "./subject.model";
 export default interface IRoom {
     ROOM_ID?: string;
     ROOM_NAME?: string;
-    FLR_ID?: DocumentReference | IFloor | string;
+    FLR_ID?: IFloor | string;
 
-    SUB_ID?: DocumentReference | ISubject | string;
+    SUB_ID?: ISubject | string;
     SUBJECTS?: Array<ISubject>;
 }

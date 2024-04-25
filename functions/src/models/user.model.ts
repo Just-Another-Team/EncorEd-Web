@@ -2,6 +2,14 @@ import { DocumentReference } from "firebase-admin/firestore";
 import IRole from "./role.model";
 import IDepartment from "./department.model";
 
+export interface IUserRole {
+    campusDirector?: boolean
+    dean?: boolean
+    attendanceChecker?: boolean
+    teacher?: boolean
+    kiosk?: boolean
+}
+
 export interface IUserAuth {
     USER_PASSWORD?: string;
 
@@ -14,11 +22,13 @@ export interface IUserAuth {
 
 export interface IUserFireStore {
     USER_USERNAME: string;
-    ROLE_ID: DocumentReference | IRole | string;
-    DEPT_ID: DocumentReference | IDepartment | string | null;
+    ROLE_ID: IRole | IUserRole | string;
+    DEPT_ID: IDepartment | string | null;
     USER_ISDELETED: boolean;
 }
 
 export default interface IUser extends IUserAuth, IUserFireStore {
     USER_ID?: string;
+    USER_CREATEDBY?: string;
+    USER_UPDATEDBY: string;
 }

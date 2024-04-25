@@ -12,21 +12,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.viewSubjectHelper = exports.scheduleCollection = exports.subjectCollection = void 0;
+exports.viewSubject = exports.scheduleCollection = exports.subjectCollection = void 0;
 const dayjs_1 = __importDefault(require("dayjs"));
 const database_1 = require("../database");
 const converter_1 = require("../models/converter");
 const user_controller_1 = require("./user.controller");
 const room_controller_1 = require("./room.controller");
+const config_1 = require("../../config");
 // import { viewUser, userCollection } from './user.controller';
 exports.subjectCollection = database_1.db.collection(`/Subject/`).withConverter((0, converter_1.converter)());
 exports.scheduleCollection = database_1.db.collection(`/Schedule/`).withConverter((0, converter_1.converter)());
 class SubjectService {
     add(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield addSubjectHelper(req.body)
+            if (req.body.SCHED_ID !== null)
+                req.body.SCHED_ID = yield exports.scheduleCollection.add(req.body.SCHED_ID).then((result) => result.id)
+                    .catch((error) => {
+                    console.error(error);
+                    return Promise.reject(error);
+                });
+            const subject = {
+                SUB_CODE: req.body.SUB_CODE,
+                SUB_DESCRIPTION: req.body.SUB_DESCRIPTION,
+                ROOM_ID: null,
+                SCHED_ID: req.body.SCHED_ID,
+                USER_ID: req.body.USER_ID,
+                SUB_ISDELETED: false,
+                SUB_CREATEDBY: req.body.SUB_CREATEDBY,
+                SUB_UPDATEDBY: req.body.SUB_UPDATEDBY
+            };
+            yield exports.subjectCollection.add(subject)
                 .then(() => {
-                res.status(200).json("Subject added successfully!");
+                res.status(200).json(subject);
             })
                 .catch((error) => {
                 console.error(error);
@@ -50,7 +67,64 @@ class SubjectService {
     }
     update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            throw new Error('Method not implemented.');
+            const { id } = req.params;
+            const reqSubject = {
+                SUB_CODE: req.body.SUB_CODE,
+                SUB_DESCRIPTION: req.body.SUB_DESCRIPTION,
+                SUB_UPDATEDBY: req.body.SUB_UPDATEDBY
+            };
+            //Assigning to a different user, that is okay, it's just replacing the UserID
+            //Assigning to a different room, that is okay, it's just replacing the RoomID
+            //Assigning to a different schedule, that is a different ball game
+            yield exports.subjectCollection.doc(id).update(reqSubject)
+                .then(() => {
+                res.status(200).json("Subject is updated successfully!");
+            })
+                .catch((error) => {
+                res.status(400).json(error);
+            });
+            //View all of the schedules first <- CHECK
+            //Find the schedule that has the same startTime, endTime, and weekAssigned <- CHECK
+            //Get the schedule ID <- CHECK
+            //Get the subjects based on the schedule ID <- CHECK
+            //THIS IS A LONG ARSE PROCESS JUST TO ASSIGN A SUBJECT TO A SCHEDULE THAT EXISTS
+            // const schedules = scheduleCollection.get()
+            //     .then((scheduleDoc) => {
+            //         const schedule = scheduleDoc.docs.map((doc):ISchedule => ({
+            //             SCHED_ID: doc.id,
+            //             ...doc.data() as ISchedule
+            //         }))
+            //         return Promise.all(schedule)
+            //             .then((result => result))
+            //             .catch((error) => Promise.reject(error))
+            //     })
+            //     .catch((error) => Promise.reject(error))
+            // const scheduleIDs = await schedules
+            //     .then((result) => {
+            //         const filteredResult = result.filter((schedule) => {
+            //             const reqStartTimeFormat = dayjs(req.body.SCHED_STARTTIME).format("HH:mm:ss")
+            //             const reqEndTimeFormat = dayjs(req.body.SCHED_ENDTIME).format("HH:mm:ss")
+            //             const startTimeFormat = dayjs(schedule.SCHED_STARTTIME).format("HH:mm:ss")
+            //             const endTimeFormat = dayjs(schedule.SCHED_ENDTIME).format("HH:mm:ss")
+            //             const reqStartTime = dayjs(`2001-01-01 ${reqStartTimeFormat}`)
+            //             const reqEndTime = dayjs(`2001-01-01 ${reqEndTimeFormat}`)
+            //             const startTime = dayjs(`2001-01-01 ${startTimeFormat}`)
+            //             const endTime = dayjs(`2001-01-01 ${endTimeFormat}`)
+            //             return schedule.SCHED_WEEKASSIGNED.some((day) => req.body.SCHED_WEEKASSIGNED.includes(day)) && (reqStartTime.isSame(startTime) && reqEndTime.isSame(endTime))
+            //         })
+            //         return filteredResult.map((schedule) => schedule.SCHED_ID)
+            //     })
+            //     // .catch((error) => {
+            //     //     res.status(400).json(error)
+            //     // })
+            // await viewAllSubjectHelper()
+            //     .then((data) => {
+            //         const subjects = data.filter((subject) => scheduleIDs.includes((subject.SCHED_ID as ISchedule).SCHED_ID))
+            //         res.status(200).json(subjects)
+            //     })
+            //     .catch((error) => {
+            //         res.status(400).json(error)
+            //     })
         });
     }
     assignRoom(req, res) {
@@ -58,7 +132,7 @@ class SubjectService {
             const { subId } = req.params;
             const roomId = req.body.ROOM_ID;
             yield exports.subjectCollection.doc(subId).update({
-                ROOM_ID: database_1.db.doc(`Room/${roomId}`),
+                ROOM_ID: roomId,
             })
                 .then(() => {
                 res.status(200).json("Subject name is assigned to Room name");
@@ -72,7 +146,7 @@ class SubjectService {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             yield exports.subjectCollection.doc(id).update({
-                SUB_STATUS: "Inactive",
+                SUB_ISDELETED: true,
             })
                 .then(() => {
                 res.status(200).json("Subject name is deleted successfully!");
@@ -84,13 +158,21 @@ class SubjectService {
     }
     view(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            throw new Error('Method not implemented.');
+            const { id } = req.params;
+            yield exports.viewSubject.view(id)
+                .then((result) => {
+                res.status(200).json(result);
+            })
+                .catch((error) => {
+                console.error(error);
+                res.status(400).json(error.message);
+            });
         });
     }
     viewBySchedule(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let currentTime = req.query.currentTime;
-            yield viewAllSubjectHelper()
+            yield exports.viewSubject.viewAll()
                 .then((result) => {
                 const currentSubject = result.filter((subject) => {
                     const schedule = subject.SCHED_ID;
@@ -112,72 +194,52 @@ class SubjectService {
     }
     viewAll(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield viewAllSubjectHelper()
+            console.log(config_1.admin.firestore.Timestamp.now());
+            yield exports.viewSubject.viewAll()
                 .then((result) => {
                 res.status(200).json(result);
             })
                 .catch((error) => {
-                res.status(400).json(error);
+                console.error(error);
+                res.status(400).json(error.message);
             });
         });
     }
 }
-const addSubjectHelper = (reqSubject) => {
-    return exports.scheduleCollection.add(reqSubject.SCHED_ID)
-        .then((result) => {
-        const subject = Object.assign(Object.assign({}, reqSubject), { USER_ID: database_1.db.doc(`User/${reqSubject.USER_ID}`), ROOM_ID: database_1.db.doc(`Room/${reqSubject.ROOM_ID}`), SCHED_ID: database_1.db.doc(`Schedule/${result.id}`) });
-        return exports.subjectCollection.doc().set(subject)
-            .catch((error) => Promise.reject(error));
-    });
-};
-//TO-DO: Fix Proper View Subject Helper where it includes Floor
-const viewSubjectHelper = (id, subject) => {
-    return subject.SCHED_ID.get()
-        //get schedule <- scheduleHelper
-        .then((schedule) => {
-        var _a, _b, _c;
-        return ({
-            SCHED_ID: {
-                SCHED_ID: schedule.id,
-                SCHED_STARTTIME: (_a = schedule.data()) === null || _a === void 0 ? void 0 : _a.SCHED_STARTTIME,
-                SCHED_ENDTIME: (_b = schedule.data()) === null || _b === void 0 ? void 0 : _b.SCHED_ENDTIME,
-                SCHED_WEEKASSIGNED: (_c = schedule.data()) === null || _c === void 0 ? void 0 : _c.SCHED_WEEKASSIGNED,
-            }
+const viewScheduleHelper = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const scheduleData = yield exports.scheduleCollection.doc(id).get();
+    return (Object.assign({ SCHED_ID: scheduleData.id }, scheduleData.data()));
+});
+class ViewSubject {
+    view(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const subject = yield exports.subjectCollection.doc(id).get();
+            const user = yield user_controller_1.viewUser.view(subject.data().USER_ID);
+            const schedule = yield viewScheduleHelper(subject.data().SCHED_ID);
+            const room = yield room_controller_1.viewRoom.view(subject.data().ROOM_ID);
+            return (Object.assign(Object.assign({}, subject.data()), { SUB_ID: subject.id, ROOM_ID: room, SCHED_ID: schedule, USER_ID: user }));
         });
-    })
-        .then((scheduleRes) => {
-        //Get all users from firestore and auth ASSIGNED
-        return subject.USER_ID.get()
-            .then((user) => {
-            return (0, user_controller_1.viewUserHelper)(user.id, user.data());
-        })
-            .then((user) => (Object.assign(Object.assign({}, scheduleRes), { USER_ID: user })))
-            .catch((error) => Promise.reject(error));
-    })
-        .then((schedUserRes) => {
-        //Get Room <- View Room Helper
-        return subject.ROOM_ID.get()
-            .then((room) => {
-            return (0, room_controller_1.viewRoomHelper)(room.id, room.data());
-        })
-            .then((result) => (Object.assign(Object.assign({}, schedUserRes), { ROOM_ID: result })))
-            .catch((error) => Promise.reject(error));
-    })
-        .then((schedUserRoomRes) => (Object.assign(Object.assign({}, subject), { SUB_ID: id, ROOM_ID: schedUserRoomRes.ROOM_ID, SCHED_ID: schedUserRoomRes.SCHED_ID, USER_ID: schedUserRoomRes.USER_ID })))
-        .catch((error) => Promise.reject(error));
-};
-exports.viewSubjectHelper = viewSubjectHelper;
-const viewAllSubjectHelper = () => {
-    return exports.subjectCollection.get()
-        .then((subjectDoc) => {
-        const subjects = subjectDoc.docs.map((doc) => {
-            return (0, exports.viewSubjectHelper)(doc.id, doc.data());
+    }
+    viewWithData(id, subject) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield user_controller_1.viewUser.view(subject.USER_ID);
+            const schedule = yield viewScheduleHelper(subject.SCHED_ID);
+            const room = subject.ROOM_ID !== null ? yield room_controller_1.viewRoom.view(subject.ROOM_ID) : null;
+            return (Object.assign(Object.assign({}, subject), { SUB_ID: id, ROOM_ID: room, SCHED_ID: schedule, USER_ID: user }));
         });
-        return Promise.all(subjects)
-            .then((result => result.filter(subject => subject.SUB_STATUS.toLowerCase() === "active")))
-            .catch((error) => Promise.reject(error));
-    })
-        .catch((error) => Promise.reject(error));
-};
+    }
+    viewAll() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const subjectSnapshot = yield exports.subjectCollection.get();
+            const subjects = subjectSnapshot.docs.map((doc) => {
+                return this.viewWithData(doc.id, doc.data());
+            });
+            return Promise.all(subjects)
+                .then((result => result.filter(subject => !subject.SUB_ISDELETED)))
+                .catch((error) => Promise.reject(error));
+        });
+    }
+}
+exports.viewSubject = new ViewSubject;
 exports.default = new SubjectService;
 //# sourceMappingURL=subject.controller.js.map

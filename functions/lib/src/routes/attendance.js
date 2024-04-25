@@ -7,6 +7,7 @@ const express_1 = require("express");
 const attendance_controller_1 = __importDefault(require("../controller/attendance.controller"));
 const attendanceRouter = (0, express_1.Router)();
 attendanceRouter.get("/view/all", attendance_controller_1.default.viewAttendances);
+attendanceRouter.get("/view/reduced", attendance_controller_1.default.viewReduceAttendances);
 attendanceRouter.get("/view/s/:id", attendance_controller_1.default.viewAttendances);
 attendanceRouter.post("/add", attendance_controller_1.default.addAttendance);
 exports.default = attendanceRouter;

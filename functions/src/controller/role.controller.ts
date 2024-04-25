@@ -43,7 +43,15 @@ class Role implements IBaseService {
                 res.status(400).json(error)
             })
     }
-    
+}
+
+export const viewRoleHelper = async (id: string): Promise<IRole> => {
+    const roleData = await roleCollection.doc(id).get()
+
+    return ({
+        ROLE_ID: roleData.id,
+        ROLE_LABEL: (roleData.data() as IRole).ROLE_LABEL
+    })
 }
 
 export default new Role;

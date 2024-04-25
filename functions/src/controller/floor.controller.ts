@@ -3,11 +3,9 @@
 import { Request, Response } from 'express';
 import { converter } from '../models/converter';
 import { db } from '../database';
-import { adminAuth } from '../authentication';
 import IBaseService from '../interfaces/IBaseService';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import ErrorController from '../types/ErrorController';
 import IFloor from '../models/floor.model';
 
 export const floorCollection = db.collection("/Floor/").withConverter(converter<IFloor>())
@@ -49,8 +47,11 @@ class FloorService implements IBaseService {
     public async viewAll(req: Request<ParamsDictionary, any, IFloor, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         await floorCollection.get()
             .then((floorDocs) => {
-                let floors = floorDocs.docs.map((floor) => {
-                    return viewFloorHelper(floor.id, floor.data() as IFloor)
+                let floors = floorDocs.docs.map((floor):IFloor => {
+                    return ({
+                        FLR_ID: floor.id,
+                        ...floor.data() as IFloor
+                    })
                 })
 
                 res.status(200).json(floors)
@@ -62,10 +63,13 @@ class FloorService implements IBaseService {
     }
 }
 
-export const viewFloorHelper = (id: string, data: IFloor): IFloor => {
+export const viewFloorHelper = async (id: string): Promise<IFloor> => {
+
+    const floor = await floorCollection.doc(id).get()
+
     return ({
         FLR_ID: id,
-        FLR_NAME: data.FLR_NAME
+        ...floor.data() as IFloor
     })
 }
 

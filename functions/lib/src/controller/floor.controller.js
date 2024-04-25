@@ -60,7 +60,7 @@ class FloorService {
             yield exports.floorCollection.get()
                 .then((floorDocs) => {
                 let floors = floorDocs.docs.map((floor) => {
-                    return (0, exports.viewFloorHelper)(floor.id, floor.data());
+                    return (Object.assign({ FLR_ID: floor.id }, floor.data()));
                 });
                 res.status(200).json(floors);
             })
@@ -71,12 +71,10 @@ class FloorService {
         });
     }
 }
-const viewFloorHelper = (id, data) => {
-    return ({
-        FLR_ID: id,
-        FLR_NAME: data.FLR_NAME
-    });
-};
+const viewFloorHelper = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const floor = yield exports.floorCollection.doc(id).get();
+    return (Object.assign({ FLR_ID: id }, floor.data()));
+});
 exports.viewFloorHelper = viewFloorHelper;
 exports.default = new FloorService;
 //# sourceMappingURL=floor.controller.js.map

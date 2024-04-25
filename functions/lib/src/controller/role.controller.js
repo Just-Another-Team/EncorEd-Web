@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.roleCollection = void 0;
+exports.viewRoleHelper = exports.roleCollection = void 0;
 const database_1 = require("../database");
 const converter_1 = require("../models/converter");
 exports.roleCollection = database_1.db.collection(`/Role/`).withConverter((0, converter_1.converter)());
@@ -56,5 +56,13 @@ class Role {
         });
     }
 }
+const viewRoleHelper = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const roleData = yield exports.roleCollection.doc(id).get();
+    return ({
+        ROLE_ID: roleData.id,
+        ROLE_LABEL: roleData.data().ROLE_LABEL
+    });
+});
+exports.viewRoleHelper = viewRoleHelper;
 exports.default = new Role;
 //# sourceMappingURL=role.controller.js.map

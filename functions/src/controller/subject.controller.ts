@@ -9,12 +9,10 @@ import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
 import { converter } from '../models/converter';
 import ISchedule from '../models/schedule.model';
-import { DocumentReference } from 'firebase-admin/firestore';
 import IRoom from '../models/room.model';
-import IUser from '../models/user.model';
-import { viewUserHelper } from './user.controller';
-import { viewRoomHelper } from './room.controller';
-import { schedule } from 'firebase-functions/v1/pubsub';
+import { viewUser } from './user.controller';
+import { viewRoom } from './room.controller';
+import { admin } from '../../config';
 
 // import { viewUser, userCollection } from './user.controller';
 
@@ -35,9 +33,11 @@ class SubjectService implements IBaseService {
             SUB_CODE: req.body.SUB_CODE,
             SUB_DESCRIPTION: req.body.SUB_DESCRIPTION,
             ROOM_ID: null,
-            SCHED_ID: req.body.SCHED_ID !== null ? db.doc(`Schedule/${req.body.SCHED_ID}`) : null,
-            USER_ID: req.body.USER_ID !== null ? db.doc(`User/${req.body.USER_ID}`) : null,
-            SUB_ISDELETED: false, //Must be isDeleted
+            SCHED_ID: req.body.SCHED_ID,
+            USER_ID: req.body.USER_ID,
+            SUB_ISDELETED: false,
+            SUB_CREATEDBY: req.body.SUB_CREATEDBY,
+            SUB_UPDATEDBY: req.body.SUB_UPDATEDBY
         }
 
         await subjectCollection.add(subject)
@@ -69,6 +69,7 @@ class SubjectService implements IBaseService {
         const reqSubject: ISubject = {
             SUB_CODE: req.body.SUB_CODE,
             SUB_DESCRIPTION: req.body.SUB_DESCRIPTION,
+            SUB_UPDATEDBY: req.body.SUB_UPDATEDBY
         }
 
         //Assigning to a different user, that is okay, it's just replacing the UserID
@@ -143,7 +144,7 @@ class SubjectService implements IBaseService {
         const roomId = (req.body as IRoom).ROOM_ID as string
 
         await subjectCollection.doc(subId).update({
-            ROOM_ID: db.doc(`Room/${roomId}`),
+            ROOM_ID: roomId,
         })
             .then(() => {
                 res.status(200).json("Subject name is assigned to Room name")
@@ -166,12 +167,21 @@ class SubjectService implements IBaseService {
             })
     }
     public async view(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        throw new Error('Method not implemented.');
+        const { id } = req.params
+
+        await viewSubject.view(id)
+            .then((result) => {
+                res.status(200).json(result)
+            })
+            .catch((error) => {
+                console.error(error)
+                res.status(400).json(error.message)
+            })
     }
     public async viewBySchedule(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         let currentTime = req.query.currentTime as string
 
-        await viewAllSubjectHelper()
+        await viewSubject.viewAll()
             .then((result) => {
                 const currentSubject = (result as Array<ISubject>).filter((subject) => {
                     const schedule = subject.SCHED_ID as ISchedule
@@ -195,82 +205,72 @@ class SubjectService implements IBaseService {
             })
     }
     public async viewAll(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        await viewAllSubjectHelper()
+        
+        console.log(admin.firestore.Timestamp.now())
+        
+        await viewSubject.viewAll()
             .then((result) => {
                 res.status(200).json(result)
             })
             .catch((error) => {
-                res.status(400).json(error)
+                console.error(error)
+                res.status(400).json(error.message)
             })
     }
 }
 
-export const viewSubjectHelper = (id: string, subject: ISubject) => {
-    //Result Subject Type
-    type SubjectReference = {
-        SCHED_ID?: DocumentReference | ISchedule | string | null;
-        USER_ID?: DocumentReference | IUser | string | null;
-        ROOM_ID?: DocumentReference | IRoom | string | null;
-    }
+const viewScheduleHelper = async (id: string): Promise<ISchedule> => {
+    const scheduleData = await scheduleCollection.doc(id).get()
 
-    return (subject.SCHED_ID as DocumentReference<ISchedule>).get()
-            //get schedule <- scheduleHelper
-            .then((schedule): SubjectReference => ({
-                SCHED_ID: {
-                    SCHED_ID: schedule.id,
-                    SCHED_STARTTIME: schedule.data()?.SCHED_STARTTIME as string,
-                    SCHED_ENDTIME: schedule.data()?.SCHED_ENDTIME as string,
-                    SCHED_WEEKASSIGNED: schedule.data()?.SCHED_WEEKASSIGNED as Array<string>,
-                }
-            }))
-            .then(async (scheduleRes): Promise<SubjectReference> => {
-                //Get all users from firestore and auth ASSIGNED
-                return await (subject.USER_ID as DocumentReference<IUser>).get()
-                    .then((user) => {
-                        return viewUserHelper(user.id, user.data() as IUser)
-                    })
-                    .then((user) => ({
-                        ...scheduleRes,
-                        USER_ID: user as IUser
-                    }))
-                    .catch((error) => Promise.reject(error))
-            })
-            .then(async (schedUserRes): Promise<SubjectReference> => {
-                return subject.ROOM_ID === null ? ({
-                    ...schedUserRes,
-                    ROOM_ID: null,
-                }) : (subject.ROOM_ID as DocumentReference<IRoom>).get()
-                    .then((room) => {
-                        return viewRoomHelper(room.id, room.data() as IRoom)
-                    })
-                    .then((result) => ({
-                        ...schedUserRes,
-                        ROOM_ID: result,
-                    }))
-                    .catch((error) => Promise.reject(error))
-            })
-            .then((schedUserRoomRes): ISubject => ({
-                ...subject,
-                SUB_ID: id,
-                ROOM_ID: schedUserRoomRes.ROOM_ID,
-                SCHED_ID: schedUserRoomRes.SCHED_ID,
-                USER_ID: schedUserRoomRes.USER_ID,
-            }))
-            .catch((error) => Promise.reject(error))
+    return ({
+        SCHED_ID: scheduleData.id,
+        ...scheduleData.data() as ISchedule
+    })
 }
 
-const viewAllSubjectHelper = () => {
-    return subjectCollection.get()
-        .then((subjectDoc) => {
-            const subjects = subjectDoc.docs.map((doc) => {
-                return viewSubjectHelper(doc.id, doc.data() as ISubject)
-            })
+class ViewSubject {
+    public async view (id: string): Promise<ISubject> {
+        const subject = await subjectCollection.doc(id).get()
 
-            return Promise.all(subjects)
-                .then((result => result.filter(subject => !subject.SUB_ISDELETED)))
-                .catch((error) => Promise.reject(error))
+        const user = await viewUser.view((subject.data() as ISubject).USER_ID as string)
+        const schedule = await viewScheduleHelper((subject.data() as ISubject).SCHED_ID as string)
+        const room = await viewRoom.view((subject.data() as ISubject).ROOM_ID as string)
+
+        return ({
+            ...subject.data() as ISubject,
+            SUB_ID: subject.id,
+            ROOM_ID: room,
+            SCHED_ID: schedule,
+            USER_ID: user,
         })
-        .catch((error) => Promise.reject(error))
+    }
+
+    public async viewWithData (id: string, subject: ISubject): Promise<ISubject> {
+        const user = await viewUser.view(subject.USER_ID as string)
+        const schedule = await viewScheduleHelper(subject.SCHED_ID as string)
+        const room = subject.ROOM_ID !== null ? await viewRoom.view(subject.ROOM_ID as string) : null
+    
+        return ({
+            ...subject,
+            SUB_ID: id,
+            ROOM_ID: room,
+            SCHED_ID: schedule,
+            USER_ID: user,
+        })
+    }
+
+    public async viewAll () {
+        const subjectSnapshot = await subjectCollection.get();
+
+        const subjects = subjectSnapshot.docs.map((doc) => {
+            return this.viewWithData(doc.id, doc.data() as ISubject)
+        })
+
+        return Promise.all(subjects)
+            .then((result => result.filter(subject => !subject.SUB_ISDELETED)))
+            .catch((error) => Promise.reject(error))
+    }
 }
 
+export const viewSubject = new ViewSubject
 export default new SubjectService;

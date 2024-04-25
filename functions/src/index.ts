@@ -2,7 +2,16 @@ import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser';
-import { https } from 'firebase-functions'
+import { converter } from './models/converter';
+import { INotification } from './models/notification.model';
+import IAttendance from './models/attendance.model';
+import ISubject from './models/subject.model';
+import ISchedule from './models/schedule.model';
+import { https, pubsub, firestore } from 'firebase-functions'
+
+import {
+    db,
+} from './database';
 
 dotenv.config()
 /**
@@ -16,12 +25,6 @@ dotenv.config()
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
-
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
-
 
 const app = express();
 const port: string = process.env.RUNNING_PORT!;
@@ -39,9 +42,7 @@ import attendanceRouter from "./routes/attendance"
 import floorRouter from './routes/floor';
 import roomRouter from './routes/room';
 import departmentRouter from './routes/department';
-// import participantRouter from "./routes/participant"
-// import eventRouter from "./routes/event"
-// import attendeeRouter from "./routes/attendees"
+import { admin } from '../config';
 
 app.use("/user", userRouter)
 app.use("/role", roleRouter)
@@ -50,13 +51,53 @@ app.use("/attendance", attendanceRouter)
 app.use("/floor", floorRouter)
 app.use("/room", roomRouter)
 app.use("/department", departmentRouter)
-// app.use("/participant", participantRouter)
-// app.use("/event", eventRouter)
-// app.use("/attendees", attendeeRouter)
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
 });
 
-// exports.encored_api = https.onRequest(app)
+//Start the notifications
 export const encored_api = https.onRequest(app)
+
+//Set an export, starting with OnCreate Attendance with notifications
+const notificationCollection = db.collection(`/Notifications/`).withConverter(converter<INotification>())
+export const addNotification = firestore.document('Attendances/{attendanceId}').onCreate(async (postSnapshot, context) => {
+
+
+    //When getting an attendance, include the following
+    //Attendance Checker Data
+    //Subject Data
+    //Schedule Data
+
+    const attendance: IAttendance = {
+        ATTD_ID: postSnapshot.id,
+        ...postSnapshot.data() as IAttendance
+    }
+
+    //Notification Descriptions
+    //Attendance Checker <User Full name> confirms that Instructor <User Fullname> is Present/Missing in <Room Name> at <Submission Time>
+
+    //Kiosk <Kiosk name> searched for <Room Name> at <Time searched>
+    //Kiosk <Kiosk name> gave directions for <Room Name> at <Time searched>
+
+    await notificationCollection.add({
+        NOTF_TYPE: `Attendance`,
+        NOTF_DATA: attendance,
+        NOTF_ISREAD: false,
+        NOTF_DATE: attendance.ATTD_SUBMISSIONDATE as string,
+    })
+    //Set a notification collection
+    //Add a notification based on the attendances made
+
+    return null
+})
+
+//send attendance checker notification. Subject
+export const sendSubjectNotification = pubsub.schedule('* * * * *').onRun(async (context) => {
+
+    const subjectQuery = await db.collection(`/Subject/`).withConverter(converter<ISubject>()).get()
+    const scheduleQuery = await db.collection(`/Schedule/`).withConverter(converter<ISchedule>()).get()
+
+    // admin.firestore.Timestamp.now
+
+})

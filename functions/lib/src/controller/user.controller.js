@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.viewUserHelper = exports.userCollection = void 0;
+exports.viewUser = exports.userCollection = void 0;
 const converter_1 = require("../models/converter");
 const database_1 = require("../database");
 const authentication_1 = require("../authentication");
+const department_controller_1 = require("./department.controller");
 exports.userCollection = database_1.db.collection("/User/").withConverter((0, converter_1.converter)());
 class UserService {
     getKey(req, res) {
@@ -38,44 +39,159 @@ class UserService {
     add(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = {
+                USER_FNAME: req.body.USER_FNAME,
+                USER_MNAME: req.body.USER_MNAME,
+                USER_LNAME: req.body.USER_LNAME,
                 USER_USERNAME: req.body.USER_USERNAME,
-                USER_PASSWORD: req.body.USER_PASSWORD,
-                ROLE_ID: database_1.db.doc(`Role/${req.body.ROLE_ID}`),
-                DEPT_ID: database_1.db.doc(`Department/${req.body.DEPT_ID}`),
-                USER_ISDELETED: req.body.USER_ISDELETED,
+                ROLE_ID: req.body.ROLE_ID,
+                DEPT_ID: req.body.DEPT_ID,
+                USER_ISDELETED: false,
+                USER_CREATEDBY: req.body.USER_CREATEDBY,
+                USER_UPDATEDBY: req.body.USER_UPDATEDBY,
             };
+            //Firestore first before Auth or Auth before Firestore?
             yield authentication_1.adminAuth.createUser({
                 email: req.body.USER_EMAIL,
                 password: req.body.USER_PASSWORD,
-                displayName: `${req.body.USER_FNAME} ${req.body.USER_MNAME} ${req.body.USER_LNAME}`,
+                displayName: `${req.body.USER_FNAME} ${req.body.USER_MNAME !== null ? req.body.USER_MNAME : ""} ${req.body.USER_LNAME}`,
             }).then((result) => {
                 return exports.userCollection.doc(result.uid).set(user)
                     .catch((error) => Promise.reject(error));
             }).then(() => {
-                res.status(200).json("User successfully added!");
+                res.status(200).json("User added successfully!");
             }).catch((error) => {
+                console.error(error);
                 res.status(400).json(error);
             });
         });
     }
+    addKiosk(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = {
+                USER_USERNAME: req.body.USER_USERNAME,
+                ROLE_ID: req.body.ROLE_ID,
+                DEPT_ID: req.body.DEPT_ID,
+                USER_ISDELETED: false,
+                USER_CREATEDBY: req.body.USER_CREATEDBY,
+                USER_UPDATEDBY: req.body.USER_UPDATEDBY,
+            };
+            //Firestore first before Auth or Auth before Firestore?
+            yield authentication_1.adminAuth.createUser({
+                email: req.body.USER_EMAIL,
+                password: req.body.USER_PASSWORD,
+                displayName: `${user.USER_USERNAME}`,
+            }).then((result) => {
+                return exports.userCollection.doc(result.uid).set(user)
+                    .catch((error) => Promise.reject(error));
+            }).then(() => {
+                res.status(200).json("Kiosk added successfully!");
+            }).catch((error) => {
+                console.error(error);
+                res.status(400).json(error.message);
+            });
+        });
+    }
     update(req, res) {
-        throw new Error('Method not implemented.');
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            yield exports.userCollection.doc(id).update({
+                USER_FNAME: req.body.USER_FNAME,
+                USER_MNAME: req.body.USER_MNAME,
+                USER_LNAME: req.body.USER_LNAME,
+                USER_USERNAME: req.body.USER_USERNAME,
+                ROLE_ID: req.body.ROLE_ID,
+                DEPT_ID: req.body.DEPT_ID,
+                USER_UPDATEDBY: req.body.USER_UPDATEDBY
+            })
+                .then(() => {
+                return authentication_1.adminAuth.updateUser(id, {
+                    email: req.body.USER_EMAIL,
+                    displayName: `${req.body.USER_FNAME} ${req.body.USER_MNAME} ${req.body.USER_LNAME}`,
+                    password: req.body.USER_PASSWORD
+                });
+            })
+                .then(() => {
+                res.status(200).json("User updated successfully!");
+            })
+                .catch((error) => {
+                console.error(error);
+                res.status(400).json(error);
+            });
+        });
+    }
+    updateKiosk(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            yield exports.userCollection.doc(id).update({
+                USER_USERNAME: req.body.USER_USERNAME,
+                USER_UPDATEDBY: req.body.USER_UPDATEDBY
+            })
+                .then(() => {
+                return authentication_1.adminAuth.updateUser(id, {
+                    email: req.body.USER_EMAIL,
+                    displayName: req.body.USER_USERNAME,
+                    password: req.body.USER_PASSWORD,
+                });
+            })
+                .then(() => {
+                res.status(200).json("Kiosk updated successfully!");
+            })
+                .catch((error) => {
+                console.error(error);
+                res.status(400).json(error);
+            });
+        });
     }
     delete(req, res) {
-        throw new Error('Method not implemented.');
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            //Delete user and disable user from logging in
+            yield exports.userCollection.doc(id).update({
+                USER_ISDELETED: true,
+            })
+                .then(() => {
+                res.status(200).json("User is deleted successfully!");
+            })
+                .catch((error) => {
+                console.error(error);
+                res.status(400).json(error);
+            });
+        });
+    }
+    assignDepartment(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+        });
     }
     view(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
+            if ((yield exports.userCollection.doc(id).get()).data() === undefined) {
+                res.status(400).json("There is no user found in the database. Please try to register again.");
+                return;
+            }
             yield exports.userCollection.doc(id).get()
                 .then((userDoc) => {
-                return (0, exports.viewUserHelper)(userDoc.id, userDoc.data());
+                return exports.viewUser.viewWithData(userDoc.id, userDoc.data());
             })
                 .then((result) => {
                 res.status(200).json(result);
             })
                 .catch((error) => {
-                res.status(400).json(error);
+                console.error('User Controller\n', error);
+                res.status(400).json(error.message);
+            });
+        });
+    }
+    viewAuth(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            yield authentication_1.adminAuth.getUser(id)
+                .then((result) => {
+                res.status(201).json(result);
+            })
+                .catch((error) => {
+                res.status(400).json(error.message);
             });
         });
     }
@@ -87,52 +203,37 @@ class UserService {
             //  - Get the user Department data based on department ID
             // The Promise.All method provides the array of user data
             // Afterall, the userDoc.docs.map is basically mapping the Promises
-            yield exports.userCollection.get()
-                .then((userDoc) => {
-                const users = userDoc.docs.map((doc) => {
-                    return (0, exports.viewUserHelper)(doc.id, doc.data());
-                });
-                return Promise.all(users)
-                    .then((result => {
-                    res.status(200).json(result);
-                }))
-                    .catch((error) => Promise.reject(error));
-            })
+            const users = req.body.map((user) => {
+                return exports.viewUser.viewWithData(user.USER_ID, user);
+            });
+            Promise.all(users)
+                .then((result => {
+                res.status(200).json(result.filter(user => !user.USER_ISDELETED));
+            }))
                 .catch((error) => {
+                console.error(error);
                 res.status(400).json(error);
             });
         });
     }
 }
-const viewUserHelper = (id, user) => {
-    return authentication_1.adminAuth.getUser(id)
-        .then((result) => ({
-        USER_FULLNAME: result.displayName,
-        USER_EMAIL: result.email
-    }))
-        .then((result) => {
-        return user.ROLE_ID.get()
-            .then((role) => {
-            var _a;
-            return (Object.assign(Object.assign({}, result), { ROLE_ID: role.id, ROLE_LABEL: (_a = role.data()) === null || _a === void 0 ? void 0 : _a.ROLE_LABEL }));
-        })
-            .catch((error) => Promise.reject(error));
-    })
-        .then((result) => {
-        return user.DEPT_ID.get()
-            .then((department) => (Object.assign(Object.assign({}, result), { DEPT_ID: department.id, DEPT_NAME: department.data().DEPT_NAME, DEPT_STATUS: department.data().DEPT_STATUS })))
-            .catch((error) => Promise.reject(error));
-    })
-        .then((result) => (Object.assign(Object.assign({}, user), { USER_ID: id, USER_FULLNAME: result.USER_FULLNAME, USER_EMAIL: result.USER_EMAIL, ROLE_ID: {
-            ROLE_ID: result.ROLE_ID,
-            ROLE_LABEL: result.ROLE_LABEL,
-        }, DEPT_ID: {
-            DEPT_ID: result.DEPT_ID,
-            DEPT_NAME: result.DEPT_NAME,
-            DEPT_STATUS: result.DEPT_STATUS
-        } })))
-        .catch((error) => Promise.reject(error));
-};
-exports.viewUserHelper = viewUserHelper;
+class ViewUser {
+    viewWithData(id, user) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const authData = yield authentication_1.adminAuth.getUser(id);
+            const department = yield (0, department_controller_1.viewDepartmentHelper)(user.DEPT_ID);
+            return (Object.assign(Object.assign({}, user), { USER_ID: id, DEPT_ID: department, USER_EMAIL: authData.email, USER_FULLNAME: authData.displayName }));
+        });
+    }
+    view(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield exports.userCollection.doc(id).get();
+            const authData = yield authentication_1.adminAuth.getUser(id);
+            const department = yield (0, department_controller_1.viewDepartmentHelper)(user.data().DEPT_ID);
+            return (Object.assign(Object.assign({}, user.data()), { USER_ID: id, DEPT_ID: department, USER_EMAIL: authData.email, USER_FULLNAME: authData.displayName }));
+        });
+    }
+}
+exports.viewUser = new ViewUser;
 exports.default = new UserService;
 //# sourceMappingURL=user.controller.js.map

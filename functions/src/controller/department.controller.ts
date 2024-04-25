@@ -3,11 +3,9 @@
 import { Request, Response } from 'express';
 import { converter } from '../models/converter';
 import { db } from '../database';
-import { adminAuth } from '../authentication';
 import IBaseService from '../interfaces/IBaseService';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
-import ErrorController from '../types/ErrorController';
 import IDepartment from '../models/department.model';
 
 export const departmentCollection = db.collection("/Department/").withConverter(converter<IDepartment>())
@@ -55,8 +53,17 @@ class DepartmentService implements IBaseService {
                 res.status(400).json(error)
             })
     }
-    public async view(req: Request<ParamsDictionary, any, IDepartment, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        throw new Error('Method not implemented.');
+    public async view(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const { id } = req.params
+        
+        await viewDepartmentHelper(id)
+            .then((departmentDocs) => {
+                res.status(200).json(departmentDocs)
+            })
+            .catch((error) => {
+                console.error(error)
+                res.status(400).json(error.message)
+            })
     }
     public async viewAll(req: Request<ParamsDictionary, any, IDepartment, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         await departmentCollection.get()
@@ -73,6 +80,15 @@ class DepartmentService implements IBaseService {
                 res.status(400).json(error.message)
             })
     }
+}
+
+export const viewDepartmentHelper = (id: string) => {
+    return departmentCollection.doc(id).get()
+        .then((department): IDepartment => ({
+            DEPT_ID: department.id,
+            DEPT_NAME: department.data()?.DEPT_NAME! as string
+        }))
+        .catch((error) => Promise.reject(error))
 }
 
 export default new DepartmentService

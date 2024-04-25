@@ -7,8 +7,10 @@ export default interface ISubject {
     SUB_ID?: string;
     SUB_CODE: string;
     SUB_DESCRIPTION: string;
-    SCHED_ID?: DocumentReference | ISchedule | string | null;
-    USER_ID?: DocumentReference | IUser | string | null;
-    ROOM_ID?: DocumentReference | IRoom | string | null;
+    SCHED_ID?: ISchedule | string | null;
+    USER_ID?: IUser | string | null;
+    ROOM_ID?: IRoom | string | null;
     SUB_ISDELETED?: boolean
+    SUB_CREATEDBY?: string
+    SUB_UPDATEDBY: string
 }
