@@ -29,7 +29,7 @@ type DialogMessageType = {
 
 type DialogContentType = {
     children?: React.ReactNode;
-    content?: string;
+    content?: string | null;
 }
 
 const DialogMessage = (props: DialogMessageType) => {

@@ -2,27 +2,26 @@ import {
     DataGrid,
     GridActionsCellItem,
     GridColDef,
+    GridRowParams,
 } from "@mui/x-data-grid"
+import { useNavigate } from 'react-router-dom'
 import IUser, { UserRole } from "../../data/IUser"
 import { DeleteOutlineOutlined, UpdateOutlined } from "@mui/icons-material"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useModal } from "../../hooks/useModal"
 import { useUsers } from "../../hooks/useUsers"
-import { useAuth } from "../../hooks/useAuth"
 import DeleteDialog from "../../components/DialogDelete"
-import IDepartment from "../../data/IDepartment"
-import IRole from "../../data/IRole"
-import UserForm from "./UserForm"
 import useLoading from "../../hooks/useLoading"
+import KioskForm from "./KioskForm"
+import { useAuth } from "../../hooks/useAuth"
 
-const UsersList = () => {
+const KioskList = () => {
     const { getCredentials } = useAuth()
 
     const { 
-        getUsers,
-        updateUser,
+        users,
+        updateKiosk,
         deleteUser,
-        setLoad,
         getCurrentUser
     } = useUsers();
 
@@ -39,39 +38,32 @@ const UsersList = () => {
     } = useModal();
 
     const { loading, openLoading, closeLoading } = useLoading();
+    const navigate = useNavigate()
 
-    const [ user, setUser ] = useState<IUser>();
+    const [ kiosk, setKiosk ] = useState<IUser>();
 
-    useEffect(() => {
-        setLoad(true)
-    }, [])
+    const handleRowClick = (e: GridRowParams<IUser>) => {
+        navigate(`${e.row.USER_ID}`)
+    }
 
     const handleClear = () => {
-        setUser(undefined)
+        setKiosk(undefined)
     }
 
     const handleUpdate = async (userData: IUser) => {
         const data: IUser = {
-            USER_ID: user?.USER_ID,
-            USER_FNAME: userData.USER_FNAME,
-            USER_LNAME: userData.USER_LNAME,
-            USER_MNAME: userData.USER_MNAME,
+            USER_ID: kiosk?.USER_ID,
             USER_EMAIL: userData.USER_EMAIL,
             USER_USERNAME: userData.USER_USERNAME,
             USER_PASSWORD: userData.USER_PASSWORD,
-            ROLE_ID: {
-                campusDirector: userData.ROLE_ID === "campusDirector" ? true : undefined,
-                dean: userData.ROLE_ID === "dean" ? true : undefined,
-                attendanceChecker: userData.ROLE_ID === "attendanceChecker" ? true : undefined,
-                teacher: userData.ROLE_ID === "teacher" ? true : undefined,
-            } as UserRole,
-            DEPT_ID: userData.DEPT_ID,
-            USER_UPDATEDBY: getCurrentUser()?.USER_ID,
+            ROLE_ID: null,
+            DEPT_ID: null,
+            USER_UPDATEDBY: getCurrentUser()?.USER_ID
         }
 
         openLoading()
 
-        await updateUser(data)
+        await updateKiosk(data)
             .then((result) => {
                 console.log(result.data)
             })
@@ -85,7 +77,7 @@ const UsersList = () => {
 
     const handleDelete = async () => {
         //Should've send a message
-        await deleteUser(user?.USER_ID!)
+        await deleteUser(kiosk?.USER_ID!)
             .then((result) => {
                 console.log(result)
             })
@@ -94,37 +86,27 @@ const UsersList = () => {
             })
     }
 
-    const UserHeaders: Array<GridColDef<IUser>> = [
+    const KioskHeaders: Array<GridColDef<IUser>> = [
         {
             field: "USER_ID",
             headerName: "ID",
         },
         {
-            field: "USER_FULLNAME",
-            headerName: "Fullname",
+            field: "USER_USERNAME",
+            headerName: "Label",
             minWidth: 256,
             flex: 1
         },
-        {
-            field: "ROLE_ID",
-            headerName: "Role",
-            minWidth: 256,
-            renderCell: (params) => {
-                const role = params.row.ROLE_ID as UserRole
-                return role.campusDirector ? "Campus Director" : role.dean ? "Dean" : role.attendanceChecker ? "Attendance Checker" : role.teacher ? "Teacher" : role.kiosk 
-            },
-            flex: 0.4
-        },
-        {
-            field: "DEPT_ID.DEPT_NAME",
-            headerName: "Department",
-            minWidth: 256,
-            renderCell: (params) => {
-                const department = params.row.DEPT_ID
-                return department !== null ? (params.row.DEPT_ID as IDepartment).DEPT_NAME : null
-            },
-            flex: 0.6
-        },
+        // {
+        //     field: "ROLE_ID",
+        //     headerName: "Role",
+        //     minWidth: 256,
+        //     renderCell: (params) => {
+        //         const role = params.row.ROLE_ID as UserRole
+
+        //         return role.campusDirector ? "Campus Director" : role.dean ? "Dean" : role.attendanceChecker ? "Attendance Checker" : role.teacher ? "Teacher" : role.kiosk 
+        //     }
+        // },
         {
             field: "UPDATE",
             headerName: "",
@@ -132,22 +114,18 @@ const UsersList = () => {
             getActions: (params) => {
 
                 const handleOnClickUpdate = async (user: IUser) => {
-                    openLoading()
-                    openUpdateModal();
+                    const credential = await getCredentials(user.USER_ID as string)
+                    const credentialData = credential.data
 
-                    const credentials = await getCredentials(user.USER_ID as string)
-                    const credentialData = credentials.data
-
-                    closeLoading()
-
-                    setUser({
+                    setKiosk({
                         ...user,
-                        USER_EMAIL: credentialData.email,
+                        USER_EMAIL: credentialData.email
                     });
+                    openUpdateModal();
                 }
                 
                 const handleOnClickDelete = (user: IUser) => {
-                    setUser(user);
+                    setKiosk(user);
                     openDeleteModal();
                 }
 
@@ -173,12 +151,12 @@ const UsersList = () => {
         },
     ]
 
-    const filteredUsers = getUsers()?.filter((user) => user.USER_ID !== getCurrentUser()?.USER_ID && !(user.ROLE_ID as UserRole).admin && !(user.ROLE_ID as UserRole).kiosk && !user.USER_ISDELETED)
+    const kiosks = users?.filter((user) => (user.ROLE_ID as UserRole).kiosk && !user.USER_ISDELETED)
 
     return (
         <>
             <DataGrid
-            loading={loading}
+            loading={users?.length! > 0 ? false : true}
             initialState={{
                 columns: {
                     columnVisibilityModel: {
@@ -191,27 +169,28 @@ const UsersList = () => {
                     }
                 }
             }}
-            columns={UserHeaders}
+            onRowDoubleClick={handleRowClick}
+            columns={KioskHeaders}
             getRowId={(row) => row.USER_ID!}
-            rows={filteredUsers!}/>
+            rows={kiosks}/>
 
-            <UserForm
-            selectedUser={user}
+            <KioskForm
+            selectedUser={kiosk}
             loading={loading}
-            title={`Update ${user?.USER_FULLNAME}`}
+            title={`Update ${kiosk?.USER_USERNAME}`}
             onSubmit={handleUpdate}
             openModal={updateModal}
             closeModal={closeUpdateModal}/>
 
             <DeleteDialog
-            selectedObject={user as IUser}
-            title={user?.USER_FULLNAME as string}
+            selectedObject={kiosk as IUser}
             handleClear={handleClear}
             deleteModal={deleteModal}
             onDelete={handleDelete}
+            title={kiosk?.USER_USERNAME as string}
             closeDeleteModal={closeDeleteModal}/>
         </>
     )
 }
 
-export default UsersList
+export default KioskList

@@ -15,6 +15,7 @@ import { AuthErrorCodes } from "firebase/auth"
 import { FirebaseError } from "firebase/app";
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
+import DialogMessage from "../../components/DialogMessage";
 
 const inputs: Array<LoginTextFieldType> = [
     {
@@ -36,7 +37,7 @@ const inputs: Array<LoginTextFieldType> = [
 ]
 
 const Login = () => {
-    const { load, login } = useAuth();
+    const { load, error, closeError, login } = useAuth();
     const [openLoading, setOpenLoading] = useState<boolean>(false);
 
     const {handleSubmit, setError, control} = useForm<LoginDataType>({
@@ -66,6 +67,7 @@ const Login = () => {
         //     .catch(handleLoginError)
         await login(loginData.email!, loginData.password!)
             .then(() => {
+                //set Notificaiton to load
                 setOpenLoading(false);
             })
             .catch(handleLoginError)
@@ -135,6 +137,17 @@ const Login = () => {
             text="Logging in to EncorEd"/>
 
             {/* Error Dialog */}
+            <DialogMessage
+            title="Error when logging in"
+            open={error.isError}>
+                <DialogMessage.Body>
+                    <DialogMessage.Text content={error.message} />
+                </DialogMessage.Body>
+                <DialogMessage.Footer>
+                    <Button onClick={() => closeError()}>OKAY</Button>
+                </DialogMessage.Footer>
+            </DialogMessage>
+
 
         </Container>
     )

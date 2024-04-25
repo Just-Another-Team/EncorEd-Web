@@ -20,7 +20,7 @@ type SubjectDeleteType = {
 }
 
 const SubjectList = () => {
-    const { subjects } = useSubject();
+    const { subjects, getSubjects } = useSubject();
 
     const { 
         openModal: updateModal,
@@ -51,7 +51,7 @@ const SubjectList = () => {
             renderCell: (params) => {
                 return params.row.SUB_CODE
             },
-            minWidth: 96,
+            minWidth: 172,
         },
         {
             field: "SUB_DESCRIPTION",
@@ -60,6 +60,7 @@ const SubjectList = () => {
                 return params.row.SUB_DESCRIPTION
             },
             minWidth: 360,
+            flex: 1
         },
         {
             field: "SUB_ID.USER_ID",
@@ -147,7 +148,7 @@ const SubjectList = () => {
             }}
             columns={SubjectHeaders}
             getRowId={(row) => row.SUB_ID!}
-            rows={subjects!}/>
+            rows={getSubjects()}/>
 
             {/* Update dialog */}
             <UpdateDialog

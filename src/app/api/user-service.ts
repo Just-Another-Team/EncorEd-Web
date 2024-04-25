@@ -19,12 +19,24 @@ class UserService {
         return http.post(`${this.userCommon}/add`, user)
     }
 
+    addKiosk(kiosk: IUser) {
+        return http.post(`${this.userCommon}/kiosk/add`, kiosk)
+    }
+
     updateUser(user: IUser) {
         return http.put(`${this.userCommon}/update/${user.USER_ID}`, user)
     }
 
+    updateKiosk(kiosk: IUser) {
+        return http.put(`${this.userCommon}/kiosk/update/${kiosk.USER_ID}`, kiosk)
+    }
+
     getUser(uid: string) {
-        return http.get<IUser>(`${this.userCommon}/view/s/${uid}`)
+        return http.get<IUser | string>(`${this.userCommon}/view/s/${uid}`)
+    }
+
+    getUserCredentials(uid: string) {
+        return http.get(`${this.userCommon}/view/s/auth/${uid}`)
     }
 
     getAllUsers(userArray: Array<IUser>) {

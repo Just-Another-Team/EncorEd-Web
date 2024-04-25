@@ -12,6 +12,7 @@ import { AuthErrorCodes } from "firebase/auth";
 import IUser from "../../data/IUser";
 import ISchedule from "../../data/ISchedule";
 import IRoom from "../../data/IRoom";
+import { useUsers } from "../../hooks/useUsers";
 
 type UpdateInputs = {
     password: string | null;
@@ -28,7 +29,8 @@ const UpdateSubject = ({
     updateModal,
     closeUpdateModal
 }: UpdateSubjectType) => {
-    const { reauthenticate } = useAuth()
+    const { reauthenticate } = useAuth();
+    const { getCurrentUser } = useUsers()
     const { updateSubject } = useSubject();
     const { loading, openLoading, closeLoading } = useLoading();
 
@@ -60,7 +62,10 @@ const UpdateSubject = ({
 
         await reauthenticate(data.password!)
             .then(() => {
-                return updateSubject(data as ISubject)
+                return updateSubject({
+                    ...data as ISubject,
+                    SUB_UPDATEDBY: getCurrentUser()?.USER_ID
+                })
                     .catch((error) => Promise.reject(error))
             })
             .then(() => {

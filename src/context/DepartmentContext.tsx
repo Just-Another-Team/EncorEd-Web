@@ -2,12 +2,15 @@ import { createContext, useEffect, useState } from "react";
 import IDepartment from "../data/IDepartment";
 import departmentService from "../app/api/department-service";
 import { AxiosResponse } from "axios";
+import { useUsers } from "../hooks/useUsers";
+import IUser from "../data/IUser";
 
 type DepartmentContextType = {
-    departments: Array<IDepartment> | null | undefined
+    departments: Array<IDepartment>
     addDepartment: (user: IDepartment) => Promise<AxiosResponse<any, any>>
     updateDepartment: (user: IDepartment) => Promise<AxiosResponse<any, any>>
     deleteDepartment: (userId: string) => Promise<AxiosResponse<any, any>>
+    getDepartments: (users: Array<IUser>) => Array<IDepartment>
     load: boolean
 }
 
@@ -35,6 +38,18 @@ export const DepartmentProvider = ({ children }: DepartmentProviderType) => {
         setLoad(true)
         return departmentService.delete(userId)
     }
+    
+    const getDepartments = (users: Array<IUser>) => {
+        return departments.map((department): IDepartment => {
+
+            const assignedUsers = users.filter(user => user.DEPT_ID === department.DEPT_ID).length
+
+            return ({
+                ...department,
+                DEPT_NOOFUSERS: assignedUsers,
+            })
+        })
+    }
 
     useEffect(() => {
         const fetchedDepartments = async () => {
@@ -50,6 +65,7 @@ export const DepartmentProvider = ({ children }: DepartmentProviderType) => {
 
     const value = {
         departments,
+        getDepartments,
         addDepartment,
         updateDepartment,
         deleteDepartment,

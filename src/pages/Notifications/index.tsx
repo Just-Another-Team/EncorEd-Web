@@ -4,7 +4,8 @@ import NotificationItems from "./NotificationItems"
 const NotificationList = () => {
 
     return(
-        <Box>
+        <Box
+        height={592}>
             <Box
             marginBottom={2}>
                 <Typography

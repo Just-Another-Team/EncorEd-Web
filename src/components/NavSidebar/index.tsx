@@ -19,8 +19,9 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import { FixMeLater } from "../../types/FixMeLater";
 import LinkListItem from "./LinkListItem";
+import { defaultSideBar } from "../../data/drawerWidth";
 
-const drawerWidth = 208; //Move to another react file
+//const drawerWidth = 208; //Move to another react file
 
 type SidebarType = {
     links: FixMeLater; //links: MenuItemType
@@ -52,10 +53,10 @@ const Sidebar = ({
         open={isDrawerOpen}
         onClose={onCloseDrawer}
         sx={{
-            width: drawerWidth,
+            width: defaultSideBar,
             flexShrink: 0,
             [`& .MuiDrawer-paper`]: { 
-                width: drawerWidth,
+                width: defaultSideBar,
                 boxSizing: 'border-box' ,
                 backgroundColor: theme.palette.primary.main,
             },

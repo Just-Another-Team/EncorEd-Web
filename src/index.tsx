@@ -18,6 +18,9 @@ import { SubjectProvider } from './context/SubjectContext';
 import { UserProvider } from './context/UserContext';
 import { DepartmentProvider } from './context/DepartmentContext';
 import { RoleProvider } from './context/RoleContext';
+import { ClockProvider } from './context/ClockContext';
+import { NotificationProvider } from './context/NotificationContext';
+import { KioskLogProvider } from './context/KioskContext';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -28,27 +31,31 @@ root.render(
       <PersistGate loading={null} persistor={persistor}> */}
 
         <AuthProvider>
-          <UserProvider>
-            <RoleProvider>
-              <DepartmentProvider>
-                <RoomProvider>
-                  <SubjectProvider>
+          <DepartmentProvider>
+            <UserProvider>
+              <RoomProvider>
+                <SubjectProvider>
+                  <KioskLogProvider>
                     <AttendanceProvider>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <NotificationProvider>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
 
-                        <BrowserRouter>
-                          <ThemeProvider theme={defaultTheme}>
-                            <App />
-                          </ThemeProvider>
-                        </BrowserRouter>
+                        {/* <ClockProvider> */}
+                          <BrowserRouter>
+                            <ThemeProvider theme={defaultTheme}>
+                              <App />
+                            </ThemeProvider>
+                          </BrowserRouter>
+                        {/* </ClockProvider> */}
 
-                      </LocalizationProvider>
+                        </LocalizationProvider>
+                      </NotificationProvider>
                     </AttendanceProvider>
-                  </SubjectProvider>
-                </RoomProvider>
-              </DepartmentProvider>
-            </RoleProvider>
-          </UserProvider>
+                  </KioskLogProvider>
+                </SubjectProvider>
+              </RoomProvider>
+            </UserProvider>
+          </DepartmentProvider>
         </AuthProvider>
         
       {/* </PersistGate>

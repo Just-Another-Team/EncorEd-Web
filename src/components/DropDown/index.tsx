@@ -22,6 +22,7 @@ const DropDown = <T extends FieldValues>(props: FormInputDropDownType<T>) => {
                     displayEmpty
                     onChange={onChange}
                     value={value}
+                    defaultValue={props.defaultValue}
                     label={props.label}
                     {...props as SelectProps}
                     error={!!error}>

@@ -11,14 +11,30 @@ import useLoading from "../../hooks/useLoading";
 import { useUsers } from "../../hooks/useUsers";
 
 const Users = () => {
-    const { addUser } = useUsers()
+    const { addUser, getCurrentUser } = useUsers()
     const { openModal, handleCloseModal, handleOpenModal } = useModal();
     const { loading, closeLoading, openLoading } = useLoading()
 
     const handleAddUser = async (data: IUser) => {
         openLoading()
-        
-        await addUser(data)
+
+        const role = data.ROLE_ID as string
+
+        console.log(role)
+
+        const user: IUser = {
+            ...data,
+            ROLE_ID: {
+                campusDirector: role === 'campusDirector' ? true : undefined,
+                dean: role === 'dean' ? true : undefined,
+                attendanceChecker: role === 'attendanceChecker' ? true : undefined,
+                teacher: role === 'teacher' ? true : undefined,
+            },
+            USER_CREATEDBY: getCurrentUser()?.USER_ID,
+            USER_UPDATEDBY: getCurrentUser()?.USER_ID,
+        }
+
+        await addUser(user)
             .then((result) => {
                 console.log(result)
             })
@@ -60,6 +76,7 @@ const Users = () => {
             </Box>
 
             <UserForm
+            title="Add Staff"
             loading={loading}
             onSubmit={handleAddUser}
             openModal={openModal}

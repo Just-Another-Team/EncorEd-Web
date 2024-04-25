@@ -22,7 +22,7 @@ const AddDialog = ({
     addModal,
     closeAddModal
 }: AddDialogType) => {
-    const { getTeachers } = useUsers();
+    const { getTeachers, getCurrentUser } = useUsers();
     const { addSubject } = useSubject();
 
     const { control, handleSubmit, setValue, reset } = useForm<ISubject>({
@@ -44,6 +44,8 @@ const AddDialog = ({
                 SCHED_WEEKASSIGNED: (input.SCHED_ID as ISchedule).SCHED_WEEKASSIGNED, 
             },
             USER_ID: input.USER_ID,
+            SUB_CREATEDBY: getCurrentUser()?.USER_ID,
+            SUB_UPDATEDBY: getCurrentUser()?.USER_ID
         }
 
         await addSubject(data)

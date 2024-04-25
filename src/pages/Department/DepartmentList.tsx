@@ -7,10 +7,12 @@ import useLoading from "../../hooks/useLoading";
 import useDepartment from "../../hooks/useDepartment";
 import DeleteDialog from "../../components/DialogDelete";
 import DepartmentForm from "./DepartmentForm";
+import { useUsers } from "../../hooks/useUsers";
 
 const DepartmentList = () => {
+    const { users } = useUsers()
     const { 
-        departments,
+        getDepartments,
         deleteDepartment,
         updateDepartment
     } = useDepartment();
@@ -78,7 +80,14 @@ const DepartmentList = () => {
         {
             field: "DEPT_NAME",
             headerName: "Name",
-            minWidth: 256
+            minWidth: 256,
+            flex: 1
+        },
+        {
+            field: "DEPT_NOOFUSERS",
+            headerName: "Users assigned",
+            minWidth: 128,
+            flex: 0.4
         },
         {
             field: "UPDATE",
@@ -135,7 +144,7 @@ const DepartmentList = () => {
             }}
             columns={DepartmentHeaders}
             getRowId={(row) => row.DEPT_ID!}
-            rows={departments!}/>
+            rows={getDepartments(users)}/>
 
             <DepartmentForm
             title={`Update ${department?.DEPT_NAME}`}
@@ -147,6 +156,7 @@ const DepartmentList = () => {
 
             <DeleteDialog
             selectedObject={department as IDepartment}
+            title={department?.DEPT_NAME as string}
             handleClear={handleClear}
             deleteModal={deleteModal}
             onDelete={handleDelete}

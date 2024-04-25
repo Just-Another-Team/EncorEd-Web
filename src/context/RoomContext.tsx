@@ -2,9 +2,10 @@ import { createContext, useEffect, useMemo, useState } from "react";
 import roomService from "../app/api/room-service";
 import IRoom from "../data/IRoom";
 import { useSubject } from "../hooks/useSubject";
+import { useAuth } from "../hooks/useAuth";
 
 type AttendanceContextType = {
-    rooms: Array<IRoom> | null | undefined;
+    rooms: Array<IRoom>;
     load: boolean;
     setLoad: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -18,6 +19,8 @@ type RoomProviderType = {
 export const RoomProvider = ({
     children
 }: RoomProviderType) => {
+    const { user } = useAuth()
+
     const [rooms, setRooms] = useState<Array<IRoom>>([]);
     const [load, setLoad] = useState<boolean>(true);
 
@@ -31,7 +34,7 @@ export const RoomProvider = ({
 
         fetchedRooms();
         setLoad(false)
-    }, [load])
+    }, [user, load])
 
     const value = {
         rooms,

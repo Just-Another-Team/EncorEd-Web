@@ -24,6 +24,7 @@ const QRCodes = () => {
     } = useRooms();
     const {
         subjects,
+        getSubjects,
         load:subjectLoad,
         setLoad:setSubjectLoad,
         assignSubjectToRoom,
@@ -35,9 +36,11 @@ const QRCodes = () => {
         setSubjectLoad(true)
         
         await assignSubjectToRoom(data)
+
+        setSubjectLoad(false)
     }
 
-    const roomSubjects = rooms?.filter(room => subjects.some(subject => subject.ROOM_ID !== null ? (subject.ROOM_ID as IRoom).ROOM_ID === room.ROOM_ID : false))
+    const roomSubjects = rooms?.filter(room => getSubjects().some(subject => subject.ROOM_ID !== null ? subject.ROOM_ID === room.ROOM_ID : false))
 
     return(
         <Box>

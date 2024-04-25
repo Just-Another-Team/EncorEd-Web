@@ -13,6 +13,7 @@ import Sidebar from '../../components/NavSidebar'
 import { DesktopWindowsOutlined, HowToReg, QrCode } from '@mui/icons-material'
 import { useAuth } from '../../hooks/useAuth'
 import { UserRole } from '../../data/IUser'
+import { useUsers } from '../../hooks/useUsers'
 
 //LinkListItemType
 export type LinkType = {
@@ -31,11 +32,14 @@ const LinkedSideBar = ({
     isDrawerOpen,
     onCloseDrawer
 }: LinkedSideBarProps) => {
-    const { user } = useAuth();
+    //const { user } = useAuth();
+    const { getCurrentUser } = useUsers()
 
     const deanlinkCommon = '/dean'
     const campusDirectorCommon = '/campusDirector'
     const adminCommon = `/admin`
+
+    //console.log(getCurrentUser())
 
     const adminlinks: Array<LinkType> = [
         {
@@ -78,7 +82,7 @@ const LinkedSideBar = ({
             key: "kiosk",
             name: "Kiosks",
             icon: <DesktopWindowsOutlined />,
-            href: `${adminCommon}//dashboard/kiosk`
+            href: `${adminCommon}/kiosk`
         }
     ]
     const deanLinks: Array<LinkType> = [
@@ -160,7 +164,7 @@ const LinkedSideBar = ({
 
     return (
         <Sidebar
-        links={user !== null ? (user?.ROLE_ID as UserRole).campusDirector ? campusDirectorLinks : (user?.ROLE_ID as UserRole).dean ? deanLinks : (user?.ROLE_ID as UserRole).admin ? adminlinks : [] : []}
+        links={getCurrentUser() !== null ? (getCurrentUser()?.ROLE_ID as UserRole).campusDirector ? campusDirectorLinks : (getCurrentUser()?.ROLE_ID as UserRole).dean ? deanLinks : (getCurrentUser()?.ROLE_ID as UserRole).admin ? adminlinks : [] : []}
         isDrawerOpen={isDrawerOpen}
         onCloseDrawer={onCloseDrawer}
         />

@@ -1,7 +1,7 @@
 import { Button, CircularProgress, Grid, Stack } from "@mui/material"
 import DialogMessage from "../../components/DialogMessage"
 import { RegisterOptions, useForm } from "react-hook-form";
-import IUser, { UserRole } from "../../data/IUser";
+import IUser from "../../data/IUser";
 import ControlledTextField from "../../components/TextFieldControlled/input";
 import DropDown from "../../components/DropDown";
 import useDepartment from "../../hooks/useDepartment";
@@ -30,7 +30,7 @@ type InputType = {
     type: 'text' | 'dropdown' | 'password' | 'email'
 }
 
-const UserForm = ({
+const KioskForm = ({
     selectedUser,
     loading,
     onSubmit,
@@ -38,28 +38,21 @@ const UserForm = ({
     title,
     closeModal
 }: AddUserType) => {
-    const { departments } = useDepartment();
-
     const { control, handleSubmit, reset, watch, setValue } = useForm<InputUser>({
         defaultValues: {
-            USER_FNAME: null,
-            USER_LNAME: null,
-            USER_MNAME: null,
             USER_EMAIL: null,
             USER_USERNAME: null,
             USER_PASSWORD: null,
             USER_CONFIRMPASSWORD: null,
-            DEPT_ID: "",
-            ROLE_ID: "",
         }
     });
 
     const inputs: Array<InputType> = [
         {
-            name: 'USER_FNAME',
-            label: "First name",
+            name: 'USER_USERNAME',
+            label: "Kiosk Label",
             rules: {
-                required: "First name is required",
+                required: "Kiosk name is required",
             },
             type: "text"
         },
@@ -70,28 +63,6 @@ const UserForm = ({
                 required: "Email is required",
             },
             type: "email"
-        },
-        {
-            name: 'USER_LNAME',
-            label: "Last name",
-            rules: {
-                required: "Last name is required",
-            },
-            type: "text"
-        },
-        {
-            name: 'USER_USERNAME',
-            label: "Username",
-            rules: {
-                required: "Username is required",
-            },
-            type: "text"
-        },
-        {
-            name: 'USER_MNAME',
-            label: "Middle name",
-            rules: {},
-            type: "text"
         },
         {
             name: 'USER_PASSWORD',
@@ -113,93 +84,15 @@ const UserForm = ({
             },
             type: "password"
         },
-        {
-            name: 'DEPT_ID',
-            label: "Department",
-            rules: {
-                required: "Department is required",
-            },
-            type: "dropdown"
-        },
-        {
-            name: 'ROLE_ID',
-            label: "Role",
-            rules: {
-                required: "Role is required",
-            },
-            type: "dropdown"
-        }
     ]
 
     useEffect(() => {
         if (selectedUser) {
-            const role = selectedUser?.ROLE_ID as UserRole
-            const department = selectedUser?.DEPT_ID as IDepartment
-
-            setValue('USER_FNAME', selectedUser?.USER_FNAME)
-            setValue('USER_MNAME', selectedUser?.USER_MNAME)
-            setValue('USER_LNAME', selectedUser?.USER_LNAME)
             setValue('USER_EMAIL', selectedUser?.USER_EMAIL)
             setValue('USER_USERNAME', selectedUser?.USER_USERNAME)
             setValue('USER_PASSWORD', selectedUser?.USER_PASSWORD)
-            setValue('DEPT_ID', department.DEPT_ID as string)
-            setValue('ROLE_ID', role.campusDirector ? "campusDirector" : role.dean ? "dean"  : role.attendanceChecker ? "attendanceChecker" : role.teacher ? "teacher" : "" )
         }
     }, [selectedUser])
-
-    // const roleOptions = roles?.map((role) => ({
-    //     value: role.ROLE_ID!,
-    //     label: role.ROLE_LABEL!
-    // }))
-    const roleOptions = [
-        {
-            value: "campusDirector",
-            label: "Campus Director"
-        },
-        {
-            value: "dean",
-            label: "Dean"
-        },
-        {
-            value: "teacher",
-            label: "Teacher"
-        },
-        {
-            value: "attendanceChecker",
-            label: "Attendance Checker"
-        },
-    ]
-
-    const campusDirectorRoleOptions = [
-        {
-            value: "dean",
-            label: "Dean"
-        },
-        {
-            value: "teacher",
-            label: "Teacher"
-        },
-        {
-            value: "attendanceChecker",
-            label: "Attendance Checker"
-        },
-    ]
-
-    const deanRoleOptions = [
-        {
-            value: "teacher",
-            label: "Teacher"
-        },
-        {
-            value: "attendanceChecker",
-            label: "Attendance Checker"
-        },
-    ]
-
-    const departmentOptions = departments?.map((department) => ({
-        value: department.DEPT_ID!,
-        label: department.DEPT_NAME!
-    }))
 
     const submitHandler = (data: InputUser) => {
         reset()
@@ -232,26 +125,10 @@ const UserForm = ({
                 container
                 columnSpacing={2}>
                     {inputs.map((input, ind) => (
-                        input.type === "dropdown" ?
                         <Grid
                         key={input.name}
                         item
-                        xs={12}>
-                            <DropDown
-                            variant="standard"
-                            name={input.name}
-                            control={control}
-                            label={input.label}
-                            defaultValue={""}
-                            fullWidth
-                            size="small"
-                            rules={input.rules}
-                            options={input.name === "ROLE_ID" ? roleOptions : input.name === "DEPT_ID" ? departmentOptions : undefined }/>
-                        </Grid> :
-                        <Grid
-                        key={input.name}
-                        item
-                        xs={ input.type === "password" ? 3 : 6}>
+                        xs={ 12 }>
                             <ControlledTextField
                             variant="standard"
                             key={input.name}
@@ -281,4 +158,4 @@ const UserForm = ({
     )
 }
 
-export default UserForm
+export default KioskForm

@@ -27,6 +27,7 @@ type DeleteDialogType = {
     handleClear: () => void
     onDelete: () => void
 
+    title: string;
     deleteModal: boolean;
     closeDeleteModal: () => void;
 }
@@ -36,6 +37,7 @@ const DeleteDialog = ({
     handleClear,
     onDelete,
     deleteModal,
+    title,
     closeDeleteModal
 }: DeleteDialogType) => {
     const { reauthenticate } = useAuth()
@@ -89,7 +91,7 @@ const DeleteDialog = ({
             },
         }}
         maxWidth="md"
-        title={`Are you sure you want to delete ${selectedObject ? instanceOfSubject(selectedObject) ? (selectedObject as ISubject).SUB_CODE : instanceOfUser(selectedObject) ? (selectedObject as IUser).USER_FULLNAME : instanceOfDepartment(selectedObject as IDepartment) ? (selectedObject as IDepartment).DEPT_NAME : undefined : undefined}?`}>
+        title={`Are you sure you want to delete ${title}?`}> {/* selectedObject ? instanceOfSubject(selectedObject) ? (selectedObject as ISubject).SUB_CODE : instanceOfUser(selectedObject) ? (selectedObject as IUser).USER_FULLNAME : instanceOfDepartment(selectedObject as IDepartment) ? (selectedObject as IDepartment).DEPT_NAME : undefined : undefined */}
             <DialogMessage.Body>
                 { loading ?
                 <Stack

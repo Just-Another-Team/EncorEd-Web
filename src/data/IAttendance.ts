@@ -8,9 +8,9 @@ export default interface IAttendance {
     ATTD_SCANDATE: Date | string | null;
     ATTD_SUBMISSIONDATE: Date | string | AttendanceSubmissionDate | null;
     ATTD_COMMENT?: string | null;
-    SUB_ID: ISubject | string;
-    ROOM_ID: IRoom | string;
-    USER_ID: IUser | string;
+    SUB_ID: ISubject | string | null;
+    ROOM_ID: IRoom | string | null;
+    USER_ID: IUser | string | null;
     ATTD_TEACHERSTATUS: string | null;
     ATTD_STATUS: string | null;
 }

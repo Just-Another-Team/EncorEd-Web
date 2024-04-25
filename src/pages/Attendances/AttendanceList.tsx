@@ -9,16 +9,12 @@ import dayjs from "dayjs"
 import IUser from "../../data/IUser"
 import ISubject from "../../data/ISubject"
 import Color from "../../assets/Color"
-import { useEffect } from "react"
 import { AttendanceSubmissionDate } from "../../data/AttendanceSubmissionDate"
+import { useUsers } from "../../hooks/useUsers"
+import { useSubject } from "../../hooks/useSubject"
 
 const AttendanceList = () => {
-    const { load, setLoad, attendances, getAttendancesByReduction } = useAttendances();
-
-    useEffect(() => {
-        console.log("Activated")
-        setLoad(true)
-    }, [])
+    const { load, attendances, getAttendances, getAttendancesByReduction } = useAttendances();
 
     const AttendanceHeaders: Array<GridColDef<IAttendance>> = [
         {
@@ -57,8 +53,6 @@ const AttendanceList = () => {
             field: "USER_ID",
             headerName: "Submitted By",
             renderCell: (params) => {
-                //console.log(params.row.USER_ID)
-
                 return (params.row.USER_ID as IUser).USER_FULLNAME
             },
             minWidth: 160,
@@ -68,12 +62,21 @@ const AttendanceList = () => {
             field: "ATTD_TEACHERSTATUS",
             headerName: "Status",
             renderCell: (params) => {
+                const status = params.row.ATTD_TEACHERSTATUS
+
                 return (
+                    status === "present" || status === "missing" ? 
                     <Typography
-                    variant="body1"
-                    fontWeight={700}
+                    variant="body2"
+                    fontWeight={400}
+                    color={Color('black', 100) as string}>
+                        {`Incomplete (${status})`}
+                    </Typography> :
+                    <Typography
+                    variant="body2"
+                    fontWeight={400}
                     color={Color('darkBlue', 400) as string}>
-                        {`${params.row.ATTD_TEACHERSTATUS?.charAt(0).toUpperCase()}${params.row.ATTD_TEACHERSTATUS?.slice(1)}`}
+                        {status}
                     </Typography>
                 )
             },
@@ -84,11 +87,25 @@ const AttendanceList = () => {
             field: "ATTD_SUBMISSIONDATE",
             headerName: "Submitted On",
             renderCell: (params) => {
-                return dayjs((params.row.ATTD_SUBMISSIONDATE as AttendanceSubmissionDate).lastSubmission).format("hh:mm A - DD/MM/YYYY")
+                return dayjs(params.row.ATTD_SUBMISSIONDATE as string).format("hh:mm A - DD/MM/YYYY")
             },
             minWidth: 224,
         },
     ]
+
+    const reducedAttendances = getAttendancesByReduction(getAttendances()).map((attendance) => {
+        return ({
+            ...attendance as IAttendance,
+            ATTD_SUBMISSIONDATE: typeof attendance.ATTD_SUBMISSIONDATE === "string" ? attendance.ATTD_SUBMISSIONDATE : (attendance.ATTD_SUBMISSIONDATE as AttendanceSubmissionDate).lastSubmission,
+        })
+    })
+
+    // const reducedAttendances = getAttendances().map((attendance) => {
+    //     return ({
+    //         ...attendance as IAttendance,
+    //         ATTD_SUBMISSIONDATE: typeof attendance.ATTD_SUBMISSIONDATE === "string" ? attendance.ATTD_SUBMISSIONDATE : (attendance.ATTD_SUBMISSIONDATE as AttendanceSubmissionDate).lastSubmission,
+    //     })
+    // })
 
     return (
         <DataGrid
@@ -102,12 +119,20 @@ const AttendanceList = () => {
                 paginationModel: {
                     pageSize: 25,
                 }
+            },
+            sorting: {
+                sortModel: [
+                    {
+                        field: 'ATTD_SUBMISSIONDATE',
+                        sort: 'desc'
+                    }
+                ]
             }
         }}
         columns={AttendanceHeaders}
         getRowId={(row) => row.ATTD_ID!}
-        loading={getAttendancesByReduction().length === 0}
-        rows={getAttendancesByReduction()}/>
+        loading={load}
+        rows={reducedAttendances}/>
     )
 }
 

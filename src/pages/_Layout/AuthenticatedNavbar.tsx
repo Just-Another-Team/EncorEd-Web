@@ -5,10 +5,11 @@ import NotificationButton from "../../components/ButtonNotification";
 import Navbar from "../../components/NavBar"
 import Menu from "@mui/icons-material/Menu";
 import { Search } from "@mui/icons-material";
-import { NotificationStatusEnum, Notifications } from "../../data/notificationData";
 import { useAuth } from "../../hooks/useAuth";
 import { commonLink } from "../../data/commonLink";
 import { UserRole } from "../../data/IUser";
+import { useNotification } from "../../hooks/useNotification";
+import { useUsers } from "../../hooks/useUsers";
 
 //-------------------------------------------------
 // useNavBar
@@ -24,14 +25,18 @@ type AuthenticatedNavbarProps = {
 const AuthenticatedNavbar = ({
     onOpenDrawer
 }: AuthenticatedNavbarProps) => {
-    const { user, signOut } = useAuth();
+    const { signOut } = useAuth();
+    const { getCurrentUser } = useUsers()
+    const { unReadNotifications, setToRead } = useNotification()
     const navigate = useNavigate();
 
     const theme = useTheme()
     const belowMid = useMediaQuery(theme.breakpoints.down("md"))
 
-    const notificationOnClick = () => {
-        navigate(`${user ? (user.ROLE_ID as UserRole).campusDirector ? commonLink.campusDirector : (user.ROLE_ID as UserRole).dean ? commonLink.dean : commonLink.admin : commonLink.admin}/notifications`)
+    const notificationOnClick = async () => {
+        //set the notifications to read
+        navigate(`${getCurrentUser() ? (getCurrentUser()?.ROLE_ID as UserRole).campusDirector ? commonLink.campusDirector : (getCurrentUser()?.ROLE_ID as UserRole).dean ? commonLink.dean : commonLink.admin : commonLink.admin}/notifications`)
+        await setToRead()
     }
 
     const handleLogout = async () => {
@@ -44,7 +49,7 @@ const AuthenticatedNavbar = ({
             })
     }
 
-    const newNotifications = Notifications.filter(notification => notification.notfStatus === NotificationStatusEnum.Unread).length;
+    const newNotifications = unReadNotifications().length;
 
     return (
         <Navbar
@@ -80,7 +85,7 @@ const AuthenticatedNavbar = ({
                 newNotificationLength={newNotifications}
                 onClick={notificationOnClick}/>
                 <AccountMenuButton
-                fullName={user?.USER_FULLNAME}
+                fullName={getCurrentUser()?.USER_FULLNAME}
                 onLogout={handleLogout}/>
             </Box>
         </Navbar>

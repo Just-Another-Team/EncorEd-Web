@@ -10,4 +10,6 @@ export default interface ISubject {
     USER_ID?: IUser | string | null;
     ROOM_ID?: IRoom | string | null;
     SUB_STATUS?: string
+    SUB_CREATEDBY?: string
+    SUB_UPDATEDBY?: string
 }

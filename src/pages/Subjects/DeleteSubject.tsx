@@ -39,6 +39,7 @@ const DeleteSubject = ({
     return (
         <DeleteDialog
         selectedObject={subject as ISubject}
+        title={subject?.SUB_DESCRIPTION as string}
         handleClear={handleClear}
         onDelete={handleDelete}
         deleteModal={openModal}
