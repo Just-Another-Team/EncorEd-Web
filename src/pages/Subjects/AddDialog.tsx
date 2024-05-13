@@ -12,6 +12,8 @@ import ControlledTextField from "../../components/TextFieldControlled/input";
 import ISchedule from "../../data/ISchedule";
 import dayjs from "dayjs";
 import { useSubject } from "../../hooks/useSubject";
+import useDepartment from "../../hooks/useDepartment";
+import IUser, { UserRole } from "../../data/IUser";
 
 type AddDialogType = {
     addModal: boolean;
@@ -22,7 +24,8 @@ const AddDialog = ({
     addModal,
     closeAddModal
 }: AddDialogType) => {
-    const { getTeachers, getCurrentUser } = useUsers();
+    const { getDepartment } = useDepartment()
+    const { getTeachers, getUsersByCreator, getCurrentUser } = useUsers();
     const { addSubject } = useSubject();
 
     const { control, handleSubmit, setValue, reset } = useForm<ISubject>({
@@ -43,10 +46,12 @@ const AddDialog = ({
                 SCHED_ENDTIME: dayjs((input.SCHED_ID as ISchedule).SCHED_ENDTIME).toISOString(),
                 SCHED_WEEKASSIGNED: (input.SCHED_ID as ISchedule).SCHED_WEEKASSIGNED, 
             },
-            USER_ID: input.USER_ID,
+            USER_ID: input.USER_ID ? input.USER_ID : null,
             SUB_CREATEDBY: getCurrentUser()?.USER_ID,
             SUB_UPDATEDBY: getCurrentUser()?.USER_ID
         }
+
+        //console.log(data)
 
         await addSubject(data)
             .then(() => {
@@ -60,10 +65,24 @@ const AddDialog = ({
         reset()
     }
 
-    const instructors = getTeachers().map((el): {label: string; value: string} => ({
-        label: el.USER_FULLNAME!,
-        value: el.USER_ID!
-    }))
+    const role = getCurrentUser()?.ROLE_ID as UserRole
+
+    // const instructors = getTeachers().map((el): {label: string; value: string} => ({
+    //     label: el.USER_FULLNAME!,
+    //     value: el.USER_ID!
+    // }))
+
+    // const filteredInstructors = getUsersByCreator(getCurrentUser()?.USER_ID as string).filter(user => (user.ROLE_ID as UserRole).teacher).map((el): {label: string; value: string} => ({
+    //     label: el.USER_FULLNAME!,
+    //     value: el.USER_ID!
+    // }))
+
+    const instructors = (instructorArray: Array<IUser>) => {
+        return instructorArray.map((el): {label: string; value: string} => ({
+            label: el.USER_FULLNAME!,
+            value: el.USER_ID!
+        }))
+    }
 
     return (
         <DialogMessage
@@ -110,13 +129,15 @@ const AddDialog = ({
                     label="Instructor"
                     name="USER_ID"
                     control={control}
-                    rules={{
-                        required: "Choose an instructor."
-                    }}
+                    // rules={{
+                    //     required: "Choose an instructor."
+                    // }}
+                    rules={undefined}
                     fullWidth
                     size="small"
                     variant="standard"
-                    options={instructors}/>
+                    //options={role.admin ? instructors : filteredInstructors}
+                    options={instructors(role.admin ? getTeachers() : getUsersByCreator(getCurrentUser()?.USER_ID as string).filter(user => (user.ROLE_ID as UserRole).teacher))}/>
                 </Box>
 
                 <Box>

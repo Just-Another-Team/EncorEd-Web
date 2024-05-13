@@ -11,6 +11,7 @@ import QRCode from "react-qr-code"
 import { useNavigate } from "react-router-dom"
 import IRoom from "../../data/IRoom"
 import { useAuth } from "../../hooks/useAuth"
+import IFloor from "../../data/IFloor"
 
 type CardQRType = {
     room: IRoom,
@@ -50,7 +51,7 @@ const CardQR = ({
                         <Typography
                         variant="h6"
                         textAlign="left">
-                            Floor: {room.FLR_ID.FLR_NAME}
+                            Floor: {(room.FLR_ID as IFloor).FLR_NAME}
                         </Typography>
                     </Box>
 

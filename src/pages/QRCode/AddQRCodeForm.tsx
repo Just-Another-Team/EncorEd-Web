@@ -6,6 +6,10 @@ import QRCode from "react-qr-code"
 import FormInputDropDown from "../../components/DropDown"
 import { useRooms } from "../../hooks/useRooms"
 import { useSubject } from "../../hooks/useSubject"
+import { useUsers } from "../../hooks/useUsers"
+import { UserRole } from "../../data/IUser"
+import useDepartment from "../../hooks/useDepartment"
+import IFloor from "../../data/IFloor"
 
 type AddQRCodeFormType = {
     open: boolean;
@@ -25,18 +29,34 @@ const AddQRCodeForm = ({
         }
     })
 
-    const { rooms } = useRooms();
+    const { getDepartment } = useDepartment()
+    const { getCurrentUser } = useUsers()
+    const { getClassrooms } = useRooms();
     const { subjects } = useSubject();
 
-    const roomInputs = rooms?.map((el): { label: string; value: string; } => ({
+    const role = getCurrentUser()?.ROLE_ID as UserRole
+
+    const roomInputs = getClassrooms().map((el): { label: string; value: string; } => ({
         label: el.ROOM_NAME,
         value: el.ROOM_ID!,
     }))
 
+    const filteredRoomInputs = getClassrooms().filter(room => (getDepartment(getCurrentUser()?.DEPT_ID as string)?.DEPT_FLOORSASSIGNED as Array<string>).includes((room.FLR_ID as IFloor).FLR_ID as string)).map((el): { label: string; value: string; } => ({
+        label: el.ROOM_NAME,
+        value: el.ROOM_ID!,
+    }))
+
+    //Select subjects based on the creator
     const subjectInputs = subjects.map((el): { label: string; value: string; } => ({
         label: el.SUB_DESCRIPTION as string,
         value: el.SUB_ID!,
     }))
+
+    const filteredSubjectInputs = subjects.filter(subject => subject.SUB_CREATEDBY === getCurrentUser()?.USER_ID).map((el): { label: string; value: string; } => ({
+        label: el.SUB_DESCRIPTION as string,
+        value: el.SUB_ID!,
+    }))
+
 
     return(
         <DialogForm
@@ -63,7 +83,7 @@ const AddQRCodeForm = ({
                     control={control}
                     rules={{}}
                     fullWidth
-                    options={roomInputs}/>
+                    options={role.admin ? roomInputs : filteredRoomInputs}/>
 
                     <FormInputDropDown
                     name={"SUB_ID"}
@@ -71,7 +91,7 @@ const AddQRCodeForm = ({
                     control={control}
                     rules={{}}
                     fullWidth
-                    options={subjectInputs}
+                    options={role.admin ? subjectInputs : filteredSubjectInputs}
                     MenuProps={{
                         sx: { height: 296 }
                     }}/>

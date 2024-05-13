@@ -21,6 +21,8 @@ import { RoleProvider } from './context/RoleContext';
 import { ClockProvider } from './context/ClockContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { KioskLogProvider } from './context/KioskContext';
+import { NavigationProvider } from './context/NavigationContext';
+import ScheduleProvider from './context/ScheduleContext';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -33,27 +35,33 @@ root.render(
         <AuthProvider>
           <DepartmentProvider>
             <UserProvider>
-              <RoomProvider>
-                <SubjectProvider>
-                  <KioskLogProvider>
-                    <AttendanceProvider>
-                      <NotificationProvider>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <ScheduleProvider>
+                <RoomProvider>
+                  <SubjectProvider>
+                    <KioskLogProvider>
+                      <AttendanceProvider>
+                        <NotificationProvider>
+                          <NavigationProvider>
 
-                        {/* <ClockProvider> */}
-                          <BrowserRouter>
-                            <ThemeProvider theme={defaultTheme}>
-                              <App />
-                            </ThemeProvider>
-                          </BrowserRouter>
-                        {/* </ClockProvider> */}
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
 
-                        </LocalizationProvider>
-                      </NotificationProvider>
-                    </AttendanceProvider>
-                  </KioskLogProvider>
-                </SubjectProvider>
-              </RoomProvider>
+                              <ClockProvider>
+                                <BrowserRouter>
+                                  <ThemeProvider theme={defaultTheme}>
+                                    <App />
+                                  </ThemeProvider>
+                                </BrowserRouter>
+                              </ClockProvider>
+
+                            </LocalizationProvider>
+
+                          </NavigationProvider>
+                        </NotificationProvider>
+                      </AttendanceProvider>
+                    </KioskLogProvider>
+                  </SubjectProvider>
+                </RoomProvider>
+              </ScheduleProvider>
             </UserProvider>
           </DepartmentProvider>
         </AuthProvider>

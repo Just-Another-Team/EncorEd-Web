@@ -9,6 +9,7 @@ import DepartmentList from "./DepartmentList";
 import DepartmentForm from "./DepartmentForm";
 import IDepartment from "../../data/IDepartment";
 import useDepartment from "../../hooks/useDepartment";
+import IFloor from "../../data/IFloor";
 
 const Department = () => {
     const { addDepartment } = useDepartment()
@@ -18,13 +19,22 @@ const Department = () => {
     const handleAddDepartment = async (data: IDepartment) => {
         openLoading()
 
-        await addDepartment(data)
-            .then((result) => {
-                console.log(result.data)
-            })
-            .catch((error) => {
-                console.error(error)
-            })
+        const floorAssigned = data.DEPT_FLOORSASSIGNED!.map((floor) => (floor as IFloor).FLR_ID as string)
+
+        const newDepartment: IDepartment = {
+            ...data,
+            DEPT_FLOORSASSIGNED: floorAssigned,
+        }
+
+        console.log(newDepartment)
+
+        // await addDepartment(data)
+        //     .then((result) => {
+        //         console.log(result.data)
+        //     })
+        //     .catch((error) => {
+        //         console.error(error)
+        //     })
 
         closeLoading()
         handleCloseModal()

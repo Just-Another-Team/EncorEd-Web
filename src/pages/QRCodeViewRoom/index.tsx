@@ -15,9 +15,10 @@ import { useRooms } from "../../hooks/useRooms";
 import { useSubject } from "../../hooks/useSubject";
 import ReactToPrint from "react-to-print";
 import pageStyle from '!!css-loader?{"sourceMap":false,"exportType":"string"}!../../assets/pageStyle.css'
+import IFloor from "../../data/IFloor";
 
 const SelectedRoom = () => {
-    const { rooms } = useRooms();
+    const { getRooms } = useRooms();
     const { getSubjectsByRoom } = useSubject();
     const { roomId } = useParams<RoomParams>();
 
@@ -29,7 +30,7 @@ const SelectedRoom = () => {
         return;
     }
 
-    const room = rooms?.find(room => room.ROOM_ID === roomId)
+    const room = getRooms().find(room => room.ROOM_ID === roomId)
     const subjects = getSubjectsByRoom(roomId as string)
 
     return(
@@ -55,7 +56,7 @@ const SelectedRoom = () => {
 
                         <Typography
                         variant="h6">
-                            Floor Location: <span style={{ fontWeight: 700 }}>{room?.FLR_ID.FLR_NAME}</span>
+                            Floor Location: <span style={{ fontWeight: 700 }}>{(room?.FLR_ID as IFloor).FLR_NAME}</span>
                         </Typography>
                     </Box>
 

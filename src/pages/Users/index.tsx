@@ -20,8 +20,6 @@ const Users = () => {
 
         const role = data.ROLE_ID as string
 
-        console.log(role)
-
         const user: IUser = {
             ...data,
             ROLE_ID: {
@@ -34,13 +32,15 @@ const Users = () => {
             USER_UPDATEDBY: getCurrentUser()?.USER_ID,
         }
 
-        await addUser(user)
-            .then((result) => {
-                console.log(result)
-            })
-            .catch((error) => {
-                console.error(error)
-            })
+        console.log(user)
+
+        // await addUser(user)
+        //     .then((result) => {
+        //         console.log(result)
+        //     })
+        //     .catch((error) => {
+        //         console.error(error)
+        //     })
 
         handleCloseModal()
         closeLoading()

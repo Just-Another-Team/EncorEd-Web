@@ -18,6 +18,7 @@ type AttendanceContextType = {
     getAttendancesByReduction: (attdArray: Array<IAttendance>) => Array<IAttendance>;
     getAttendancesByCurrentDay: () => Array<IAttendance>;
     getAttendances: () => IAttendance[];
+    getCompleteAttendancesByCreator: (userCreatorId: string) => Array<IAttendance>
     load: boolean;
     setLoad: Dispatch<React.SetStateAction<boolean>>
 }
@@ -95,7 +96,7 @@ export const AttendanceProvider = ({ children }: AttendanceProviderType) => {
     }
 
     const getAttendances = () => {
-        return attendances.map((attendance):IAttendance => {
+        return attendances.map((attendance): IAttendance => {
             const user = users.find(user => user.USER_ID === attendance.USER_ID)
             const subject = getSubjects().find(subject => subject.SUB_ID === attendance.SUB_ID)
 
@@ -103,6 +104,15 @@ export const AttendanceProvider = ({ children }: AttendanceProviderType) => {
                 ...attendance,
                 USER_ID: user ? user : null,
                 SUB_ID: subject ? subject : null,
+            })
+        })
+    }
+
+    const getCompleteAttendancesByCreator = (userCreatorId: string): Array<IAttendance> => {
+        return getAttendancesByReduction(getAttendances().filter(attendance => (attendance.USER_ID as IUser).USER_CREATEDBY === userCreatorId)).map((attendance) => {
+            return ({
+                ...attendance as IAttendance,
+                ATTD_SUBMISSIONDATE: typeof attendance.ATTD_SUBMISSIONDATE === "string" ? attendance.ATTD_SUBMISSIONDATE : (attendance.ATTD_SUBMISSIONDATE as AttendanceSubmissionDate).lastSubmission,
             })
         })
     }
@@ -137,6 +147,7 @@ export const AttendanceProvider = ({ children }: AttendanceProviderType) => {
         getAttendancesByReduction,
         getAttendancesByCurrentDay,
         getAttendances,
+        getCompleteAttendancesByCreator,
         setLoad,
         load
     }

@@ -307,6 +307,7 @@ const CampusMap = ({
                 paint={el.paint}
                 type={el.type}/>
             ))}
+            
             {hoverInfo && (
             <div className="tooltip" style={{left: hoverInfo.x, top: hoverInfo.y}}>
                 <div>State: {hoverInfo.feature.properties.name}</div>

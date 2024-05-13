@@ -4,17 +4,19 @@ import AttendanceChart from "./AttendanceChart"
 import OngoingSubjects from "./OngoingSubjects"
 import { useSubject } from "../../hooks/useSubject"
 import { useUsers } from "../../hooks/useUsers"
-import { UserRole } from "../../data/IUser"
+import IUser, { UserRole } from "../../data/IUser"
 import { useAttendances } from "../../hooks/useAttendances"
 
 const Home = () => {
-    const { getAttendancesByCurrentDay } = useAttendances()
-    const { getSubjects } = useSubject()
-    const { users } = useUsers()
+    const { getAttendancesByCurrentDay, getAttendancesByReduction, getAttendances } = useAttendances()
+    const { getSubjects, getSubjectsByCreator } = useSubject()
+    const { getTeachers, getCurrentUser, getUsersByCreator } = useUsers()
     //const belowMd =
 
+    const role = getCurrentUser()?.ROLE_ID as UserRole
+
     const attendanceData = () => {
-        const reducedAttendances = getAttendancesByCurrentDay()
+        const reducedAttendances = getAttendancesByCurrentDay() // getAttendancesByReduction(getAttendances())
         
         const presentValue = reducedAttendances.filter((attd) => attd.ATTD_TEACHERSTATUS === "Present").length
         const earlyDismissalValue = reducedAttendances.filter((attd) => attd.ATTD_TEACHERSTATUS === "Early Dismissal").length
@@ -150,7 +152,7 @@ const Home = () => {
                                 display={'flex'}>
                                     <Typography flex={1} variant="h5" fontWeight={700} lineHeight={1}>Subjects</Typography>
                                     <Box>
-                                        <Typography variant="h6" lineHeight={1} textAlign={"end"}>{ getSubjects().length }</Typography>
+                                        <Typography variant="h6" lineHeight={1} textAlign={"end"}>{ role.admin ? getSubjects().length : getSubjectsByCreator(getCurrentUser()?.USER_ID as string).length }</Typography>
                                         <Typography variant="inherit" lineHeight={1} fontSize={12} fontStyle={"italic"}>&nbsp;</Typography>
                                     </Box>
                                 </Box>
@@ -169,7 +171,7 @@ const Home = () => {
                                 display={'flex'}>
                                     <Typography flex={1} variant="h5" fontWeight={700} lineHeight={1}>Teachers</Typography>
                                     <Box>
-                                        <Typography variant="h5" lineHeight={1} textAlign={"end"}>{ users.filter(user => (user.ROLE_ID as UserRole).teacher).length }</Typography>
+                                        <Typography variant="h5" lineHeight={1} textAlign={"end"}>{ role.admin ? getTeachers().length : getUsersByCreator(getCurrentUser()?.USER_ID as string).filter(user => (user.ROLE_ID as UserRole).teacher).length }</Typography>
                                         <Typography variant="inherit" lineHeight={1} fontSize={12} fontStyle={"italic"}>&nbsp;</Typography>
                                     </Box>
                                 </Box>
@@ -179,7 +181,10 @@ const Home = () => {
                 </Grid>
             </Grid>
 
-            <OngoingSubjects />
+            <Box>
+                <Typography variant="h6" marginBottom={1}>Recently Submitted Attendances</Typography>
+                <OngoingSubjects />
+            </Box>
         </Box>
     )
 }

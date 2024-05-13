@@ -9,6 +9,7 @@ import useRole from "../../hooks/useRole";
 import { useEffect } from "react";
 import IDepartment from "../../data/IDepartment";
 import IRole from "../../data/IRole";
+import { useUsers } from "../../hooks/useUsers";
 
 type AddUserType = {
     selectedUser?: IUser | undefined;
@@ -26,7 +27,7 @@ type InputUser = {
 type InputType = {
     name: "USER_ID" | "USER_FULLNAME" | "USER_FNAME" | "USER_LNAME" | "USER_MNAME" | "USER_EMAIL" | "USER_USERNAME" | "USER_PASSWORD" | "USER_CONFIRMPASSWORD" | "ROLE_ID" | "DEPT_ID" | "USER_ISDELETED"
     label: string
-    rules: Omit<RegisterOptions<InputUser, any>, "valueAsNumber" | "valueAsDate" | "setValueAs" | "disabled">
+    rules: Omit<RegisterOptions<InputUser, any>, "valueAsNumber" | "valueAsDate" | "setValueAs" | "disabled"> | undefined
     type: 'text' | 'dropdown' | 'password' | 'email'
 }
 
@@ -39,6 +40,9 @@ const UserForm = ({
     closeModal
 }: AddUserType) => {
     const { departments } = useDepartment();
+    const { getCurrentUser } = useUsers()
+
+    const role = getCurrentUser()?.ROLE_ID as UserRole
 
     const { control, handleSubmit, reset, watch, setValue } = useForm<InputUser>({
         defaultValues: {
@@ -49,7 +53,7 @@ const UserForm = ({
             USER_USERNAME: null,
             USER_PASSWORD: null,
             USER_CONFIRMPASSWORD: null,
-            DEPT_ID: "",
+            DEPT_ID: role.admin ? "" : getCurrentUser()?.DEPT_ID as string,
             ROLE_ID: "",
         }
     });
@@ -96,13 +100,13 @@ const UserForm = ({
         {
             name: 'USER_PASSWORD',
             label: "Password",
-            rules: {
+            rules: watch("ROLE_ID") === "attendanceChecker" ? {
                 required: "Password is required",
                 minLength: {
                     value: 8,
                     message: "Password must have at least 8 characters"
                 }
-            },
+            } : undefined,
             type: "password"
         },
         {
@@ -132,6 +136,10 @@ const UserForm = ({
     ]
 
     useEffect(() => {
+        // if (!role.admin) {
+        //     setValue('DEPT_ID', getCurrentUser()?.DEPT_ID as string)
+        // }
+
         if (selectedUser) {
             const role = selectedUser?.ROLE_ID as UserRole
             const department = selectedUser?.DEPT_ID as IDepartment
@@ -147,10 +155,6 @@ const UserForm = ({
         }
     }, [selectedUser])
 
-    // const roleOptions = roles?.map((role) => ({
-    //     value: role.ROLE_ID!,
-    //     label: role.ROLE_LABEL!
-    // }))
     const roleOptions = [
         {
             value: "campusDirector",
@@ -238,6 +242,7 @@ const UserForm = ({
                         item
                         xs={12}>
                             <DropDown
+                            disabled={!role.admin && input.name === "DEPT_ID" ? true : false}
                             variant="standard"
                             name={input.name}
                             control={control}
@@ -246,13 +251,14 @@ const UserForm = ({
                             fullWidth
                             size="small"
                             rules={input.rules}
-                            options={input.name === "ROLE_ID" ? roleOptions : input.name === "DEPT_ID" ? departmentOptions : undefined }/>
+                            options={input.name === "ROLE_ID" ? role.admin ? roleOptions : role.campusDirector ? campusDirectorRoleOptions : deanRoleOptions : input.name === "DEPT_ID" ? departmentOptions : undefined }/>
                         </Grid> :
                         <Grid
                         key={input.name}
                         item
                         xs={ input.type === "password" ? 3 : 6}>
                             <ControlledTextField
+                            disabled={watch("ROLE_ID") === "teacher" && input.type === "password" ? true : false}
                             variant="standard"
                             key={input.name}
                             fullWidth

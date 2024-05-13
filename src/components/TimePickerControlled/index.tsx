@@ -3,12 +3,10 @@ import { Controller, FieldValues } from "react-hook-form"
 import { FormPropsInput } from "../../types/FormPropsInput"
 import dayjs from "dayjs"
 
-const TimePickerControlled = <T extends FieldValues>({ 
-    name,
-    control,
-    rules,
-    label
-}: FormPropsInput<T>) => {
+const TimePickerControlled = <T extends FieldValues>(props: FormPropsInput<T>) => {
+
+    const { name, control, rules, label } = props
+
     return (
         <Controller
         name={name}
@@ -17,18 +15,21 @@ const TimePickerControlled = <T extends FieldValues>({
         render={({
             field: { onChange, value },
             fieldState: { error }
-        }) => (
-            <TimePicker
-            label={label}
-            value={dayjs(value)}
-            onChange={onChange}
-            slotProps={{
-                textField: {
-                    size: "small", 
-                    error: !!error
-                }
-            }}/>
-        )}/>
+        }) => {
+            return (
+                <TimePicker
+                label={label}
+                disabled={props.disabled}
+                value={value ? dayjs(value) : null}
+                onChange={onChange}
+                slotProps={{
+                    textField: {
+                        size: "small", 
+                        error: !!error
+                    }
+                }}/>
+            )
+        }}/>
     )
 }
 

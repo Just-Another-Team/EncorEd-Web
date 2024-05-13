@@ -6,7 +6,7 @@ import {
 import { useAttendances } from "../../hooks/useAttendances"
 import IAttendance from "../../data/IAttendance"
 import dayjs from "dayjs"
-import IUser from "../../data/IUser"
+import IUser, { UserRole } from "../../data/IUser"
 import ISubject from "../../data/ISubject"
 import Color from "../../assets/Color"
 import { AttendanceSubmissionDate } from "../../data/AttendanceSubmissionDate"
@@ -14,7 +14,8 @@ import { useUsers } from "../../hooks/useUsers"
 import { useSubject } from "../../hooks/useSubject"
 
 const AttendanceList = () => {
-    const { load, attendances, getAttendances, getAttendancesByReduction } = useAttendances();
+    const { load, getAttendances, getAttendancesByReduction, getCompleteAttendancesByCreator } = useAttendances();
+    const { getCurrentUser } = useUsers()
 
     const AttendanceHeaders: Array<GridColDef<IAttendance>> = [
         {
@@ -53,7 +54,9 @@ const AttendanceList = () => {
             field: "USER_ID",
             headerName: "Submitted By",
             renderCell: (params) => {
-                return (params.row.USER_ID as IUser).USER_FULLNAME
+                console.log(params.row.USER_ID)
+
+                return params.row.USER_ID !== null ? (params.row.USER_ID as IUser).USER_FULLNAME : ""
             },
             minWidth: 160,
             flex: 0.5
@@ -93,19 +96,16 @@ const AttendanceList = () => {
         },
     ]
 
-    const reducedAttendances = getAttendancesByReduction(getAttendances()).map((attendance) => {
+    const role = getCurrentUser()?.ROLE_ID as UserRole
+
+    //If it is a Dean, get attendances made by Attendance Checker's Created By
+
+    const attendances = getAttendancesByReduction(getAttendances()).map((attendance) => {
         return ({
             ...attendance as IAttendance,
             ATTD_SUBMISSIONDATE: typeof attendance.ATTD_SUBMISSIONDATE === "string" ? attendance.ATTD_SUBMISSIONDATE : (attendance.ATTD_SUBMISSIONDATE as AttendanceSubmissionDate).lastSubmission,
         })
     })
-
-    // const reducedAttendances = getAttendances().map((attendance) => {
-    //     return ({
-    //         ...attendance as IAttendance,
-    //         ATTD_SUBMISSIONDATE: typeof attendance.ATTD_SUBMISSIONDATE === "string" ? attendance.ATTD_SUBMISSIONDATE : (attendance.ATTD_SUBMISSIONDATE as AttendanceSubmissionDate).lastSubmission,
-    //     })
-    // })
 
     return (
         <DataGrid
@@ -132,7 +132,7 @@ const AttendanceList = () => {
         columns={AttendanceHeaders}
         getRowId={(row) => row.ATTD_ID!}
         loading={load}
-        rows={reducedAttendances}/>
+        rows={role.admin ? attendances : getCompleteAttendancesByCreator(getCurrentUser()?.USER_ID as string)}/>
     )
 }
 

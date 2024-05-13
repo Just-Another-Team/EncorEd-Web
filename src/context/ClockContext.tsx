@@ -1,11 +1,11 @@
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc'
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 dayjs.extend(utc)
 
 type ClockContextType = {
-    ctime: dayjs.Dayjs
+    ctime: dayjs.Dayjs | undefined
 }
 
 export const ClockContext = createContext<ClockContextType>({} as ClockContextType);
@@ -15,17 +15,16 @@ type ClockProviderType = {
 }
 
 export const ClockProvider = ({ children }: ClockProviderType) => {
-    //let time = new Date().toLocaleTimeString()
-    let time = dayjs().local()
 
-    const [ ctime, setTime ] = useState(time)
+    const [ ctime, setTime ] = useState<dayjs.Dayjs>()
 
-    const UpdateTime = () => {
-        //time = new Date().toLocaleTimeString()
-        time = dayjs().local()
-        setTime(time)
-    }
-    setTimeout(UpdateTime, 1000/60)
+    useEffect(() => {
+        setInterval(() => {
+            const newDate = dayjs()
+
+            setTime(newDate)
+        }, 1000)
+    }, [])
 
     const value = {
         ctime

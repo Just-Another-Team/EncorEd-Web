@@ -1,13 +1,8 @@
 
 import HomeOutline from '@mui/icons-material/HomeOutlined'
 import BookOutline from '@mui/icons-material/ClassOutlined'
-import MapOutline from '@mui/icons-material/MapOutlined'
-import EventOutline from '@mui/icons-material/CalendarTodayOutlined'
-import GroupsOutline from '@mui/icons-material/GroupsOutlined'
-import OrganizationOutline from '@mui/icons-material/PieChartOutlined'
-import ReportOutline from '@mui/icons-material/AssessmentOutlined';
-import PostAddIcon from '@mui/icons-material/PostAdd';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import MeetingRoomOutlinedIcon from '@mui/icons-material/MeetingRoomOutlined';
 import LanOutlinedIcon from '@mui/icons-material/LanOutlined';
 import Sidebar from '../../components/NavSidebar'
 import { DesktopWindowsOutlined, HowToReg, QrCode } from '@mui/icons-material'
@@ -83,6 +78,12 @@ const LinkedSideBar = ({
             name: "Kiosks",
             icon: <DesktopWindowsOutlined />,
             href: `${adminCommon}/kiosk`
+        },
+        {
+            key: "room",
+            name: "Rooms",
+            icon: <MeetingRoomOutlinedIcon />,
+            href: `${adminCommon}/roomMap`
         }
     ]
     const deanLinks: Array<LinkType> = [
@@ -164,10 +165,12 @@ const LinkedSideBar = ({
 
     return (
         <Sidebar
-        links={getCurrentUser() !== null ? (getCurrentUser()?.ROLE_ID as UserRole).campusDirector ? campusDirectorLinks : (getCurrentUser()?.ROLE_ID as UserRole).dean ? deanLinks : (getCurrentUser()?.ROLE_ID as UserRole).admin ? adminlinks : [] : []}
         isDrawerOpen={isDrawerOpen}
-        onCloseDrawer={onCloseDrawer}
-        />
+        onCloseDrawer={onCloseDrawer}>
+            <Sidebar.ItemList
+            links={getCurrentUser() !== null ? (getCurrentUser()?.ROLE_ID as UserRole).campusDirector ? campusDirectorLinks : (getCurrentUser()?.ROLE_ID as UserRole).dean ? deanLinks : (getCurrentUser()?.ROLE_ID as UserRole).admin ? adminlinks : [] : []}
+            onCloseDrawer={onCloseDrawer}/>
+        </Sidebar>
     )
 }
 

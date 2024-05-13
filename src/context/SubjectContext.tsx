@@ -11,6 +11,7 @@ import { converter } from "../types/converter";
 import { db } from "../app/firebase/config";
 import { useAuth } from "../hooks/useAuth";
 import { useUsers } from "../hooks/useUsers";
+import { useSchedules } from "../hooks/useSchedules";
 
 type SubjectContextType = {
     subjects: Array<ISubject>
@@ -20,9 +21,11 @@ type SubjectContextType = {
     deleteSubject: (subId: string) => Promise<AxiosResponse<any, any>>
     setLoad: React.Dispatch<React.SetStateAction<boolean>>;
     getSubjects: () => Array<ISubject>
+    getSubjectsByCreator: (creatorId: string) => Array<ISubject>
     getOngoingSubjects: (currentTime: string) => Array<ISubject>
     getSubjectsByRoom: (roomId: string) => Array<ISubject>;
     assignSubjectToRoom: (data: QRCodeType) => Promise<AxiosResponse<any, any>>;
+    assignTeacherToSubject: (data: { SUB_ID: string; USER_ID: string; }) => Promise<AxiosResponse<any, any>>
 }
 
 export const SubjectContext = createContext<SubjectContextType>({} as SubjectContextType);
@@ -34,9 +37,9 @@ type SubjectProviderType = {
 export const SubjectProvider = ({ children }: SubjectProviderType) => {
     const { user } = useAuth()
     const { users } = useUsers()
+    const { getSchedule } = useSchedules()
 
     const [subjects, setSubjects] = useState<Array<ISubject>>([]);
-    const [schedules, setSchedules] = useState<Array<ISchedule>>([]);
     const [load, setLoad] = useState<boolean>(true);
 
     const assignSubjectToRoom = (data: QRCodeType) => {
@@ -58,9 +61,17 @@ export const SubjectProvider = ({ children }: SubjectProviderType) => {
         return subjectService.deleteSubject(subId)
     }
 
+    const assignTeacherToSubject = (data: { SUB_ID: string, USER_ID: string }) => {
+        return subjectService.assignInstructor(data)
+    }
+
+    const removeAssignedTeacher = () => {
+        
+    }
+
     const getSubjects = (): Array<ISubject> => {
         return subjects.map(subject => {
-            const schedule = schedules.find(schedule => schedule.SCHED_ID === subject.SCHED_ID)
+            const schedule = getSchedule(subject.SCHED_ID as string)
             const user = users.find(user => user.USER_ID === subject.USER_ID)
             return ({
                 ...subject,
@@ -69,7 +80,11 @@ export const SubjectProvider = ({ children }: SubjectProviderType) => {
             })
         })
     }
-    
+
+    const getSubjectsByCreator = (creatorId: string): Array<ISubject> => {
+        return getSubjects().filter(subject => subject.SUB_CREATEDBY === creatorId)
+    }
+
     const getOngoingSubjects = (currentTime: string) => {
         return getSubjects().filter((subject) => {
             const schedule = subject.SCHED_ID as ISchedule
@@ -91,22 +106,8 @@ export const SubjectProvider = ({ children }: SubjectProviderType) => {
     }
 
     const subjectCollection = collection(db, '/Subject/').withConverter(converter<ISubject>())
-    const scheduleCollection = collection(db, '/Schedule/').withConverter(converter<ISchedule>())
 
     useEffect(() => {
-        const fetchScheduleSnapshot = onSnapshot(scheduleCollection, (snapshot) => {
-            const scheduleDocs = snapshot.docs.map((schedule):ISchedule => {
-                return({
-                    ...schedule.data(),
-                    SCHED_ID: schedule.id,
-                })
-            })
-
-            setSchedules(scheduleDocs)
-        }, (error) => {
-            console.error('Schedule Context Error', error)
-        })
-
         const fetchSubjectSnapshot = onSnapshot(subjectCollection, (snapshot) => {
             const scheduleDocs = snapshot.docs.map((subject):ISubject => {
                 return({
@@ -121,7 +122,6 @@ export const SubjectProvider = ({ children }: SubjectProviderType) => {
         })
 
         return () => {
-            fetchScheduleSnapshot()
             fetchSubjectSnapshot()
 
             setLoad(false)
@@ -138,7 +138,9 @@ export const SubjectProvider = ({ children }: SubjectProviderType) => {
         getSubjectsByRoom,
         getOngoingSubjects,
         getSubjects,
-        assignSubjectToRoom
+        getSubjectsByCreator,
+        assignSubjectToRoom,
+        assignTeacherToSubject,
     }
 
     return (

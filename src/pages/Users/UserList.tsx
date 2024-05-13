@@ -23,7 +23,9 @@ const UsersList = () => {
         updateUser,
         deleteUser,
         setLoad,
-        getCurrentUser
+        getCurrentUser,
+        getUser,
+        getUsersByCreator
     } = useUsers();
 
     const { 
@@ -71,13 +73,14 @@ const UsersList = () => {
 
         openLoading()
 
-        await updateUser(data)
-            .then((result) => {
-                console.log(result.data)
-            })
-            .catch((error) => {
-                console.error(error)
-            })
+        console.log(data)
+        // await updateUser(data)
+        //     .then((result) => {
+        //         console.log(result.data)
+        //     })
+        //     .catch((error) => {
+        //         console.error(error)
+        //     })
         
         closeLoading()
         closeUpdateModal()
@@ -87,6 +90,7 @@ const UsersList = () => {
         //Should've send a message
         await deleteUser(user?.USER_ID!)
             .then((result) => {
+                //When a user is deleted, set the subject Teacher to null
                 console.log(result)
             })
             .catch((error) => {
@@ -105,6 +109,11 @@ const UsersList = () => {
             minWidth: 256,
             flex: 1
         },
+        // {
+        //     field: "USER_EMAIL",
+        //     headerName: "Email",
+        //     minWidth: 256,
+        // },
         {
             field: "ROLE_ID",
             headerName: "Role",
@@ -124,6 +133,16 @@ const UsersList = () => {
                 return department !== null ? (params.row.DEPT_ID as IDepartment).DEPT_NAME : null
             },
             flex: 0.6
+        },
+        {
+            field: "USER_CREATEDBY",
+            headerName: "Created by",
+            minWidth: 192,
+            renderCell: (params) => {
+                const createdBy = params.row.USER_CREATEDBY
+                return createdBy ? getUser(createdBy)?.USER_FULLNAME : "No creator"
+            },
+            // flex: 0.6
         },
         {
             field: "UPDATE",
@@ -173,7 +192,11 @@ const UsersList = () => {
         },
     ]
 
-    const filteredUsers = getUsers()?.filter((user) => user.USER_ID !== getCurrentUser()?.USER_ID && !(user.ROLE_ID as UserRole).admin && !(user.ROLE_ID as UserRole).kiosk && !user.USER_ISDELETED)
+    const filteredUsers = (users: Array<IUser>): Array<IUser> => {
+        return users.filter((user) => user.USER_ID !== getCurrentUser()?.USER_ID && !(user.ROLE_ID as UserRole).admin && !(user.ROLE_ID as UserRole).kiosk && !user.USER_ISDELETED)
+    }
+
+    const role = getCurrentUser()?.ROLE_ID as UserRole
 
     return (
         <>
@@ -183,6 +206,7 @@ const UsersList = () => {
                 columns: {
                     columnVisibilityModel: {
                         USER_ID: false,
+                        USER_CREATEDBY: role.admin ? true : false
                     }
                 },
                 pagination: {
@@ -193,7 +217,7 @@ const UsersList = () => {
             }}
             columns={UserHeaders}
             getRowId={(row) => row.USER_ID!}
-            rows={filteredUsers!}/>
+            rows={filteredUsers( role.admin ? getUsers() : getUsersByCreator(getCurrentUser()?.USER_ID as string))}/>
 
             <UserForm
             selectedUser={user}

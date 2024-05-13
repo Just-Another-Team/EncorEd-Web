@@ -67,7 +67,6 @@ const Login = () => {
         //     .catch(handleLoginError)
         await login(loginData.email!, loginData.password!)
             .then(() => {
-                //set Notificaiton to load
                 setOpenLoading(false);
             })
             .catch(handleLoginError)

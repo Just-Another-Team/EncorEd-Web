@@ -4,7 +4,7 @@ import { Control, Controller, FieldValues, RegisterOptions, UseFormSetValue } fr
 type ControlledTextFieldType<T extends FieldValues> = {
     name: string,
     control: Control<T, any>;
-    rules: Omit<RegisterOptions<T, any>, "valueAsNumber" | "valueAsDate" | "setValueAs" | "disabled">
+    rules: Omit<RegisterOptions<T, any>, "valueAsNumber" | "valueAsDate" | "setValueAs" | "disabled"> | undefined
 } & TextFieldProps
 
 const ControlledTextField = <T extends FieldValues>(props: ControlledTextFieldType<T>) => {

@@ -3,20 +3,19 @@ import DialogMessage from "../../components/DialogMessage"
 import ControlledTextField from "../../components/TextFieldControlled/input"
 import useLoading from "../../hooks/useLoading";
 import { useForm } from "react-hook-form";
-import { useSubject } from "../../hooks/useSubject";
 import { FirebaseError } from "firebase/app";
 import { AuthErrorCodes } from "firebase/auth";
 import { useAuth } from "../../hooks/useAuth";
 import ISubject from "../../data/ISubject";
-import { AxiosResponse } from "axios";
 import IUser from "../../data/IUser";
 import IDepartment from "../../data/IDepartment";
+import IRoom from "../../data/IRoom";
 
 type DeleteType = {
     password: string | null;
 }
 
-type ObjectType = IUser | ISubject | IDepartment
+type ObjectType = IUser | ISubject | IRoom | IDepartment
 //User
 //Subject
 //Department

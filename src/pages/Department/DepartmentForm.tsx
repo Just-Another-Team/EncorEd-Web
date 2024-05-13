@@ -9,6 +9,8 @@ import useRole from "../../hooks/useRole";
 import { useEffect } from "react";
 import IDepartment from "../../data/IDepartment";
 import IRole from "../../data/IRole";
+import FloorAutoComplete from "./FloorText";
+import { useUsers } from "../../hooks/useUsers";
 
 type DepartmentFormProps = {
     title: string;
@@ -27,9 +29,13 @@ const DepartmentForm = ({
     openModal,
     closeModal
 }: DepartmentFormProps) => {
+    const { getDeans } = useUsers()
+
     const { control, handleSubmit, reset, setValue } = useForm<IDepartment>({
         defaultValues: {
             DEPT_NAME: null,
+            DEPT_DEAN: "",
+            DEPT_FLOORSASSIGNED: []
         }
     });
 
@@ -43,6 +49,11 @@ const DepartmentForm = ({
         reset()
         onSubmit(data)
     }
+
+    const deans: Array<{ label: string; value: string}> = getDeans().map(user => ({
+        label: user.USER_FULLNAME as string,
+        value: user.USER_ID as string
+    }))
 
     return (
         <DialogMessage
@@ -66,15 +77,35 @@ const DepartmentForm = ({
                     <CircularProgress
                     size={"4rem"}/>
                 </Stack> :
-                <ControlledTextField
-                control={control}
-                name="DEPT_NAME"
-                fullWidth
-                variant="standard"
-                label="Department name"
-                rules={{
-                    required: "Department name is required"
-                }}/> }
+                <>
+                    <ControlledTextField
+                    control={control}
+                    name="DEPT_NAME"
+                    fullWidth
+                    variant="standard"
+                    label="Department name"
+                    rules={{
+                        required: "Department name is required"
+                    }}/>
+
+                    <DropDown
+                    variant="standard"
+                    name="DEPT_DEAN"
+                    control={control}
+                    label="Dean or Officer-In-Charge of the Department"
+                    defaultValue={""}
+                    fullWidth
+                    size="small"
+                    rules={undefined}
+                    options={deans}/>
+
+                    <FloorAutoComplete
+                    name={"DEPT_FLOORSASSIGNED"}
+                    control={control}
+                    rules={undefined}
+                    />
+                </>
+                }
             </DialogMessage.Body>
             <DialogMessage.Footer>
                 <Button

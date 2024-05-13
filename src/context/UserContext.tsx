@@ -2,11 +2,9 @@ import { createContext, Dispatch, useEffect, useState } from "react";
 import IUser, { UserRole } from "../data/IUser";
 import userService from "../app/api/user-service";
 import { AxiosResponse } from "axios";
-import { collection, DocumentReference, getDocs, onSnapshot, query } from "firebase/firestore";
+import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "../app/firebase/config";
 import { converter } from "../types/converter";
-import IDepartment from "../data/IDepartment";
-import departmentService from "../app/api/department-service";
 import useDepartment from "../hooks/useDepartment";
 import { useAuth } from "../hooks/useAuth";
 
@@ -21,6 +19,9 @@ type UserContextType = {
     getTeachers: () => Array<IUser>
     getKiosks: () => Array<IUser>
     getUsers: () => Array<IUser>
+    getDeans: () => IUser[]
+    getUser: (userId: string) => IUser | undefined,
+    getUsersByCreator: (creatorId: string) => Array<IUser>,
     load: boolean,
     setLoad: Dispatch<React.SetStateAction<boolean>>
 }
@@ -63,8 +64,12 @@ export const UserProvider = ({ children }: UserProviderType) => {
         return userService.deleteUser(userId)
     }
 
+    const getDeans = () => {
+        return getUsers().filter(user => (user.ROLE_ID as UserRole).dean)
+    }
+
     const getTeachers = () => {
-        return users.filter(user => (user.ROLE_ID as UserRole).teacher)
+        return getUsers().filter(user => (user.ROLE_ID as UserRole).teacher)
     }
 
     const getUsers = () => {
@@ -76,6 +81,21 @@ export const UserProvider = ({ children }: UserProviderType) => {
                 DEPT_ID: department ? department : null,
             })
         })
+    }
+
+    const getUsersByCreator = (creatorId: string) => {
+        return users.filter(user => user.USER_CREATEDBY === creatorId).map((user): IUser => {
+            const department = departments.find(department => department.DEPT_ID === user.DEPT_ID as string)
+
+            return ({
+                ...user,
+                DEPT_ID: department ? department : null,
+            })
+        })
+    }
+
+    const getUser = (userId: string) => {
+        return users.find(user => user.USER_ID === userId)
     }
 
     const getKiosks = () => {
@@ -123,7 +143,10 @@ export const UserProvider = ({ children }: UserProviderType) => {
         getTeachers,
         getCurrentUser,
         getUsers,
+        getDeans,
         getKiosks,
+        getUser,
+        getUsersByCreator,
         load,
     }
 

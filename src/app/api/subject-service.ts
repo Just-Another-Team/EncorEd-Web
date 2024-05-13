@@ -13,6 +13,10 @@ class SubjectService {
         return http.put(`${this.subjectCommon}/update/${data.SUB_ID}`, data)
     }
 
+    public assignInstructor(data: { SUB_ID: string, USER_ID: string }) {
+        return http.patch(`${this.subjectCommon}/assign/${data.SUB_ID}/teacher`, data)
+    }
+
     public assignRoom(data: QRCodeType) {
         return http.patch(`${this.subjectCommon}/assign/${data.SUB_ID}/room`, data)
     }

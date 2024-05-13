@@ -1,5 +1,5 @@
 import { Box, Container, Stack, Toolbar, Typography, useMediaQuery, useTheme } from "@mui/material"
-import { Outlet } from "react-router-dom"
+import { Outlet, useNavigate, useNavigation } from "react-router-dom"
 import AuthenticatedNavbar from "./AuthenticatedNavbar"
 import LinkedSideBar from "./LinkedSidebar"
 import { useEffect, useState } from "react"
@@ -9,8 +9,16 @@ import { useUsers } from "../../hooks/useUsers"
 import { UserRole } from "../../data/IUser"
 import { defaultSideBar, kioskSideBar } from "../../data/drawerWidth"
 import KioskNavBar from "./KioskNavBar"
+import KioskSideBar from "./KioskSideBar"
+import { useMapboxNavigation } from "../../hooks/useMapboxNavigation"
+import KioskSearchArea from "./KioskSearchArea"
+import KioskFloorTabs from "./KioskFloorTabs"
+import KioskClock from "./KioskClock"
+import KioskAccountBar from "./KioskNavBar"
+import KioskRoomInfo from "./KioskRoomInfo"
 
 const Layout = () => {
+    const { accessToken } = useMapboxNavigation()
     const { getCurrentUser } = useUsers()
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
@@ -25,35 +33,28 @@ const Layout = () => {
         setSidebarOpen(false);
     }
 
-    //Fixes:
-    // - Use a react-pro-sidebar for the sidebar
+    const role = (getCurrentUser()?.ROLE_ID as UserRole)
 
     return (
-        <Box
-        //sx={{ display: 'flex' }}
-        >
-            {/* Prop drilled 2 layered components: AuthenticatedNavbar and NavBar */}
-            {/* <AuthenticatedNavbar onOpenDrawer={openSidebar}/> */}
-
-            {/* Prop drilled 2 layered components: LinkedSideBar and SideBar */}
-            {/* Provide a way to separate based on if the logged in user is a kiosk or not */}
+        <Box>
+            { role.kiosk ?
+            undefined :
             <LinkedSideBar
             isDrawerOpen={sidebarOpen}
-            onCloseDrawer={closeSidebar}/>
+            onCloseDrawer={closeSidebar}/> }
 
-            {/* { (getCurrentUser()?.ROLE_ID as UserRole).kiosk ? 
-            undefined :
-            <AuthenticatedNavbar
-            onOpenDrawer={openSidebar}/> } */}
-
-            {/* <AuthenticatedNavbar
-            onOpenDrawer={openSidebar}/> */}
-
-            {/* <KioskNavBar /> */}
-
+            { role.kiosk ?
+            <Box
+            height={'100vh'}
+            width={'100%'}>
+                <KioskSearchArea />
+                <KioskFloorTabs />
+                <KioskClock />
+                <KioskRoomInfo />
+                <Outlet />
+            </Box> :
             <Box
             marginLeft={!belowMid ? `${defaultSideBar}px` : 0}>
-
                 <AuthenticatedNavbar
                 onOpenDrawer={openSidebar}/>
 
@@ -64,15 +65,7 @@ const Layout = () => {
                 }}>
                     <Outlet />
                 </Container>
-            </Box>
-
-            {/* <Box
-            height={'100vh'}
-            //border={'1px solid black'}
-            bgcolor={'green'}
-            marginLeft={!belowMid ? `${kioskSideBar}px` : 0}>
-                <Outlet />
-            </Box> */}
+            </Box> }
         </Box>
     )
 }

@@ -1,11 +1,12 @@
-import { Box } from "@mui/material"
+import { Box, Button, IconButton, Stack, Typography } from "@mui/material"
 import Navbar from "../../components/NavBar"
 import { useUsers } from "../../hooks/useUsers"
 import { useAuth } from "../../hooks/useAuth"
 import { useNavigate } from "react-router-dom"
 import AccountMenuButton from "../../components/ButtonAccountMenu"
+import { MoreVertOutlined } from "@mui/icons-material"
 
-const KioskNavBar = () => {
+const KioskAccountBar = () => {
     const { signOut } = useAuth()
     const { getCurrentUser } = useUsers()
     
@@ -22,42 +23,17 @@ const KioskNavBar = () => {
     }
 
     return (
-        <Navbar
-        childrenDirection="space-between">
-            {/* <Stack
-            direction={"row"}
-            gap={2}>
-                <IconButton
-                onClick={onOpenDrawer}
-                sx={{ display: !belowMid ? "none" : "block" }}>
-                    <Menu />
-                </IconButton>
-                <TextField
-                placeholder="Search"
-                size="small"
-                InputProps={{
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <Search />
-                        </InputAdornment>
-                    )
-                }}
-                sx={{
-                    width: 240,
-                }}/>
-
-            </Stack> */}
-
-            <Box>
-                {/* <NotificationButton
-                newNotificationLength={newNotifications}
-                onClick={notificationOnClick}/> */}
-                <AccountMenuButton
-                fullName={getCurrentUser()?.USER_USERNAME!}
-                onLogout={handleLogout}/>
-            </Box>
-        </Navbar>
+        <Box
+        border={'1px solid black'}
+        position={'fixed'}
+        zIndex={2}
+        bottom={32}>
+            <IconButton>
+                <MoreVertOutlined />
+            </IconButton>
+            <Typography>{ getCurrentUser()?.USER_USERNAME }</Typography>
+        </Box>
     )
 }
 
-export default KioskNavBar
+export default KioskAccountBar

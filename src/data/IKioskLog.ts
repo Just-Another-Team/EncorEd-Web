@@ -7,5 +7,5 @@ export interface IKioskLog {
     KILG_DATE: Date | string
     USER_ID: IUser | string | null;
     ROOM_ID: IRoom | string | null;
-    KILG_ISREAD: boolean
+    KILG_ISREAD?: boolean
 }

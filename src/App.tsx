@@ -20,6 +20,7 @@ import IUser, { UserRole } from './data/IUser';
 import Kiosk from './pages/Kiosk';
 import { useUsers } from './hooks/useUsers';
 import Map from './pages/Map';
+import Room from './pages/Room';
 
 function App() {
   const { user } = useAuth()
@@ -30,7 +31,7 @@ function App() {
       {/* Public pages */}
       <Route path='/' element={ getCurrentUser() ? IdentifyRole(getCurrentUser()!) : <Login />}/> {/* IdentifyRole(getCurrentUser()!) */} 
 
-      {/* All Users */}
+      {/* Admin user */}
       <Route path='/admin' element={ !user ? <Navigate replace to="/" /> : <Layout />  }> 
         <Route index path='home' element={<Home />}  />
 
@@ -54,6 +55,8 @@ function App() {
           <Route element={<Kiosks />} index />
           <Route path=':kioskId' element={<Kiosk />}/>
         </Route>
+
+        <Route path="roomMap" element={<Room />}/>
       </Route>
 
       {/* Dean */}

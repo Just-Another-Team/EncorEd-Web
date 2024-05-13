@@ -1,5 +1,5 @@
 import { Control, FieldValues, RegisterOptions, UseControllerProps } from 'react-hook-form'
-import { FilledInputProps, InputProps, OutlinedInputProps, SxProps, TextFieldPropsColorOverrides, TextFieldVariants, Theme } from '@mui/material'
+import { FilledInputProps, InputProps, OutlinedInputProps, SxProps, TextFieldProps, TextFieldPropsColorOverrides, TextFieldVariants, Theme } from '@mui/material'
 import { OverridableStringUnion } from '@mui/types/index'
 
 export type FormPropsInput<T extends FieldValues> = {
@@ -23,4 +23,4 @@ export type FormPropsInput<T extends FieldValues> = {
     InputProps?: Partial<OutlinedInputProps> | Partial<InputProps> | Partial<FilledInputProps> | undefined
 
     setValue?: any
-} & UseControllerProps<T>
+} & UseControllerProps<T> & TextFieldProps

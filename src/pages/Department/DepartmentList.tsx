@@ -1,4 +1,4 @@
-import { DeleteOutlineOutlined, UpdateOutlined } from "@mui/icons-material";
+import { DeleteOutlineOutlined, PersonAddAlt, UpdateOutlined } from "@mui/icons-material";
 import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import IDepartment from "../../data/IDepartment";
 import { useState } from "react";
@@ -8,9 +8,13 @@ import useDepartment from "../../hooks/useDepartment";
 import DeleteDialog from "../../components/DialogDelete";
 import DepartmentForm from "./DepartmentForm";
 import { useUsers } from "../../hooks/useUsers";
+import { UserRole } from "../../data/IUser";
+import { Box, Chip, Stack } from "@mui/material";
+import { useRooms } from "../../hooks/useRooms";
 
 const DepartmentList = () => {
-    const { users } = useUsers()
+    const { users, getUser } = useUsers()
+    const { getRoomFloor } = useRooms()
     const { 
         getDepartments,
         deleteDepartment,
@@ -45,18 +49,22 @@ const DepartmentList = () => {
 
         const data: IDepartment = {
             DEPT_ID: department?.DEPT_ID,
-            DEPT_NAME: departmentData.DEPT_NAME
+            DEPT_NAME: departmentData.DEPT_NAME,
+            DEPT_DEAN: departmentData.DEPT_DEAN,
+            DEPT_FLOORSASSIGNED: departmentData.DEPT_FLOORSASSIGNED,
         }
 
         openLoading()
 
-        await updateDepartment(data)
-            .then((result) => {
-                console.log(result)
-            })
-            .catch((error) => {
-                console.error(error)
-            })
+        console.log(data)
+
+        // await updateDepartment(data)
+        //     .then((result) => {
+        //         console.log(result)
+        //     })
+        //     .catch((error) => {
+        //         console.error(error)
+        //     })
 
         closeLoading()
         closeUpdateModal()
@@ -84,10 +92,43 @@ const DepartmentList = () => {
             flex: 1
         },
         {
+            field: "DEPT_DEAN",
+            headerName: "Dean Assigned",
+            minWidth: 256,
+            renderCell: (params) => {
+                const userId = params.row.DEPT_DEAN as string
+                return getUser(userId) ? getUser(userId)?.USER_FULLNAME : "No Dean"
+            }
+        },
+        {
+            field: "DEPT_FLOORSASSIGNED",
+            headerName: "Floors Assigned",
+            minWidth: 256,
+            flex: 1,
+            renderCell: (params) => {
+
+                const floors = params.row.DEPT_FLOORSASSIGNED as Array<string>
+
+                return (
+                    <Box
+                    gap={2}>
+                        {floors.map((floorId) => {
+                            const floor = getRoomFloor(floorId)
+                            return floor ? (
+                                <Chip
+                                size="small"
+                                label={floor.FLR_NAME} />
+                            ) : undefined
+                        })}
+                    </Box>
+                )
+            }
+        },
+        {
             field: "DEPT_NOOFUSERS",
             headerName: "Users assigned",
             minWidth: 128,
-            flex: 0.4
+            flex: 0.3
         },
         {
             field: "UPDATE",
@@ -107,6 +148,14 @@ const DepartmentList = () => {
 
                 return [
                     <GridActionsCellItem
+                    key={"assign"}
+                    icon={<PersonAddAlt />}
+                    label="Assign"
+                    className="textPrimary"
+                    onClick={() => {}}
+                    color="primary"
+                    />,
+                    <GridActionsCellItem
                     key={"update"}
                     icon={<UpdateOutlined />}
                     label="Edit"
@@ -123,7 +172,8 @@ const DepartmentList = () => {
                     />,
                 ];
             },
-            
+            minWidth: 128,
+            flex: 0.1
         },
     ]
 
@@ -144,7 +194,7 @@ const DepartmentList = () => {
             }}
             columns={DepartmentHeaders}
             getRowId={(row) => row.DEPT_ID!}
-            rows={getDepartments(users)}/>
+            rows={getDepartments(users.filter(user => !user.USER_ISDELETED && !(user.ROLE_ID as UserRole).admin))}/>
 
             <DepartmentForm
             title={`Update ${department?.DEPT_NAME}`}

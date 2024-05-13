@@ -1,11 +1,10 @@
 import { createContext, Dispatch, useEffect, useState } from "react";
-import IUser from "../data/IUser";
 import authService from "../app/api/user-service";
 import { EmailAuthProvider, User, UserCredential, onAuthStateChanged, reauthenticateWithCredential, signInWithEmailAndPassword } from "firebase/auth";
-import { FIREBASE_AUTH, getAuth } from '../app/firebase/config'
+import { getAuth } from '../app/firebase/config'
 import { AxiosResponse } from "axios";
 
-type AuthError = { 
+type AuthError = {
     isError: boolean,
     message: string | null
 }

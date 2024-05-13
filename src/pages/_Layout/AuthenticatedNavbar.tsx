@@ -77,7 +77,6 @@ const AuthenticatedNavbar = ({
                 sx={{
                     width: 240,
                 }}/>
-
             </Stack>
 
             <Box>

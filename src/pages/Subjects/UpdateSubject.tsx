@@ -65,8 +65,7 @@ const UpdateSubject = ({
                 return updateSubject({
                     ...data as ISubject,
                     SUB_UPDATEDBY: getCurrentUser()?.USER_ID
-                })
-                    .catch((error) => Promise.reject(error))
+                }).catch((error) => Promise.reject(error))
             })
             .then(() => {
                 console.log("Successfully updated!")

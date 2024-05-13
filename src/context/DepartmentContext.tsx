@@ -11,6 +11,7 @@ type DepartmentContextType = {
     updateDepartment: (user: IDepartment) => Promise<AxiosResponse<any, any>>
     deleteDepartment: (userId: string) => Promise<AxiosResponse<any, any>>
     getDepartments: (users: Array<IUser>) => Array<IDepartment>
+    getDepartment: (departmentId: string) => IDepartment | undefined
     load: boolean
 }
 
@@ -39,6 +40,10 @@ export const DepartmentProvider = ({ children }: DepartmentProviderType) => {
         return departmentService.delete(userId)
     }
     
+    const getDepartment = (departmentId: string) => {
+        return departments.find(department => department.DEPT_ID === departmentId)
+    }
+
     const getDepartments = (users: Array<IUser>) => {
         return departments.map((department): IDepartment => {
 
@@ -66,6 +71,7 @@ export const DepartmentProvider = ({ children }: DepartmentProviderType) => {
     const value = {
         departments,
         getDepartments,
+        getDepartment,
         addDepartment,
         updateDepartment,
         deleteDepartment,

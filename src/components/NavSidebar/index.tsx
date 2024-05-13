@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { ReactNode, useEffect } from "react";
 import {
     Drawer,
     Toolbar,
@@ -23,29 +23,33 @@ import { defaultSideBar } from "../../data/drawerWidth";
 
 //const drawerWidth = 208; //Move to another react file
 
-type SidebarType = {
-    links: FixMeLater; //links: MenuItemType
-    // select: FixMeLater; //MenuItemOnClick
-    // selectedPage: FixMeLater;
-    isDrawerOpen: boolean; //IsDrawerOpen
-    onCloseDrawer: () => void //OnCloseDrawer
+type OnCloseDrawer = {
+    onCloseDrawer: () => void
 }
 
-const Sidebar = ({
-    links,
-    isDrawerOpen,
-    onCloseDrawer
-}: SidebarType) => {
+type SidebarListType = {
+    links: FixMeLater;
+} & OnCloseDrawer
 
-    //selectedPage: Selector
-    const { pathname } = useLocation();
+type SidebarType = {
+    // select: FixMeLater; //MenuItemOnClick
+    // selectedPage: FixMeLater;
+    sideBarWidth?: number
+    isDrawerOpen: boolean; //IsDrawerOpen
+    children: ReactNode
+    backgroundColor?: string
+} & OnCloseDrawer
+
+const Sidebar = ({
+    isDrawerOpen,
+    onCloseDrawer,
+    sideBarWidth = defaultSideBar,
+    children,
+    backgroundColor
+}: SidebarType) => {
 
     const theme = useTheme()
     const belowMid = useMediaQuery(theme.breakpoints.down("md"))
-
-    const handleOnClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-        onCloseDrawer();
-    }
 
     return(
         <Drawer
@@ -53,12 +57,12 @@ const Sidebar = ({
         open={isDrawerOpen}
         onClose={onCloseDrawer}
         sx={{
-            width: defaultSideBar,
+            width: sideBarWidth,
             flexShrink: 0,
             [`& .MuiDrawer-paper`]: { 
-                width: defaultSideBar,
+                width: sideBarWidth,
                 boxSizing: 'border-box' ,
-                backgroundColor: theme.palette.primary.main,
+                backgroundColor: backgroundColor ? backgroundColor : theme.palette.primary.main,
             },
         }}>
             {/* TO-DO: Color the title and provide links */}
@@ -71,8 +75,11 @@ const Sidebar = ({
                     Encor<span>Ed</span>
                 </Typography>
             </Toolbar>
+
+            { children }
             
-            <Box sx={{ overflow: 'auto'}}> 
+            {/* Turn this into children instead */}
+            {/* <Box sx={{ overflow: 'auto'}}>
                 <List disablePadding>
                     {links?.map((navigation: FixMeLater, index: FixMeLater) => (
                         <ListItem key={navigation.name} disablePadding>
@@ -98,10 +105,56 @@ const Sidebar = ({
                         </ListItem>
                     ))}
                 </List>
+            </Box> */}
 
-            </Box>
         </Drawer>
     )
 }
+
+const SideBarList = ({ 
+    links,
+    onCloseDrawer
+}: SidebarListType) => {
+
+    const { pathname } = useLocation();
+
+    const theme = useTheme()
+
+    const handleOnClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+        onCloseDrawer();
+    }
+
+    return (
+        <Box sx={{ overflow: 'auto'}}>
+            <List disablePadding>
+                {links?.map((navigation: FixMeLater, index: FixMeLater) => (
+                    <ListItem key={navigation.name} disablePadding>
+                        <LinkListItem
+                        component={Link}    
+                        to={navigation.href}
+                        onClick={handleOnClick}
+                        sx={{
+                            color: pathname === navigation.href ? theme.palette.grey[50] : theme.palette.grey[400],
+                        }}>
+                            <ListItemIcon
+                            sx={{
+                                color: pathname === navigation.href ? theme.palette.grey[50] : theme.palette.grey[400],
+                            }}>
+                                {navigation.icon}
+                            </ListItemIcon>
+                            <ListItemText
+                            primary={navigation.name}
+                            primaryTypographyProps={{
+                                fontWeight: pathname === navigation.href ? 700 : 400
+                            }}/>
+                        </LinkListItem>
+                    </ListItem>
+                ))}
+            </List>
+        </Box>
+    )
+}
+
+Sidebar.ItemList = SideBarList
 
 export default Sidebar

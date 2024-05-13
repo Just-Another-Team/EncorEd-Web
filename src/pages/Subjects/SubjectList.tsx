@@ -4,23 +4,33 @@ import {
     GridColDef,
 } from "@mui/x-data-grid"
 import dayjs from "dayjs"
-import IUser from "../../data/IUser"
+import IUser, { UserRole } from "../../data/IUser"
 import ISubject from "../../data/ISubject"
 import { useSubject } from "../../hooks/useSubject"
 import ISchedule from "../../data/ISchedule"
-import { DeleteOutlineOutlined, UpdateOutlined } from "@mui/icons-material"
+import { DeleteOutlineOutlined, PersonAddAlt1Outlined, UpdateOutlined } from "@mui/icons-material"
 import { useState } from "react"
 import { useModal } from "../../hooks/useModal"
 import DeleteDialog from "./DeleteSubject"
 import UpdateDialog from "./UpdateSubject"
 import DeleteSubject from "./DeleteSubject"
+import { useUsers } from "../../hooks/useUsers"
+import { Button } from "@mui/material"
+import AssignTeacher from "./AssignTeacher"
 
 type SubjectDeleteType = {
     password: string | null;
 }
 
 const SubjectList = () => {
-    const { subjects, getSubjects } = useSubject();
+    const { subjects, getSubjects, getSubjectsByCreator } = useSubject();
+    const { getUser, getCurrentUser } = useUsers()
+
+    const { 
+        openModal: assignModal,
+        handleOpenModal: openAssignModal,
+        handleCloseModal: closeAssignModal
+    } = useModal();
 
     const { 
         openModal: updateModal,
@@ -63,9 +73,36 @@ const SubjectList = () => {
             flex: 1
         },
         {
+            field: "SUB_CREATEDBY",
+            headerName: "Created by",
+            minWidth: 256,
+            renderCell: (params) => {
+                const createdBy = params.row.SUB_CREATEDBY
+                return createdBy ? getUser(createdBy)?.USER_FULLNAME : "No creator"
+            },
+            // flex: 0.6
+        },
+        {
             field: "SUB_ID.USER_ID",
             headerName: "Instructor",
             renderCell: (params) => {
+
+                const handleOnClickAssign = (subject: ISubject) => {
+                    setSubject(subject)
+                    openAssignModal();
+                }
+
+                if ( !params.row.USER_ID || params.row.USER_ID === null ) 
+                    return (
+                        <Button
+                        onClick={() => handleOnClickAssign(params.row)}
+                        startIcon={<PersonAddAlt1Outlined />}
+                        size="small"
+                        variant="outlined">
+                            Assign a Teacher
+                        </Button>
+                    )
+
                 return (params.row.USER_ID as IUser).USER_FULLNAME
             },
             sortable: false,
@@ -75,6 +112,7 @@ const SubjectList = () => {
             field: "SUB_ID.SCHED_ID.SCHED_RANGE",
             headerName: "Schedule",
             renderCell: (params) => {
+                if (!params.row.SCHED_ID) return null 
                 return `${dayjs((params.row.SCHED_ID as ISchedule).SCHED_STARTTIME).format("hh:mm A")} - ${dayjs((params.row.SCHED_ID as ISchedule).SCHED_ENDTIME).format("hh:mm A")}`
     
             },
@@ -85,10 +123,14 @@ const SubjectList = () => {
             field: "SCHED_ID.SCHED_WEEKASSIGNED",
             headerName: "Days",
             renderCell: (params) => {
-                return (params.row.SCHED_ID as ISchedule).SCHED_WEEKASSIGNED.reduce((prevValue, curValue) => {
+                if (!params.row.SCHED_ID) return null 
+
+                const scheduledDays = (params.row.SCHED_ID as ISchedule).SCHED_WEEKASSIGNED.reduce((prevValue, curValue) => {
                     const currentValue = curValue == "Thursday" ? curValue.substring(0, 2) : curValue.charAt(0)
                     return prevValue + currentValue
                 }, "")
+
+                return scheduledDays
             },
             sortable: false,
             minWidth: 96,
@@ -99,12 +141,12 @@ const SubjectList = () => {
             type: "actions",
             getActions: (params) => {
 
-                const handleOnClickUpdate = (subject: ISubject) => () => {
+                const handleOnClickUpdate = (subject: ISubject) => {
                     setSubject(subject);
                     openUpdateModal();
                 }
                 
-                const handleOnClickDelete = (subject: ISubject) => () => {
+                const handleOnClickDelete = (subject: ISubject) => {
                     setSubject(subject);
                     openDeleteModal();
                 }
@@ -115,14 +157,14 @@ const SubjectList = () => {
                     icon={<UpdateOutlined />}
                     label="Edit"
                     className="textPrimary"
-                    onClick={handleOnClickUpdate(params.row)}
+                    onClick={() => handleOnClickUpdate(params.row)}
                     color="secondary"
                     />,
                     <GridActionsCellItem
                     key={"delete"}
                     icon={<DeleteOutlineOutlined />}
                     label="Delete"
-                    onClick={handleOnClickDelete(params.row)}
+                    onClick={() => handleOnClickDelete(params.row)}
                     color="error"
                     />,
                   ];
@@ -130,6 +172,8 @@ const SubjectList = () => {
             
         },
     ]
+
+    const role = getCurrentUser()?.ROLE_ID as UserRole
 
     return (
         <>
@@ -148,7 +192,7 @@ const SubjectList = () => {
             }}
             columns={SubjectHeaders}
             getRowId={(row) => row.SUB_ID!}
-            rows={getSubjects()}/>
+            rows={role.admin ? getSubjects() : getSubjectsByCreator(getCurrentUser()?.USER_ID as string)}/>
 
             {/* Update dialog */}
             <UpdateDialog
@@ -161,6 +205,12 @@ const SubjectList = () => {
             openModal={deleteModal}
             handleCloseModal={closeDeleteModal}
             handleClear={handleClear}/>
+
+            {/* Assign a teacher */}
+            <AssignTeacher
+            subject={subject}
+            openModal={assignModal}
+            closeModal={closeAssignModal}/>
         </>
     )
 }

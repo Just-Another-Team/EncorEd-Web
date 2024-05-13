@@ -41,6 +41,8 @@ const KioskLogList = ({
             headerName: "Room Searched/Navigated",
             minWidth: 224,
             renderCell: (params) => {
+                if ( params.row.ROOM_ID === null ) return null
+
                 const room = params.row.ROOM_ID as IRoom
                 return room.ROOM_NAME
             }
