@@ -9,7 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.kioskLogCollection = void 0;
+const database_1 = require("../database");
+const converter_1 = require("../models/converter");
+exports.kioskLogCollection = database_1.db.collection(`/KioskLog/`).withConverter((0, converter_1.converter)());
 class Navigation {
+    getAccessToken(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const mapboxAccessToken = process.env.MAPBOX_ACCESSTOKEN;
+            res.status(200).json({ token: mapboxAccessToken });
+        });
+    }
     initializeGraph(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -38,15 +48,14 @@ class Navigation {
             }
             catch (error) {
                 if (error instanceof Error) {
-                    const institutionControllerError = {
+                    const navigationControllerError = {
                         name: "Navigation",
                         error: true,
                         errorType: "Controller Error",
                         control: "Initialize",
                         message: error.message
                     };
-                    console.error(institutionControllerError);
-                    res.status(400).json(institutionControllerError); //type: error.type, code: error.code
+                    res.status(400).json(navigationControllerError); //type: error.type, code: error.code
                 }
             }
         });
@@ -76,6 +85,20 @@ class Navigation {
             }
         });
     }
+    addLog(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const log = Object.assign(Object.assign({}, req.body), { KILG_ISREAD: false });
+            yield exports.kioskLogCollection.add(log)
+                .then(() => {
+                console.log(`Log added as type ${log.KILG_TYPE}`);
+                res.status(200).json(`Log added as type ${log.KILG_TYPE}`);
+            })
+                .catch((error) => {
+                console.log(error.message);
+                res.status(400).json(error.message);
+            });
+        });
+    }
 }
 class Graph {
     constructor() {
@@ -92,6 +115,7 @@ class Graph {
     }
     //calculate distance
     distance(v1, v2) {
+        //2d Pythegorean Theorem
         //3d Pythegorean Theorem
         //l^2 + w^2 + h^2 = d^2
         //d = sqrt((l2 - l1)^2 + (w2 - w1)^2 + (h2 - h1)^2)

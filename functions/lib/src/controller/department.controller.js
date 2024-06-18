@@ -18,6 +18,8 @@ class DepartmentService {
         return __awaiter(this, void 0, void 0, function* () {
             const department = {
                 DEPT_NAME: req.body.DEPT_NAME,
+                DEPT_DEAN: req.body.DEPT_DEAN,
+                DEPT_FLOORSASSIGNED: req.body.DEPT_FLOORSASSIGNED,
                 DEPT_ISDELETED: false
             };
             yield exports.departmentCollection.doc().set(department)
@@ -33,7 +35,9 @@ class DepartmentService {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             yield exports.departmentCollection.doc(id).update({
-                DEPT_NAME: req.body.DEPT_NAME
+                DEPT_NAME: req.body.DEPT_NAME,
+                DEPT_DEAN: req.body.DEPT_DEAN,
+                DEPT_FLOORSASSIGNED: req.body.DEPT_FLOORSASSIGNED,
             })
                 .then(() => {
                 res.status(200).json("Department updated successfully!");
@@ -55,6 +59,20 @@ class DepartmentService {
             })
                 .catch((error) => {
                 console.error(error);
+                res.status(400).json(error);
+            });
+        });
+    }
+    assignDean(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { deptId } = req.params;
+            yield exports.departmentCollection.doc(deptId).update({
+                DEPT_DEAN: req.body.USER_ID
+            })
+                .then(() => {
+                res.status(200).json("Dean is assigned to Department successfully!");
+            })
+                .catch((error) => {
                 res.status(400).json(error);
             });
         });
@@ -89,10 +107,12 @@ class DepartmentService {
 const viewDepartmentHelper = (id) => {
     return exports.departmentCollection.doc(id).get()
         .then((department) => {
-        var _a;
+        var _a, _b, _c;
         return ({
             DEPT_ID: department.id,
-            DEPT_NAME: (_a = department.data()) === null || _a === void 0 ? void 0 : _a.DEPT_NAME
+            DEPT_DEAN: (_a = department.data()) === null || _a === void 0 ? void 0 : _a.DEPT_DEAN,
+            DEPT_FLOORSASSIGNED: (_b = department.data()) === null || _b === void 0 ? void 0 : _b.DEPT_FLOORSASSIGNED,
+            DEPT_NAME: (_c = department.data()) === null || _c === void 0 ? void 0 : _c.DEPT_NAME
         });
     })
         .catch((error) => Promise.reject(error));

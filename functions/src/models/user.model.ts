@@ -31,4 +31,7 @@ export default interface IUser extends IUserAuth, IUserFireStore {
     USER_ID?: string;
     USER_CREATEDBY?: string;
     USER_UPDATEDBY: string;
+    USER_FCMTOKEN?: string;
+    USER_IMAGE?: string;
+    USER_ATTENDANCECHECKERSCHEDULE?: string | null
 }

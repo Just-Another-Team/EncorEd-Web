@@ -4,6 +4,9 @@ import { ParsedQs } from 'qs';
 import { FixMeLater } from "../types/FixMeLater";
 import { VertexType } from "../types/VertexType";
 import ErrorController from '../types/ErrorController';
+import { IKioskLog } from '../models/kioskLog.model';
+import { db } from '../database';
+import { converter } from '../models/converter';
 
 interface LooseObject {
     [key: number | string]: any;
@@ -18,12 +21,18 @@ interface IGraphData {
 interface IPathData {
     origin: number;
     destination: number;
-    routes?: Array<number>
 }
 
 type PathInputType = IPathData & IGraphData;
 
+export const kioskLogCollection = db.collection(`/KioskLog/`).withConverter(converter<IKioskLog>())
+
 class Navigation {
+    public async getAccessToken(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const mapboxAccessToken = process.env.MAPBOX_ACCESSTOKEN
+        res.status(200).json({ token: mapboxAccessToken })
+    }
+
     public async initializeGraph(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         try {
             const graphData = req.body as IGraphData;
@@ -49,7 +58,7 @@ class Navigation {
 
                 features.neighbors.forEach(element => {
                     let neighbor = vertices.find(vertex => vertex.id === element);
-
+                    
                     if (neighbor !== undefined)
                         graph.addEdge(origin.id, neighbor.id, graph.distance(origin.coordinates, neighbor!.coordinates))
                 })
@@ -58,7 +67,7 @@ class Navigation {
             res.status(200).json({graph: graph.printGraph(), edges: graphData.edges})
         } catch (error) {
             if (error instanceof Error) {
-                const institutionControllerError: ErrorController = {
+                const navigationControllerError: ErrorController = {
                     name: "Navigation",
                     error: true,
                     errorType: "Controller Error",
@@ -66,9 +75,7 @@ class Navigation {
                     message: error.message
                 }
 
-                console.error(institutionControllerError)
-
-                res.status(400).json(institutionControllerError) //type: error.type, code: error.code
+                res.status(400).json(navigationControllerError) //type: error.type, code: error.code
             }
         }
     }
@@ -100,6 +107,23 @@ class Navigation {
             }
         }
     }
+
+    public async addLog(req: Request<ParamsDictionary, any, IKioskLog, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const log: IKioskLog = {
+            ...req.body,
+            KILG_ISREAD: false
+        }
+
+        await kioskLogCollection.add(log)
+            .then(() => {
+                console.log(`Log added as type ${log.KILG_TYPE}`)
+                res.status(200).json(`Log added as type ${log.KILG_TYPE}`)
+            })
+            .catch((error) => {
+                console.log(error.message)
+                res.status(400).json(error.message)
+            })
+    }
 }
 
 class Graph {
@@ -122,6 +146,8 @@ class Graph {
 
     //calculate distance
     public distance(v1: Array<number>, v2: Array<number>): number {
+        //2d Pythegorean Theorem
+
         //3d Pythegorean Theorem
         //l^2 + w^2 + h^2 = d^2
         //d = sqrt((l2 - l1)^2 + (w2 - w1)^2 + (h2 - h1)^2)
@@ -137,7 +163,6 @@ class Graph {
             let values = this.neighbors.get(key); //mapValue
             graph[key] = Object.fromEntries(values!)
         }
-
         return graph;
     }
 }

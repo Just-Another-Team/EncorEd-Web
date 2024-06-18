@@ -17,8 +17,21 @@ const subject_controller_1 = require("./subject.controller");
 exports.roomCollection = database_1.db.collection("/Room/").withConverter((0, converter_1.converter)());
 class RoomService {
     add(req, res) {
+        var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function* () {
-            yield exports.roomCollection.doc().set(Object.assign(Object.assign({}, req.body), { FLR_ID: database_1.db.doc(`/Floor/${req.body.FLR_ID}`) }))
+            const roomId = `room_${(_a = req.body.ROOM_TYPE) === null || _a === void 0 ? void 0 : _a.toLowerCase()}_${(_b = req.body.ROOM_NAME) === null || _b === void 0 ? void 0 : _b.replace(/\s/g, "").toLowerCase()}`;
+            const room = Object.assign(Object.assign({}, req.body), { ROOM_ISDELETED: false, ROOM_REMARKS: req.body.ROOM_TYPE === "Office" ? `On Saturdays, ${req.body.ROOM_NAME} will be open between 8:00 AM to 12:00 PM.` : null });
+            //add schedule
+            if (req.body.SCHED_ID !== null) {
+                room.SCHED_ID = `room_allday_${(_c = req.body.ROOM_NAME) === null || _c === void 0 ? void 0 : _c.replace(/\s/g, "").toLowerCase()}`;
+                yield subject_controller_1.scheduleCollection.doc(room.SCHED_ID).set(req.body.SCHED_ID);
+                // room.SCHED_ID = await scheduleCollection.add(req.body.SCHED_ID as ISchedule).then((result) => result.id)
+                //                             .catch((error) => {
+                //                                 console.error(error)
+                //                                 return Promise.reject(error)
+                //                             })
+            }
+            yield exports.roomCollection.doc(roomId).set(room)
                 .then(() => {
                 res.status(200).json("Room added successfully!");
             })
@@ -28,13 +41,49 @@ class RoomService {
         });
     }
     update(req, res) {
+        var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function* () {
-            throw new Error('Method not implemented.');
+            const { id } = req.params;
+            const roomId = `room_${(_a = req.body.ROOM_TYPE) === null || _a === void 0 ? void 0 : _a.toLowerCase()}_${(_b = req.body.ROOM_NAME) === null || _b === void 0 ? void 0 : _b.replace(/\s/g, "").toLowerCase()}`;
+            const room = req.body;
+            if (req.body.SCHED_ID === null) {
+                room.SCHED_ID = null;
+                if (req.body.OLD_SCHED_ID !== null)
+                    yield subject_controller_1.scheduleCollection.doc(req.body.OLD_SCHED_ID).delete();
+            }
+            else {
+                const newSchedId = `room_allday_${(_c = req.body.ROOM_NAME) === null || _c === void 0 ? void 0 : _c.replace(/\s/g, "").toLowerCase()}`;
+                if (req.body.OLD_SCHED_ID !== null)
+                    yield subject_controller_1.scheduleCollection.doc(req.body.OLD_SCHED_ID).delete(); //delete the old schedule
+                if (!!req.body.SCHED_ID.SCHED_ID)
+                    delete req.body.SCHED_ID.SCHED_ID;
+                yield subject_controller_1.scheduleCollection.doc(newSchedId).set(req.body.SCHED_ID);
+                room.SCHED_ID = newSchedId;
+            }
+            delete room.OLD_SCHED_ID;
+            yield exports.roomCollection.doc(id).delete();
+            room.ROOM_REMARKS = room.ROOM_TYPE === "Office" ? `On Saturdays, ${req.body.ROOM_NAME} will be open between 8:00 AM to 12:00 PM.` : null;
+            yield exports.roomCollection.doc(roomId).set(room)
+                .then(() => {
+                res.status(200).json("Room updated successfully!");
+            })
+                .catch((error) => {
+                res.status(400).json(error.message);
+            });
         });
     }
     delete(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            throw new Error('Method not implemented.');
+            const { id } = req.params;
+            yield exports.roomCollection.doc(id).update({
+                ROOM_ISDELETED: true
+            })
+                .then(() => {
+                res.status(200).json("Room deleted successfully!");
+            })
+                .catch((error) => {
+                res.status(400).json(error);
+            });
         });
     }
     view(req, res) {

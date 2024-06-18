@@ -10,5 +10,7 @@ roomRouter.get("/view/all", room_controller_1.default.viewAll);
 roomRouter.get("/view/s/:id", room_controller_1.default.view);
 //roomRouter.get("/view/subject", room.viewWithSubjects);
 roomRouter.post("/add", room_controller_1.default.add);
+roomRouter.delete("/delete/:id", room_controller_1.default.delete);
+roomRouter.patch("/update/:id", room_controller_1.default.update);
 exports.default = roomRouter;
 //# sourceMappingURL=room.js.map

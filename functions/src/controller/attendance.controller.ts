@@ -13,6 +13,7 @@ import { viewRoom } from './room.controller';
 import { viewUser } from './user.controller';
 import ISubject from '../models/subject.model';
 import dayjs from 'dayjs';
+import { admin } from '../../config';
 
 const attendanceCollection = db.collection(`/Attendances/`).withConverter(converter<IAttendance>())
 
@@ -37,13 +38,13 @@ class attendance {
     }
 
     public async addAttendance(req: Request<ParamsDictionary, any, IAttendance, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
-        await attendanceCollection.doc().set({
+        const attendance: IAttendance = {
             ...req.body,
-            ATTD_STATUS: "Active",
-            USER_ID: req.body.USER_ID,
-            ROOM_ID: req.body.ROOM_ID,
-            SUB_ID: req.body.SUB_ID
-        })
+            ATTD_SUBMISSIONDATE: admin.firestore.Timestamp.now().toDate().toISOString(),
+            ATTD_STATUS: 'Active',
+        }
+
+        await attendanceCollection.doc().set(attendance)
             .then(() => {
                 res.status(200).json("Attendance added successfully!")
             })
@@ -91,7 +92,7 @@ class attendance {
                     const mergedAttendance: IAttendance = {
                         ...previousAttendance,
                         ...currentAttendance,
-                        ATTD_TEACHERSTATUS: AttendanceStatus(previousAttendance.ATTD_TEACHERSTATUS, currentAttendance.ATTD_TEACHERSTATUS),
+                        ATTD_TEACHERSTATUS: AttendanceStatus(previousAttendance.ATTD_TEACHERSTATUS as string, currentAttendance.ATTD_TEACHERSTATUS),
                         ATTD_SUBMISSIONDATE: {
                             firstSubmission: previousAttendance.ATTD_SUBMISSIONDATE,
                             lastSubmission: currentAttendance.ATTD_SUBMISSIONDATE,

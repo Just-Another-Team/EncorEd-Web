@@ -9,4 +9,8 @@ roomRouter.get("/view/s/:id", room.view);
 
 roomRouter.post("/add", room.add);
 
+roomRouter.delete("/delete/:id", room.delete)
+
+roomRouter.patch("/update/:id", room.update)
+
 export default roomRouter

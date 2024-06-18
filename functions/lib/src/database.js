@@ -12,4 +12,5 @@ Object.defineProperty(exports, "Filter", { enumerable: true, get: function () { 
 Object.defineProperty(exports, "FieldPath", { enumerable: true, get: function () { return firestore_1.FieldPath; } });
 const db = (0, firestore_1.getFirestore)(config_1.adminApp);
 exports.db = db;
+db.settings({ ignoreUndefinedProperties: true });
 //# sourceMappingURL=database.js.map

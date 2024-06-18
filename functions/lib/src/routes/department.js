@@ -9,6 +9,7 @@ const departmentRouter = (0, express_1.Router)();
 departmentRouter.get("/view/all", department_controller_1.default.viewAll);
 departmentRouter.get("/view/s/:id", department_controller_1.default.view);
 departmentRouter.put("/update/:id", department_controller_1.default.update);
+departmentRouter.patch("/assign/:deptId/dean", department_controller_1.default.assignDean);
 departmentRouter.delete("/delete/:id", department_controller_1.default.delete);
 departmentRouter.post("/add", department_controller_1.default.add);
 exports.default = departmentRouter;

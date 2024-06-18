@@ -21,11 +21,14 @@ const subject_controller_1 = __importDefault(require("../controller/subject.cont
 const subjectRouter = (0, express_1.Router)();
 /* SUBJECT */
 subjectRouter.post("/add", subject_controller_1.default.add);
+subjectRouter.post("/add/multiple", subject_controller_1.default.addMultiple);
 subjectRouter.get("/view/q/", subject_controller_1.default.viewBySchedule);
 subjectRouter.get("/view/all", subject_controller_1.default.viewAll);
 subjectRouter.get("/view/s/:id", subject_controller_1.default.view);
 subjectRouter.put("/update/:id", subject_controller_1.default.update);
 subjectRouter.delete("/delete/:id", subject_controller_1.default.delete);
+subjectRouter.patch("/assign/teacher/remove", subject_controller_1.default.removeAssignInstructor);
+subjectRouter.patch("/assign/:subId/teacher", subject_controller_1.default.assignInstructor);
 subjectRouter.patch("/assign/:subId/room", subject_controller_1.default.assignRoom);
 exports.default = subjectRouter;
 //# sourceMappingURL=subject.js.map

@@ -22,14 +22,8 @@ export const scheduleCollection = db.collection(`/Schedule/`).withConverter(conv
 class SubjectService implements IBaseService {
     public async add(req: Request<ParamsDictionary, any, ISubject, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
 
-        if (req.body.SCHED_ID !== null) 
-            req.body.SCHED_ID = await scheduleCollection.add(req.body.SCHED_ID as ISchedule).then((result) => result.id)
-                                        .catch((error) => {
-                                            console.error(error)
-                                            return Promise.reject(error)
-                                        })
-
         const subject: ISubject = {
+            SUB_EDP_CODE: req.body.SUB_EDP_CODE,
             SUB_CODE: req.body.SUB_CODE,
             SUB_DESCRIPTION: req.body.SUB_DESCRIPTION,
             ROOM_ID: null,
@@ -38,6 +32,16 @@ class SubjectService implements IBaseService {
             SUB_ISDELETED: false,
             SUB_CREATEDBY: req.body.SUB_CREATEDBY,
             SUB_UPDATEDBY: req.body.SUB_UPDATEDBY
+        }
+
+        if (req.body.SCHED_ID !== null) {
+            const days = (req.body.SCHED_ID as ISchedule).SCHED_WEEKASSIGNED.reduce((prevValue, curValue) => {
+                const currentValue = curValue == "Thursday" ? curValue.substring(0, 2) : curValue.charAt(0)
+                return prevValue + currentValue
+            }, "")
+
+            subject.SCHED_ID = `subject_${days}_${req.body.SUB_CODE?.replace(/\s/g, "")}`
+            await scheduleCollection.doc(subject.SCHED_ID).set(req.body.SCHED_ID as ISchedule)            
         }
 
         await subjectCollection.add(subject)
@@ -52,6 +56,41 @@ class SubjectService implements IBaseService {
     public async addMultiple(req: Request<ParamsDictionary, any, Array<ISubject>, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
         const subjectBatch = db.batch();
 
+        req.body.forEach(async (subjectReq) => {
+            const subject: ISubject = {
+                SUB_EDP_CODE: subjectReq.SUB_EDP_CODE,
+                SUB_CODE: subjectReq.SUB_CODE,
+                SUB_DESCRIPTION: subjectReq.SUB_DESCRIPTION,
+                ROOM_ID: null,
+                SCHED_ID: subjectReq.SCHED_ID,
+                USER_ID: subjectReq.USER_ID,
+                SUB_ISDELETED: false,
+                SUB_CREATEDBY: subjectReq.SUB_CREATEDBY,
+                SUB_UPDATEDBY: subjectReq.SUB_UPDATEDBY
+            }
+
+            if (subjectReq.SCHED_ID !== null) {
+                const days = (subjectReq.SCHED_ID as ISchedule).SCHED_WEEKASSIGNED.reduce((prevValue, curValue) => {
+                    const currentValue = curValue == "Thursday" ? curValue.substring(0, 2) : curValue.charAt(0)
+                    return prevValue + currentValue
+                }, "")
+    
+                subject.SCHED_ID = `subject_${days}_${subjectReq.SUB_CODE?.replace(/\s/g, "")}`
+                //await scheduleCollection.doc(subject.SCHED_ID).set(subjectReq.SCHED_ID as ISchedule)
+                subjectBatch.set(scheduleCollection.doc(subject.SCHED_ID), subjectReq.SCHED_ID as ISchedule)     
+            }
+
+            subjectBatch.create(subjectCollection.doc(), subject)
+        })
+
+        subjectBatch.commit()
+            .then(() => {
+                res.status(200).json("Subjects and schedules added successfully!")
+            })
+            .catch((error) => {
+                console.error(error)
+                res.status(400).json(error)
+            })
         //Promise.all
         
         // await addSubjectHelper(req.body)
@@ -67,10 +106,23 @@ class SubjectService implements IBaseService {
         const { id } = req.params
 
         const reqSubject: ISubject = {
+            SUB_EDP_CODE: req.body.SUB_EDP_CODE,
             SUB_CODE: req.body.SUB_CODE,
             SUB_DESCRIPTION: req.body.SUB_DESCRIPTION,
+            USER_ID: req.body.USER_ID,
             SUB_UPDATEDBY: req.body.SUB_UPDATEDBY
         }
+
+        //Updating Subject Code also updates the Schedule ID
+        const days = (req.body.SCHED_ID as ISchedule).SCHED_WEEKASSIGNED.reduce((prevValue, curValue) => {
+            const currentValue = curValue == "Thursday" ? curValue.substring(0, 2) : curValue.charAt(0)
+            return prevValue + currentValue
+        }, "")
+
+        await scheduleCollection.doc((req.body.SCHED_ID as ISchedule).SCHED_ID as string).delete()
+
+        reqSubject.SCHED_ID = `subject_${days}_${req.body.SUB_CODE?.replace(/\s/g, "")}`
+        await scheduleCollection.doc(reqSubject.SCHED_ID).set(req.body.SCHED_ID as ISchedule)
 
         //Assigning to a different user, that is okay, it's just replacing the UserID
         //Assigning to a different room, that is okay, it's just replacing the RoomID
@@ -133,6 +185,46 @@ class SubjectService implements IBaseService {
         //     .then((data) => {
         //         const subjects = data.filter((subject) => scheduleIDs.includes((subject.SCHED_ID as ISchedule).SCHED_ID))
         //         res.status(200).json(subjects)
+        //     })
+        //     .catch((error) => {
+        //         res.status(400).json(error)
+        //     })
+    }
+    public async assignInstructor(req: Request<ParamsDictionary, any, { USER_ID: string }, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const { subId } = req.params
+
+        await subjectCollection.doc(subId).update({
+            USER_ID: req.body.USER_ID
+        })
+            .then(() => {
+                res.status(200).json("User is assigned to subject successfully!")
+            })
+            .catch((error) => {
+                res.status(400).json(error)
+            })
+    }
+    public async removeAssignInstructor(req: Request<ParamsDictionary, any, Array<string>, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void> {
+        const subjectBatch = db.batch();
+
+        const subjectIds = req.body
+
+        subjectIds.map(subjectId => {
+            subjectBatch.update(subjectCollection.doc(subjectId), { USER_ID: null })
+        })
+
+        await subjectBatch.commit()
+            .then(() => {
+                res.status(200).json("Subjects' instructor removed successfully!")
+            })
+            .catch((error) => {
+                res.status(400).json(error)
+            })
+        
+        // await subjectCollection.doc(subId).update({
+        //     USER_ID: null
+        // })
+        //     .then(() => {
+        //         res.status(200).json("User is assigned to subject successfully!")
         //     })
         //     .catch((error) => {
         //         res.status(400).json(error)
@@ -234,7 +326,7 @@ class ViewSubject {
 
         const user = await viewUser.view((subject.data() as ISubject).USER_ID as string)
         const schedule = await viewScheduleHelper((subject.data() as ISubject).SCHED_ID as string)
-        const room = await viewRoom.view((subject.data() as ISubject).ROOM_ID as string)
+        const room = subject.data()?.ROOM_ID !== null ? await viewRoom.view((subject.data() as ISubject).ROOM_ID as string) : null
 
         return ({
             ...subject.data() as ISubject,

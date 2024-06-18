@@ -19,6 +19,7 @@ const subject_controller_1 = require("./subject.controller");
 const room_controller_1 = require("./room.controller");
 const user_controller_1 = require("./user.controller");
 const dayjs_1 = __importDefault(require("dayjs"));
+const config_1 = require("../../config");
 const attendanceCollection = database_1.db.collection(`/Attendances/`).withConverter((0, converter_1.converter)());
 class attendance {
     viewAttendances(req, res) {
@@ -42,7 +43,8 @@ class attendance {
     }
     addAttendance(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield attendanceCollection.doc().set(Object.assign(Object.assign({}, req.body), { ATTD_STATUS: "Active", USER_ID: req.body.USER_ID, ROOM_ID: req.body.ROOM_ID, SUB_ID: req.body.SUB_ID }))
+            const attendance = Object.assign(Object.assign({}, req.body), { ATTD_SUBMISSIONDATE: config_1.admin.firestore.Timestamp.now().toDate().toISOString(), ATTD_STATUS: 'Active' });
+            yield attendanceCollection.doc().set(attendance)
                 .then(() => {
                 res.status(200).json("Attendance added successfully!");
             })

@@ -24,14 +24,10 @@ exports.subjectCollection = database_1.db.collection(`/Subject/`).withConverter(
 exports.scheduleCollection = database_1.db.collection(`/Schedule/`).withConverter((0, converter_1.converter)());
 class SubjectService {
     add(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            if (req.body.SCHED_ID !== null)
-                req.body.SCHED_ID = yield exports.scheduleCollection.add(req.body.SCHED_ID).then((result) => result.id)
-                    .catch((error) => {
-                    console.error(error);
-                    return Promise.reject(error);
-                });
             const subject = {
+                SUB_EDP_CODE: req.body.SUB_EDP_CODE,
                 SUB_CODE: req.body.SUB_CODE,
                 SUB_DESCRIPTION: req.body.SUB_DESCRIPTION,
                 ROOM_ID: null,
@@ -41,6 +37,14 @@ class SubjectService {
                 SUB_CREATEDBY: req.body.SUB_CREATEDBY,
                 SUB_UPDATEDBY: req.body.SUB_UPDATEDBY
             };
+            if (req.body.SCHED_ID !== null) {
+                const days = req.body.SCHED_ID.SCHED_WEEKASSIGNED.reduce((prevValue, curValue) => {
+                    const currentValue = curValue == "Thursday" ? curValue.substring(0, 2) : curValue.charAt(0);
+                    return prevValue + currentValue;
+                }, "");
+                subject.SCHED_ID = `subject_${days}_${(_a = req.body.SUB_CODE) === null || _a === void 0 ? void 0 : _a.replace(/\s/g, "")}`;
+                yield exports.scheduleCollection.doc(subject.SCHED_ID).set(req.body.SCHED_ID);
+            }
             yield exports.subjectCollection.add(subject)
                 .then(() => {
                 res.status(200).json(subject);
@@ -54,6 +58,38 @@ class SubjectService {
     addMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const subjectBatch = database_1.db.batch();
+            req.body.forEach((subjectReq) => __awaiter(this, void 0, void 0, function* () {
+                var _a;
+                const subject = {
+                    SUB_EDP_CODE: subjectReq.SUB_EDP_CODE,
+                    SUB_CODE: subjectReq.SUB_CODE,
+                    SUB_DESCRIPTION: subjectReq.SUB_DESCRIPTION,
+                    ROOM_ID: null,
+                    SCHED_ID: subjectReq.SCHED_ID,
+                    USER_ID: subjectReq.USER_ID,
+                    SUB_ISDELETED: false,
+                    SUB_CREATEDBY: subjectReq.SUB_CREATEDBY,
+                    SUB_UPDATEDBY: subjectReq.SUB_UPDATEDBY
+                };
+                if (subjectReq.SCHED_ID !== null) {
+                    const days = subjectReq.SCHED_ID.SCHED_WEEKASSIGNED.reduce((prevValue, curValue) => {
+                        const currentValue = curValue == "Thursday" ? curValue.substring(0, 2) : curValue.charAt(0);
+                        return prevValue + currentValue;
+                    }, "");
+                    subject.SCHED_ID = `subject_${days}_${(_a = subjectReq.SUB_CODE) === null || _a === void 0 ? void 0 : _a.replace(/\s/g, "")}`;
+                    //await scheduleCollection.doc(subject.SCHED_ID).set(subjectReq.SCHED_ID as ISchedule)
+                    subjectBatch.set(exports.scheduleCollection.doc(subject.SCHED_ID), subjectReq.SCHED_ID);
+                }
+                subjectBatch.create(exports.subjectCollection.doc(), subject);
+            }));
+            subjectBatch.commit()
+                .then(() => {
+                res.status(200).json("Subjects and schedules added successfully!");
+            })
+                .catch((error) => {
+                console.error(error);
+                res.status(400).json(error);
+            });
             //Promise.all
             // await addSubjectHelper(req.body)
             //     .then(() => {
@@ -66,13 +102,24 @@ class SubjectService {
         });
     }
     update(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const reqSubject = {
+                SUB_EDP_CODE: req.body.SUB_EDP_CODE,
                 SUB_CODE: req.body.SUB_CODE,
                 SUB_DESCRIPTION: req.body.SUB_DESCRIPTION,
+                USER_ID: req.body.USER_ID,
                 SUB_UPDATEDBY: req.body.SUB_UPDATEDBY
             };
+            //Updating Subject Code also updates the Schedule ID
+            const days = req.body.SCHED_ID.SCHED_WEEKASSIGNED.reduce((prevValue, curValue) => {
+                const currentValue = curValue == "Thursday" ? curValue.substring(0, 2) : curValue.charAt(0);
+                return prevValue + currentValue;
+            }, "");
+            yield exports.scheduleCollection.doc(req.body.SCHED_ID.SCHED_ID).delete();
+            reqSubject.SCHED_ID = `subject_${days}_${(_a = req.body.SUB_CODE) === null || _a === void 0 ? void 0 : _a.replace(/\s/g, "")}`;
+            yield exports.scheduleCollection.doc(reqSubject.SCHED_ID).set(req.body.SCHED_ID);
             //Assigning to a different user, that is okay, it's just replacing the UserID
             //Assigning to a different room, that is okay, it's just replacing the RoomID
             //Assigning to a different schedule, that is a different ball game
@@ -83,44 +130,41 @@ class SubjectService {
                 .catch((error) => {
                 res.status(400).json(error);
             });
-            //View all of the schedules first <- CHECK
-            //Find the schedule that has the same startTime, endTime, and weekAssigned <- CHECK
-            //Get the schedule ID <- CHECK
-            //Get the subjects based on the schedule ID <- CHECK
-            //THIS IS A LONG ARSE PROCESS JUST TO ASSIGN A SUBJECT TO A SCHEDULE THAT EXISTS
-            // const schedules = scheduleCollection.get()
-            //     .then((scheduleDoc) => {
-            //         const schedule = scheduleDoc.docs.map((doc):ISchedule => ({
-            //             SCHED_ID: doc.id,
-            //             ...doc.data() as ISchedule
-            //         }))
-            //         return Promise.all(schedule)
-            //             .then((result => result))
-            //             .catch((error) => Promise.reject(error))
-            //     })
-            //     .catch((error) => Promise.reject(error))
-            // const scheduleIDs = await schedules
-            //     .then((result) => {
-            //         const filteredResult = result.filter((schedule) => {
-            //             const reqStartTimeFormat = dayjs(req.body.SCHED_STARTTIME).format("HH:mm:ss")
-            //             const reqEndTimeFormat = dayjs(req.body.SCHED_ENDTIME).format("HH:mm:ss")
-            //             const startTimeFormat = dayjs(schedule.SCHED_STARTTIME).format("HH:mm:ss")
-            //             const endTimeFormat = dayjs(schedule.SCHED_ENDTIME).format("HH:mm:ss")
-            //             const reqStartTime = dayjs(`2001-01-01 ${reqStartTimeFormat}`)
-            //             const reqEndTime = dayjs(`2001-01-01 ${reqEndTimeFormat}`)
-            //             const startTime = dayjs(`2001-01-01 ${startTimeFormat}`)
-            //             const endTime = dayjs(`2001-01-01 ${endTimeFormat}`)
-            //             return schedule.SCHED_WEEKASSIGNED.some((day) => req.body.SCHED_WEEKASSIGNED.includes(day)) && (reqStartTime.isSame(startTime) && reqEndTime.isSame(endTime))
-            //         })
-            //         return filteredResult.map((schedule) => schedule.SCHED_ID)
-            //     })
-            //     // .catch((error) => {
-            //     //     res.status(400).json(error)
-            //     // })
-            // await viewAllSubjectHelper()
-            //     .then((data) => {
-            //         const subjects = data.filter((subject) => scheduleIDs.includes((subject.SCHED_ID as ISchedule).SCHED_ID))
-            //         res.status(200).json(subjects)
+        });
+    }
+    assignInstructor(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { subId } = req.params;
+            yield exports.subjectCollection.doc(subId).update({
+                USER_ID: req.body.USER_ID
+            })
+                .then(() => {
+                res.status(200).json("User is assigned to subject successfully!");
+            })
+                .catch((error) => {
+                res.status(400).json(error);
+            });
+        });
+    }
+    removeAssignInstructor(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const subjectBatch = database_1.db.batch();
+            const subjectIds = req.body;
+            subjectIds.map(subjectId => {
+                subjectBatch.update(exports.subjectCollection.doc(subjectId), { USER_ID: null });
+            });
+            yield subjectBatch.commit()
+                .then(() => {
+                res.status(200).json("Subjects' instructor removed successfully!");
+            })
+                .catch((error) => {
+                res.status(400).json(error);
+            });
+            // await subjectCollection.doc(subId).update({
+            //     USER_ID: null
+            // })
+            //     .then(() => {
+            //         res.status(200).json("User is assigned to subject successfully!")
             //     })
             //     .catch((error) => {
             //         res.status(400).json(error)
@@ -212,11 +256,12 @@ const viewScheduleHelper = (id) => __awaiter(void 0, void 0, void 0, function* (
 });
 class ViewSubject {
     view(id) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const subject = yield exports.subjectCollection.doc(id).get();
             const user = yield user_controller_1.viewUser.view(subject.data().USER_ID);
             const schedule = yield viewScheduleHelper(subject.data().SCHED_ID);
-            const room = yield room_controller_1.viewRoom.view(subject.data().ROOM_ID);
+            const room = ((_a = subject.data()) === null || _a === void 0 ? void 0 : _a.ROOM_ID) !== null ? yield room_controller_1.viewRoom.view(subject.data().ROOM_ID) : null;
             return (Object.assign(Object.assign({}, subject.data()), { SUB_ID: subject.id, ROOM_ID: room, SCHED_ID: schedule, USER_ID: user }));
         });
     }

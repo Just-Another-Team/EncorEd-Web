@@ -5,6 +5,7 @@ import IRoom from "./room.model";
 
 export default interface ISubject {
     SUB_ID?: string;
+    SUB_EDP_CODE: number;
     SUB_CODE: string;
     SUB_DESCRIPTION: string;
     SCHED_ID?: ISchedule | string | null;

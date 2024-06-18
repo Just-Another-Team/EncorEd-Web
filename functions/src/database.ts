@@ -12,6 +12,7 @@ import {
 } from 'firebase-admin/firestore'
 
 const db = getFirestore(adminApp)
+db.settings({ ignoreUndefinedProperties:true })
 
 export {
     db,

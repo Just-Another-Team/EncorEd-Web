@@ -9,6 +9,7 @@ userRouter.post("/kiosk/add", userService.addKiosk);
 
 userRouter.delete("/delete/:id", userService.delete)
 
+userRouter.put("/add/fcm/:id", userService.addFCMToken)
 userRouter.put("/update/:id", userService.update)
 userRouter.put("/kiosk/update/:id", userService.updateKiosk)
 
