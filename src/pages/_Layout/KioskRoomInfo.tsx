@@ -1,10 +1,14 @@
 import { Box, Button, Typography } from "@mui/material"
 import Color from "../../assets/Color"
 import { useMapboxNavigation } from "../../hooks/useMapboxNavigation"
-import { useRooms } from "../../hooks/useRooms"
+import IRoom from "../../data/IRoom"
 
 const KioskRoomInfo = () => {
-    const { selectedRoom, selectedFloor } = useMapboxNavigation()
+    const { selectedRoom, selectedFloor, navigateTo } = useMapboxNavigation()
+
+    const handleNavigate = () => {
+        navigateTo(selectedRoom as IRoom)
+    }
 
     return (
         <Box
@@ -31,7 +35,10 @@ const KioskRoomInfo = () => {
                 display={'flex'}
                 flexDirection={'column'}
                 justifyContent={'center'}>
-                    <Button>Navigate</Button>
+                    <Button
+                    onClick={handleNavigate}>
+                        Navigate
+                    </Button>
                 </Box>
             </Box>
         </Box>

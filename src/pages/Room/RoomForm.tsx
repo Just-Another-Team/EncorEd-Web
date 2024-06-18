@@ -132,8 +132,9 @@ const RoomForm = ({
                             name="SCHED_ID.SCHED_STARTTIME"
                             label={"Start Time"}
                             rules={{
-                                required: watch('ROOM_TYPE') === "Office" ? "Set an ending hour of the subject" : undefined
+                                required: watch('ROOM_TYPE') === "Office" ? "Set a starting hour of the office" : undefined
                             }}
+                            fullWidth
                             control={control}/>
 
                             <ArrowForwardOutlined />

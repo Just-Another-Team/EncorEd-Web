@@ -2,6 +2,9 @@ import { useState } from "react"
 import { Avatar, Box, Button, Link, Menu, MenuItem, Stack, Typography, useMediaQuery, useTheme } from "@mui/material"
 import Logout from "@mui/icons-material/Logout";
 import { FixMeLater } from "../../types/FixMeLater";
+import { useUsers } from "../../hooks/useUsers";
+import { Settings } from "@mui/icons-material";
+import { UserRole } from "../../data/IUser";
 
 type AccountMenuButtonType = {
     avatarSrc?: string;
@@ -14,12 +17,15 @@ const AccountMenuButton = ({
     fullName = "Firstname Lastname",
     onLogout
 }: AccountMenuButtonType) => {
+    const { getCurrentUser } = useUsers()
 
     const theme = useTheme()
     const belowMd = useMediaQuery(theme.breakpoints.down("md"))
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+
+    const role = getCurrentUser()?.ROLE_ID as UserRole
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         setAnchorEl(event.currentTarget);
@@ -32,6 +38,10 @@ const AccountMenuButton = ({
     const handleLogout = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
         handleClose();
         onLogout!(e);
+    }
+
+    const handleSettings = () => {
+
     }
 
     return(
@@ -68,8 +78,18 @@ const AccountMenuButton = ({
             }}>
                 { belowMd ?
                     <MenuItem>
-                        <Typography>Firstname Lastname</Typography>
+                        <Typography>{getCurrentUser()?.USER_FULLNAME}</Typography>
                     </MenuItem> : undefined
+                }
+                {
+                    role.admin || role.campusDirector ? (
+                        <MenuItem onClick={handleSettings}>
+                            <Stack direction={"row"} gap={1}>
+                                <Settings />
+                                <Typography>Settings</Typography>
+                            </Stack>
+                        </MenuItem>
+                    ) : undefined
                 }
                 <MenuItem onClick={handleLogout}>
                     <Stack direction={"row"} gap={1}>

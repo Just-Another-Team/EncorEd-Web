@@ -23,8 +23,10 @@ export default interface IUser {
     USER_PASSWORD: string | null;
     ROLE_ID: UserRole | string | null | undefined;
     DEPT_ID: IDepartment | string | null;
-    USER_ISDELETED?: boolean;
 
+    USER_IMAGE?: string;
+    USER_ISDELETED?: boolean;
     USER_CREATEDBY?: string;
     USER_UPDATEDBY?: string;
+    USER_ATTENDANCECHECKERSCHEDULE?: string | null
 }

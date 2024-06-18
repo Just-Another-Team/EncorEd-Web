@@ -14,6 +14,13 @@ import IDepartment from "../../data/IDepartment"
 import IRole from "../../data/IRole"
 import UserForm from "./UserForm"
 import useLoading from "../../hooks/useLoading"
+import { Alert, Avatar, Box, Button, Fade, Link, Slide, Snackbar, Typography } from "@mui/material"
+import { Link as RouterLink } from 'react-router-dom'
+import { useSubject } from "../../hooks/useSubject"
+import { getDownloadURL, ref } from 'firebase/storage'
+import { storage } from "../../app/firebase/config"
+import SnackBar from "../../components/Snackbar/SnackBar"
+import DialogMessage from "../../components/DialogMessage"
 
 const UsersList = () => {
     const { getCredentials } = useAuth()
@@ -22,11 +29,24 @@ const UsersList = () => {
         getUsers,
         updateUser,
         deleteUser,
-        setLoad,
         getCurrentUser,
         getUser,
         getUsersByCreator
     } = useUsers();
+
+    const { getSubjects, removeAssignedTeacher } = useSubject()
+
+    const { 
+        openModal: successSnackbar,
+        handleOpenModal: openSuccessSnackbar,
+        handleCloseModal: closeSuccessSnackbar
+    } = useModal();
+
+    const { 
+        openModal: errorSnackbar,
+        handleOpenModal: openErrorSnackbar,
+        handleCloseModal: closeErrorSnackbar
+    } = useModal();
 
     const { 
         openModal: updateModal,
@@ -40,13 +60,17 @@ const UsersList = () => {
         handleCloseModal: closeDeleteModal
     } = useModal();
 
+    const {
+        openModal: isVerified,
+        handleOpenModal: openVerify,
+        handleCloseModal: closeVerify
+    } = useModal()
+
     const { loading, openLoading, closeLoading } = useLoading();
 
     const [ user, setUser ] = useState<IUser>();
-
-    useEffect(() => {
-        setLoad(true)
-    }, [])
+    const [ updatedUser, setUpdatedUser ] = useState<IUser>();
+    const [ message, setMessage] = useState<string>();
 
     const handleClear = () => {
         setUser(undefined)
@@ -61,6 +85,7 @@ const UsersList = () => {
             USER_EMAIL: userData.USER_EMAIL,
             USER_USERNAME: userData.USER_USERNAME,
             USER_PASSWORD: userData.USER_PASSWORD,
+            USER_ATTENDANCECHECKERSCHEDULE: userData.USER_ATTENDANCECHECKERSCHEDULE ? userData.USER_ATTENDANCECHECKERSCHEDULE : null,
             ROLE_ID: {
                 campusDirector: userData.ROLE_ID === "campusDirector" ? true : undefined,
                 dean: userData.ROLE_ID === "dean" ? true : undefined,
@@ -69,32 +94,84 @@ const UsersList = () => {
             } as UserRole,
             DEPT_ID: userData.DEPT_ID,
             USER_UPDATEDBY: getCurrentUser()?.USER_ID,
+            USER_IMAGE: userData.USER_IMAGE,
+        }
+
+        //console.log(data.USER_ID)
+        const assignedSubjects = getSubjects().filter(subjects => subjects.USER_ID !== null && (subjects.USER_ID as IUser).USER_ID === data.USER_ID)
+
+        if (user && (user?.ROLE_ID as UserRole).teacher !== (data.ROLE_ID as UserRole).teacher && assignedSubjects.length > 0) {
+            openVerify()
+            setUpdatedUser(data)
+            return
         }
 
         openLoading()
 
-        console.log(data)
-        // await updateUser(data)
-        //     .then((result) => {
-        //         console.log(result.data)
-        //     })
-        //     .catch((error) => {
-        //         console.error(error)
-        //     })
+        await updateUser(data)
+            .then((result) => {
+                //Snack bar
+                setMessage(result.data)
+                openSuccessSnackbar()
+            })
+            .catch((error) => {
+                console.error(error)
+                setMessage(error.data)
+                openErrorSnackbar()
+            })
         
         closeLoading()
         closeUpdateModal()
     }
 
-    const handleDelete = async () => {
-        //Should've send a message
-        await deleteUser(user?.USER_ID!)
+    const verifySubmit = async () => {
+        const subjectIds = getSubjects().filter(subject => subject.USER_ID !== null && (subject.USER_ID as IUser).USER_ID === user?.USER_ID).map(subject => subject.SUB_ID as string)
+
+        closeVerify()
+        openLoading()
+
+        await removeAssignedTeacher(subjectIds)
+            .then(() => deleteUser(user?.USER_ID!))
             .then((result) => {
-                //When a user is deleted, set the subject Teacher to null
-                console.log(result)
+                console.log(result.data)
+                setMessage(result.data)
+                openSuccessSnackbar()
+            })
+            .catch((error) => {
+                console.error(error.response.data)
+                setMessage(error.response.data)
+                openErrorSnackbar()
+            })
+
+        await updateUser(updatedUser!)
+            .then((result) => {
+                setMessage(result.data)
+                openSuccessSnackbar()
             })
             .catch((error) => {
                 console.error(error)
+                setMessage(error.data)
+                openErrorSnackbar()
+            })
+
+        closeLoading()
+        closeUpdateModal()
+    }
+
+    const handleDelete = async () => {
+        const subjectIds = getSubjects().filter(subject => (subject.USER_ID as IUser).USER_ID === user?.USER_ID).map(subject => subject.SUB_ID as string)
+
+        await removeAssignedTeacher(subjectIds)
+            .then(() => deleteUser(user?.USER_ID!))
+            .then((result) => {
+                console.log(result.data)
+                setMessage(result.data)
+                openSuccessSnackbar()
+            })
+            .catch((error) => {
+                console.error(error.response.data)
+                setMessage(error.response.data)
+                openErrorSnackbar()
             })
     }
 
@@ -102,12 +179,39 @@ const UsersList = () => {
         {
             field: "USER_ID",
             headerName: "ID",
+            minWidth: 320,
         },
         {
             field: "USER_FULLNAME",
             headerName: "Fullname",
             minWidth: 256,
-            flex: 1
+            flex: 1,
+            renderCell: (params) => {
+                return (
+                    (params.row.ROLE_ID as UserRole).teacher ? 
+                    <Box
+                    display={'flex'}
+                    justifyContent={'center'}
+                    alignItems={'center'}
+                    gap={2}>
+                        {/* <Avatar src="/assets/profilepic.png" /> */}
+                        <Link
+                        component={RouterLink}
+                        to={`/${role.admin ? "admin" : role.campusDirector ? "campusDirector" : "dean" }/users/${params.row.USER_ID}`}
+                        underline="none">
+                            {params.row.USER_FULLNAME}
+                        </Link>
+                    </Box> : 
+                    <Box
+                    display={'flex'}
+                    justifyContent={'center'}
+                    alignItems={'center'}
+                    gap={2}>
+                        {/* <Avatar src="/assets/profilepic.png" /> */}
+                        <Typography variant="body2">{params.row.USER_FULLNAME}</Typography>
+                    </Box>
+                )
+            }
         },
         // {
         //     field: "USER_EMAIL",
@@ -151,6 +255,8 @@ const UsersList = () => {
             getActions: (params) => {
 
                 const handleOnClickUpdate = async (user: IUser) => {
+                    console.log("On Update: ", user)
+
                     openLoading()
                     openUpdateModal();
 
@@ -205,7 +311,7 @@ const UsersList = () => {
             initialState={{
                 columns: {
                     columnVisibilityModel: {
-                        USER_ID: false,
+                        //USER_ID: false,
                         USER_CREATEDBY: role.admin ? true : false
                     }
                 },
@@ -217,7 +323,7 @@ const UsersList = () => {
             }}
             columns={UserHeaders}
             getRowId={(row) => row.USER_ID!}
-            rows={filteredUsers( role.admin ? getUsers() : getUsersByCreator(getCurrentUser()?.USER_ID as string))}/>
+            rows={filteredUsers( role.admin || role.campusDirector ? getUsers() : getUsersByCreator(getCurrentUser()?.USER_ID as string))}/>
 
             <UserForm
             selectedUser={user}
@@ -227,6 +333,37 @@ const UsersList = () => {
             openModal={updateModal}
             closeModal={closeUpdateModal}/>
 
+            <DialogMessage
+            open={isVerified}
+            title="Are you sure want to change role?">
+                <DialogMessage.Body>
+                    <Typography
+                    variant="body1"
+                    marginBottom={1}>
+                        This user is assigned to subjects. Continuing the submission will remove the user from the subjects its assigned to.
+                    </Typography>
+                    <Typography
+                    variant="body1"
+                    marginBottom={1}>
+                        Do you wish to continue?
+                    </Typography>
+                </DialogMessage.Body>
+                <DialogMessage.Footer>
+                    <Button
+                    color="error"
+                    onClick={() => {
+                        closeVerify()
+                    }}>
+                        No
+                    </Button>
+                    <Button
+                    color="primary"
+                    onClick={verifySubmit}>
+                        Yes
+                    </Button>
+                </DialogMessage.Footer>
+            </DialogMessage>
+
             <DeleteDialog
             selectedObject={user as IUser}
             title={user?.USER_FULLNAME as string}
@@ -234,6 +371,18 @@ const UsersList = () => {
             deleteModal={deleteModal}
             onDelete={handleDelete}
             closeDeleteModal={closeDeleteModal}/>
+
+            <SnackBar
+            message={message}
+            onClose={closeSuccessSnackbar}
+            open={successSnackbar}
+            severity="success"/>
+
+            <SnackBar
+            message={message}
+            onClose={closeErrorSnackbar}
+            open={errorSnackbar}
+            severity="error"/>
         </>
     )
 }

@@ -10,6 +10,7 @@ import { commonLink } from "../../data/commonLink";
 import { UserRole } from "../../data/IUser";
 import { useNotification } from "../../hooks/useNotification";
 import { useUsers } from "../../hooks/useUsers";
+import { useModal } from "../../hooks/useModal";
 
 //-------------------------------------------------
 // useNavBar
@@ -25,6 +26,13 @@ type AuthenticatedNavbarProps = {
 const AuthenticatedNavbar = ({
     onOpenDrawer
 }: AuthenticatedNavbarProps) => {
+
+    const {
+        openModal,
+        handleOpenModal,
+        handleCloseModal
+    } = useModal()
+
     const { signOut } = useAuth();
     const { getCurrentUser } = useUsers()
     const { unReadNotifications, setToRead } = useNotification()
@@ -38,6 +46,8 @@ const AuthenticatedNavbar = ({
         navigate(`${getCurrentUser() ? (getCurrentUser()?.ROLE_ID as UserRole).campusDirector ? commonLink.campusDirector : (getCurrentUser()?.ROLE_ID as UserRole).dean ? commonLink.dean : commonLink.admin : commonLink.admin}/notifications`)
         await setToRead()
     }
+
+    
 
     const handleLogout = async () => {
         await signOut()
@@ -63,8 +73,7 @@ const AuthenticatedNavbar = ({
                     <Menu />
                 </IconButton>
 
-                {/* Make the search more informative */}
-                <TextField
+                {/* <TextField
                 placeholder="Search"
                 size="small"
                 InputProps={{
@@ -76,7 +85,7 @@ const AuthenticatedNavbar = ({
                 }}
                 sx={{
                     width: 240,
-                }}/>
+                }}/> */}
             </Stack>
 
             <Box>
@@ -87,6 +96,8 @@ const AuthenticatedNavbar = ({
                 fullName={getCurrentUser()?.USER_FULLNAME}
                 onLogout={handleLogout}/>
             </Box>
+
+            {/* Dialog for changing dates */}
         </Navbar>
     )
 }

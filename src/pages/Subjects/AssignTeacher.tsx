@@ -7,45 +7,94 @@ import DropDown from "../../components/DropDown";
 import { useUsers } from "../../hooks/useUsers";
 import IUser, { UserRole } from "../../data/IUser";
 import { useSubject } from "../../hooks/useSubject";
+import ISchedule from "../../data/ISchedule";
+import dayjs, { Dayjs } from "dayjs";
+import isBetweenDates from 'dayjs/plugin/isBetween'
+
+dayjs.extend(isBetweenDates)
 
 type AssignTeacherType = {
     openModal: boolean;
     closeModal: () => void;
     subject: ISubject | undefined
+    onSubmit: (data: ISubject) => void
 }
 
 const AssignTeacher = ({
     openModal,
     closeModal,
-    subject
+    subject,
+    onSubmit
 }: AssignTeacherType) => {
 
-    const { assignTeacherToSubject } = useSubject()
+    const { getSubjects } = useSubject()
     const { getUsersByCreator, getTeachers, getCurrentUser } = useUsers()
 
-    const { control, handleSubmit, setValue, reset } = useForm<ISubject>({
+    const { control, handleSubmit, setValue, reset, setError } = useForm<ISubject>({
         defaultValues: {
             USER_ID: undefined,
         }
     });
 
-    const assignTeacherHandler = async (data: ISubject) => {
-        console.log("USER_ID: ", data)
+    // const assignTeacherHandler = async (data: ISubject) => {
+    //     const assignedTeacher: { SUB_ID: string, USER_ID: string} = {
+    //         SUB_ID: subject?.SUB_ID as string,
+    //         USER_ID: data.USER_ID as string
+    //     }
 
-        const assignedTeacher: { SUB_ID: string, USER_ID: string} = {
-            SUB_ID: subject?.SUB_ID as string,
-            USER_ID: data.USER_ID as string
+    //     await assignTeacherToSubject(assignedTeacher)
+    //         .then((result) => {
+    //             console.log(result)
+    //         })
+    //         .catch((error) => {
+    //             console.error(error)
+    //         })
+
+    //     closeModal()
+    //     reset()
+    // }
+
+    const submitHandler = (data: ISubject) => {
+        //Get user ID, show how many 
+        const subjectSchedules = getSubjects().filter(subject => subject.USER_ID !== null).filter(subject => (subject.USER_ID as IUser).USER_ID === data.USER_ID)//.map(subject => subject.SCHED_ID as ISchedule)
+        const subjectSchedule = {
+            ...subject?.SCHED_ID as ISchedule,
+            SCHED_STARTTIME: dayjs((subject?.SCHED_ID as ISchedule).SCHED_STARTTIME),
+            SCHED_ENDTIME: dayjs((subject?.SCHED_ID as ISchedule).SCHED_ENDTIME)
+        } as ISchedule
+
+        //console.log(subjectSchedule, subjectSchedules)
+        // console.log(subjectSchedule.SCHED_WEEKASSIGNED, subjectSchedules.map(subjectSchedule => (subjectSchedule.SCHED_ID as ISchedule).SCHED_WEEKASSIGNED), subjectSchedules.find(subjectSched => (subjectSched.SCHED_ID as ISchedule).SCHED_WEEKASSIGNED.some(week => subjectSchedule.SCHED_WEEKASSIGNED.includes(week))))
+        
+        //Get start time and end time of selected subject
+        //Get start time and end time of subjects assigned to Teacher
+
+        //Check if the selected subject is included in one of the weeks in the subjectsAssignedToTeacher
+        const subjectInSameDay = subjectSchedules.find(subjectSched => (subjectSched.SCHED_ID as ISchedule).SCHED_WEEKASSIGNED.some(week => subjectSchedule.SCHED_WEEKASSIGNED.includes(week)))
+
+        if (!subjectInSameDay) {
+            onSubmit(data)
+            reset()
+            return
         }
 
-        await assignTeacherToSubject(assignedTeacher)
-            .then((result) => {
-                console.log(result)
-            })
-            .catch((error) => {
-                console.error(error)
-            })
+        //If start time of selected subject is within the start time and end time of subjects assigned to teacher OR
+        //If end time of selected subject is within the start time and end time of subjects assigned to teacher
+        //Then show an error where the selected subject will overlap to other subjects assigned to teacher OR
+        //Filter a list of teachers
+        
+        const sameDaySchedule = {
+            ...subjectInSameDay?.SCHED_ID as ISchedule,
+            SCHED_STARTTIME: dayjs((subjectInSameDay?.SCHED_ID as ISchedule).SCHED_STARTTIME),
+            SCHED_ENDTIME: dayjs((subjectInSameDay?.SCHED_ID as ISchedule).SCHED_ENDTIME)
+        } as ISchedule
 
-        closeModal()
+        if ((subjectSchedule.SCHED_STARTTIME as Dayjs).isSame(sameDaySchedule.SCHED_STARTTIME, "minute") || (subjectSchedule.SCHED_ENDTIME as Dayjs).isSame(sameDaySchedule.SCHED_ENDTIME, "minute") || (subjectSchedule.SCHED_STARTTIME as Dayjs).isBetween(sameDaySchedule.SCHED_STARTTIME, sameDaySchedule.SCHED_ENDTIME, 'minute', "()") || (subjectSchedule.SCHED_ENDTIME as Dayjs).isBetween(sameDaySchedule.SCHED_STARTTIME, sameDaySchedule.SCHED_ENDTIME, 'minute', "()")) {
+            setError('USER_ID', { message: `Teacher has subjects that will be overlapped by ${subject?.SUB_DESCRIPTION}` }) //set to react-hook-forms validate soon
+            return
+        }
+
+        onSubmit(data)
         reset()
     }
 
@@ -63,7 +112,7 @@ const AssignTeacher = ({
         open={openModal}
         PaperProps={{
             component: 'form',
-            onSubmit: handleSubmit(assignTeacherHandler),
+            onSubmit: handleSubmit(submitHandler),
             onReset: () => {
                 closeModal()
                 reset()

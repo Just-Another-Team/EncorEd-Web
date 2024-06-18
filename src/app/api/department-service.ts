@@ -17,6 +17,10 @@ class DepartmentService {
         return http.delete(`${this.departmentComment}/delete/${departmentID}`)
     }
 
+    assignDean(data: { DEPT_ID: string, USER_ID: string}) {
+        return http.patch(`${this.departmentComment}/assign/${data.DEPT_ID}/dean`, data)
+    }
+
     view(departmentID: string) {
         return http.get<IDepartment>(`${this.departmentComment}/view/s/${departmentID}`)
     }

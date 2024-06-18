@@ -12,11 +12,13 @@ import { db } from "../app/firebase/config";
 import { useAuth } from "../hooks/useAuth";
 import { useUsers } from "../hooks/useUsers";
 import { useSchedules } from "../hooks/useSchedules";
+import { dayName } from "../helper/dayName";
 
 type SubjectContextType = {
     subjects: Array<ISubject>
     load: boolean,
     addSubject: (data: ISubject) => Promise<AxiosResponse<any, any>>
+    addSubjects: (data: Array<ISubject>) => Promise<AxiosResponse<any, any>>
     updateSubject: (data: ISubject) => Promise<AxiosResponse<any, any>>
     deleteSubject: (subId: string) => Promise<AxiosResponse<any, any>>
     setLoad: React.Dispatch<React.SetStateAction<boolean>>;
@@ -26,6 +28,9 @@ type SubjectContextType = {
     getSubjectsByRoom: (roomId: string) => Array<ISubject>;
     assignSubjectToRoom: (data: QRCodeType) => Promise<AxiosResponse<any, any>>;
     assignTeacherToSubject: (data: { SUB_ID: string; USER_ID: string; }) => Promise<AxiosResponse<any, any>>
+    getSubject: (subjectId: string) => ISubject | undefined
+    getAllSubjects: () => Array<ISubject>
+    removeAssignedTeacher: (data: Array<string>) => Promise<AxiosResponse<any, any>>
 }
 
 export const SubjectContext = createContext<SubjectContextType>({} as SubjectContextType);
@@ -51,6 +56,11 @@ export const SubjectProvider = ({ children }: SubjectProviderType) => {
         return subjectService.add(data)
     }
 
+    const addSubjects = (data: Array<ISubject>) => {
+        setLoad(true)
+        return subjectService.addBatch(data)
+    }
+
     const updateSubject = (data: ISubject) => {
         setLoad(true)
         return subjectService.update(data)
@@ -65,11 +75,28 @@ export const SubjectProvider = ({ children }: SubjectProviderType) => {
         return subjectService.assignInstructor(data)
     }
 
-    const removeAssignedTeacher = () => {
-        
+    const removeAssignedTeacher = (data: Array<string>) => {
+        return subjectService.removeAssignInstructor(data)
     }
 
     const getSubjects = (): Array<ISubject> => {
+        return subjects.filter(subject => !subject.SUB_ISDELETED).map(subject => {
+            const user = users.find(user => user.USER_ID === subject.USER_ID)
+            
+            const schedule = getSchedule(subject.SCHED_ID as string)
+            schedule?.SCHED_WEEKASSIGNED.sort((a, b) => {
+                return dayName[a] - dayName[b]
+            })
+
+            return ({
+                ...subject,
+                SCHED_ID: schedule ? schedule : null,
+                USER_ID: user ? user : null,
+            })
+        })
+    }
+
+    const getAllSubjects = (): Array<ISubject> => {
         return subjects.map(subject => {
             const schedule = getSchedule(subject.SCHED_ID as string)
             const user = users.find(user => user.USER_ID === subject.USER_ID)
@@ -79,6 +106,10 @@ export const SubjectProvider = ({ children }: SubjectProviderType) => {
                 USER_ID: user ? user : null,
             })
         })
+    }
+
+    const getSubject = (subjectId: string) => {
+        return getSubjects().find(subject => subject.SUB_ID === subjectId)
     }
 
     const getSubjectsByCreator = (creatorId: string): Array<ISubject> => {
@@ -132,6 +163,7 @@ export const SubjectProvider = ({ children }: SubjectProviderType) => {
         subjects,
         load,
         addSubject,
+        addSubjects,
         updateSubject,
         deleteSubject,
         setLoad,
@@ -141,6 +173,9 @@ export const SubjectProvider = ({ children }: SubjectProviderType) => {
         getSubjectsByCreator,
         assignSubjectToRoom,
         assignTeacherToSubject,
+        getSubject,
+        getAllSubjects,
+        removeAssignedTeacher
     }
 
     return (

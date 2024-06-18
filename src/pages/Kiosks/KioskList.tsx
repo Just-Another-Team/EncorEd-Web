@@ -14,6 +14,7 @@ import DeleteDialog from "../../components/DialogDelete"
 import useLoading from "../../hooks/useLoading"
 import KioskForm from "./KioskForm"
 import { useAuth } from "../../hooks/useAuth"
+import { Alert, Fade, Snackbar } from "@mui/material"
 
 const KioskList = () => {
     const { getCredentials } = useAuth()
@@ -36,6 +37,20 @@ const KioskList = () => {
         handleOpenModal: openDeleteModal,
         handleCloseModal: closeDeleteModal
     } = useModal();
+
+    const { 
+        openModal: successSnackbar,
+        handleOpenModal: openSuccessSnackbar,
+        handleCloseModal: closeSuccessSnackbar
+    } = useModal();
+
+    const { 
+        openModal: errorSnackbar,
+        handleOpenModal: openErrorSnackbar,
+        handleCloseModal: closeErrorSnackbar
+    } = useModal();
+
+    const [ message, setMessage ] = useState<string>();
 
     const { loading, openLoading, closeLoading } = useLoading();
     const navigate = useNavigate()
@@ -66,9 +81,13 @@ const KioskList = () => {
         await updateKiosk(data)
             .then((result) => {
                 console.log(result.data)
+                setMessage(result.data)
+                openSuccessSnackbar()
             })
             .catch((error) => {
                 console.error(error)
+                setMessage(error.response.data)
+                openErrorSnackbar()
             })
         
         closeLoading()
@@ -76,13 +95,16 @@ const KioskList = () => {
     }
 
     const handleDelete = async () => {
-        //Should've send a message
         await deleteUser(kiosk?.USER_ID!)
             .then((result) => {
                 console.log(result)
+                setMessage("Kiosk Deleted Successfully!")
+                openSuccessSnackbar()
             })
             .catch((error) => {
                 console.error(error)
+                setMessage(error.response.data)
+                openErrorSnackbar()
             })
     }
 
@@ -189,6 +211,32 @@ const KioskList = () => {
             onDelete={handleDelete}
             title={kiosk?.USER_USERNAME as string}
             closeDeleteModal={closeDeleteModal}/>
+
+            <Snackbar
+            open={successSnackbar}
+            autoHideDuration={3000}
+            TransitionComponent={Fade}
+            onClose={closeSuccessSnackbar}>
+                <Alert
+                variant="filled"
+                severity="success"
+                onClose={closeSuccessSnackbar}>
+                    { message }
+                </Alert>
+            </Snackbar>
+
+            <Snackbar
+            open={errorSnackbar}
+            autoHideDuration={3000}
+            TransitionComponent={Fade}
+            onClose={closeErrorSnackbar}>
+                <Alert
+                variant="filled"
+                severity="error"
+                onClose={closeErrorSnackbar}>
+                    { message }
+                </Alert>
+            </Snackbar>
         </>
     )
 }

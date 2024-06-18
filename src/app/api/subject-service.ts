@@ -9,6 +9,11 @@ class SubjectService {
         return http.post(`${this.subjectCommon}/add`, data)
     }
 
+    public addBatch(data: Array<ISubject>) {
+        return http.post(`${this.subjectCommon}/add/multiple`, data)
+    }
+
+
     public update(data: ISubject) {
         return http.put(`${this.subjectCommon}/update/${data.SUB_ID}`, data)
     }
@@ -20,6 +25,10 @@ class SubjectService {
     public assignRoom(data: QRCodeType) {
         return http.patch(`${this.subjectCommon}/assign/${data.SUB_ID}/room`, data)
     }
+
+    public removeAssignInstructor(data: Array<string>) {
+        return http.patch(`${this.subjectCommon}/assign/teacher/remove`, data)
+    } 
 
     public view(id: string) {
         return http.get<ISubject>(`${this.subjectCommon}/view/s/${id}`)

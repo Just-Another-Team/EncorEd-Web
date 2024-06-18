@@ -4,6 +4,10 @@ import departmentService from "../app/api/department-service";
 import { AxiosResponse } from "axios";
 import { useUsers } from "../hooks/useUsers";
 import IUser from "../data/IUser";
+import { collection, onSnapshot } from "firebase/firestore";
+import { converter } from "../types/converter";
+import { db } from "../app/firebase/config";
+import { useAuth } from "../hooks/useAuth";
 
 type DepartmentContextType = {
     departments: Array<IDepartment>
@@ -12,6 +16,7 @@ type DepartmentContextType = {
     deleteDepartment: (userId: string) => Promise<AxiosResponse<any, any>>
     getDepartments: (users: Array<IUser>) => Array<IDepartment>
     getDepartment: (departmentId: string) => IDepartment | undefined
+    assignDean: (data: {DEPT_ID: string;USER_ID: string;}) => Promise<AxiosResponse<any, any>>
     load: boolean
 }
 
@@ -22,8 +27,16 @@ type DepartmentProviderType = {
 }
 
 export const DepartmentProvider = ({ children }: DepartmentProviderType) => {
+    const { user } = useAuth()
+
     const [ departments, setDepartments ] = useState<Array<IDepartment>>([]);
     const [ load, setLoad ] = useState<boolean>(true);
+
+    const departmentCollection = collection(db, '/Department/').withConverter(converter<IDepartment>())
+
+    const assignDean = (data: { DEPT_ID: string, USER_ID: string}) => {
+        return departmentService.assignDean(data)
+    }
 
     const addDepartment = (department: IDepartment) => {
         setLoad(true)
@@ -45,7 +58,7 @@ export const DepartmentProvider = ({ children }: DepartmentProviderType) => {
     }
 
     const getDepartments = (users: Array<IUser>) => {
-        return departments.map((department): IDepartment => {
+        return departments.filter(department => !department.DEPT_ISDELETED).map((department): IDepartment => {
 
             const assignedUsers = users.filter(user => user.DEPT_ID === department.DEPT_ID).length
 
@@ -57,16 +70,26 @@ export const DepartmentProvider = ({ children }: DepartmentProviderType) => {
     }
 
     useEffect(() => {
-        const fetchedDepartments = async () => {
-            const response = await departmentService.viewAll()
-            const responseData = response.data;
+        const fetchDepartmentSnapshot = onSnapshot(departmentCollection, (snapshot) => {
+            const departmentDocs = snapshot.docs.map((department): IDepartment => {
+                const attendanceData = department.data()
 
-            setDepartments(responseData)
+                return ({
+                    DEPT_ID: department.id,
+                    ...attendanceData,
+                })
+            })
+
+            setDepartments(departmentDocs)
+        }, (error) => {
+            console.error('Attendance Context Error', error)
+        })
+
+        return () => {
+            fetchDepartmentSnapshot()
+            setLoad(false)
         }
-
-        fetchedDepartments();
-        setLoad(false)
-    }, [load])
+    }, [user])
 
     const value = {
         departments,
@@ -75,6 +98,7 @@ export const DepartmentProvider = ({ children }: DepartmentProviderType) => {
         addDepartment,
         updateDepartment,
         deleteDepartment,
+        assignDean,
         load
     }
 

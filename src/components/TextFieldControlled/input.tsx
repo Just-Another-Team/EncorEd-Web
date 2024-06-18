@@ -18,11 +18,11 @@ const ControlledTextField = <T extends FieldValues>(props: ControlledTextFieldTy
             fieldState: { error }
         }) => (
             <TextField
+            {...props as TextFieldProps}
             onChange={onChange}
             value={value}
             error={!!error}
-            helperText={error ? error.message : " "}
-            {...props as TextFieldProps}/>
+            helperText={error ? error.message : " "}/>
         )}/>
     )
 }

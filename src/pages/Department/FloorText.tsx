@@ -1,4 +1,4 @@
-import { Autocomplete, Chip, TextField } from "@mui/material";
+import { Autocomplete, Chip, ListItemText, TextField } from "@mui/material";
 import { useState } from "react";
 import { useRooms } from "../../hooks/useRooms";
 import IFloor from "../../data/IFloor";
@@ -26,9 +26,7 @@ const FloorAutoComplete = <T extends FieldValues>(props: FloorAutoCompleteType<T
             id="floor-tags"
             value={value}
             fullWidth
-            // onChange={(event, newValue) => {
-            //     setValue(newValue);
-            // }}
+            filterSelectedOptions
             onChange={((e, data) => onChange(data))}
             options={getFloorSortedByLevel()}
             componentsProps={{
@@ -45,15 +43,18 @@ const FloorAutoComplete = <T extends FieldValues>(props: FloorAutoCompleteType<T
                     ]
                 }
             }}
+            isOptionEqualToValue={(option, value) => option.FLR_ID === value.FLR_ID}
             getOptionLabel={(option) => option.FLR_NAME}
             renderTags={(tagValue, getTagProps) =>
-                tagValue.map((option, index) => (
-                    <Chip
-                    label={option.FLR_NAME}
-                    {...getTagProps({ index })}
-                    key={option.FLR_ID}
-                    size="small"/>
-                ))
+                tagValue.map((option, index) => {
+                    return (
+                        <Chip
+                        label={option.FLR_NAME}
+                        {...getTagProps({ index })}
+                        key={option.FLR_ID}
+                        size="small"/>
+                    )
+                })
             }
             renderInput={(params) => (
                 <TextField

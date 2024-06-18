@@ -5,6 +5,7 @@ import { Search } from "@mui/icons-material";
 import IRoom from "../../data/IRoom";
 import { useMapboxNavigation } from "../../hooks/useMapboxNavigation";
 import { useState } from "react";
+import { availableFloors } from "../../data/availableFloors";
 
 const GroupHeader = styled('div')(({ theme }) => ({
     position: 'sticky',
@@ -23,7 +24,7 @@ const GroupItems = styled('ul')({
   
 const MapAutocomplete = () => {
     const { getRooms } = useRooms()
-    const { setRoom, setRoomAndFloor, setRoomInputValue, selectedRoom, selectedRoomInputValue, addSearchLog } = useMapboxNavigation()
+    const { setRoom, setRoomAndFloor, setRoomInputValue, selectedRoom, selectedRoomInputValue, addSearchLog, setFloor } = useMapboxNavigation()
 
     const handleOnChange = (event: React.SyntheticEvent<Element, Event>, value: string | IRoom | null) => {
         if (value === null) {
@@ -39,11 +40,14 @@ const MapAutocomplete = () => {
         setRoomInputValue(value)
     }
 
+    const rooms = getRooms().filter(room => availableFloors.includes((room.FLR_ID as IFloor).FLR_LEVEL))
+
+
     return (
         <Autocomplete
         value={selectedRoom}
         inputValue={selectedRoomInputValue}
-        options={getRooms()}
+        options={rooms.sort((roomA, roomB) => (roomA.FLR_ID as IFloor).FLR_LEVEL > (roomB.FLR_ID as IFloor).FLR_LEVEL ? 1 : -1)}
         groupBy={(option) => (option.FLR_ID as IFloor).FLR_NAME}
         getOptionLabel={(option) => option ? (option as IRoom).ROOM_NAME : ''}
         renderGroup={(params) => (
@@ -53,7 +57,6 @@ const MapAutocomplete = () => {
             </li>
         )}
         fullWidth
-        // freeSolo
         size="small"
         onChange={handleOnChange}
         onInputChange={handleOnInputChange}

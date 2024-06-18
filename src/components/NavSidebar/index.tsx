@@ -20,6 +20,7 @@ import { Link, useLocation } from "react-router-dom";
 import { FixMeLater } from "../../types/FixMeLater";
 import LinkListItem from "./LinkListItem";
 import { defaultSideBar } from "../../data/drawerWidth";
+import Color from "../../assets/Color";
 
 //const drawerWidth = 208; //Move to another react file
 
@@ -71,6 +72,7 @@ const Sidebar = ({
                 <Typography
                 variant="h5"
                 fontWeight={700}
+                color={Color('white', 400)}
                 noWrap>
                     Encor<span>Ed</span>
                 </Typography>
@@ -127,29 +129,31 @@ const SideBarList = ({
     return (
         <Box sx={{ overflow: 'auto'}}>
             <List disablePadding>
-                {links?.map((navigation: FixMeLater, index: FixMeLater) => (
-                    <ListItem key={navigation.name} disablePadding>
-                        <LinkListItem
-                        component={Link}    
-                        to={navigation.href}
-                        onClick={handleOnClick}
-                        sx={{
-                            color: pathname === navigation.href ? theme.palette.grey[50] : theme.palette.grey[400],
-                        }}>
-                            <ListItemIcon
+                {links?.map((navigation: FixMeLater, index: FixMeLater) => {
+                    return (
+                        <ListItem key={navigation.name} disablePadding>
+                            <LinkListItem
+                            component={Link}    
+                            to={navigation.href}
+                            onClick={handleOnClick}
                             sx={{
-                                color: pathname === navigation.href ? theme.palette.grey[50] : theme.palette.grey[400],
+                                color: pathname.split("/")[2] === (navigation.href as string).split("/")[2] ? theme.palette.grey[50] : theme.palette.grey[400],
                             }}>
-                                {navigation.icon}
-                            </ListItemIcon>
-                            <ListItemText
-                            primary={navigation.name}
-                            primaryTypographyProps={{
-                                fontWeight: pathname === navigation.href ? 700 : 400
-                            }}/>
-                        </LinkListItem>
-                    </ListItem>
-                ))}
+                                <ListItemIcon
+                                sx={{
+                                    color: pathname.split("/")[2] === (navigation.href as string).split("/")[2] ? theme.palette.grey[50] : theme.palette.grey[400],
+                                }}>
+                                    {navigation.icon}
+                                </ListItemIcon>
+                                <ListItemText
+                                primary={navigation.name}
+                                primaryTypographyProps={{
+                                    fontWeight: pathname.split("/")[2] === (navigation.href as string).split("/")[2] ? 700 : 400
+                                }}/>
+                            </LinkListItem>
+                        </ListItem>
+                    )
+                })}
             </List>
         </Box>
     )

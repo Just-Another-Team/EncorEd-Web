@@ -2,12 +2,19 @@ import { Box, PaginationItem } from "@mui/material"
 import { useMapboxNavigation } from "../../hooks/useMapboxNavigation"
 import { useRooms } from "../../hooks/useRooms"
 import IFloor from "../../data/IFloor"
+import { availableFloors } from "../../data/availableFloors"
 
 const KioskFloorTabs = () => {
     const { getFloorSortedByLevel } = useRooms()
-    const { selectedFloor, setFloor, setRoom } = useMapboxNavigation()
+    const { selectedFloor, setFloor, setRoom, destination } = useMapboxNavigation()
 
     const handleOnClick = (floor: IFloor) => {
+        //If it has a destination
+        if (destination) {
+            setFloor(floor)
+            return
+        }
+
         setFloor(floor)
         setRoom(undefined)
     }
@@ -22,7 +29,7 @@ const KioskFloorTabs = () => {
         gap={1}
         bottom={0}
         right={0}>
-            { getFloorSortedByLevel().map(floor => (
+            { getFloorSortedByLevel().filter(floor => availableFloors.includes(floor.FLR_LEVEL)).map(floor => (
                 <PaginationItem
                 key={floor.FLR_ID}
                 onClick={() => handleOnClick(floor)}

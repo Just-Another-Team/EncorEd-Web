@@ -1,4 +1,4 @@
-import { Button, Typography } from "@mui/material"
+import { Button, Link, Typography } from "@mui/material"
 import {
     DataGrid,
     GridColDef
@@ -11,7 +11,7 @@ import ISubject from "../../data/ISubject"
 import Color from "../../assets/Color"
 import { AttendanceSubmissionDate } from "../../data/AttendanceSubmissionDate"
 import { useUsers } from "../../hooks/useUsers"
-import { useSubject } from "../../hooks/useSubject"
+import { Link as RouterLink } from 'react-router-dom'
 
 const AttendanceList = () => {
     const { load, getAttendances, getAttendancesByReduction, getCompleteAttendancesByCreator } = useAttendances();
@@ -28,37 +28,47 @@ const AttendanceList = () => {
             renderCell: (params) => {
                 return (params.row.SUB_ID as ISubject).SUB_CODE
             },
-            minWidth: 96,
+            minWidth: 128,
         },
         {
             field: "SUB_DESCRIPTION",
             headerName: "Subject Description",
             renderCell: (params) => {
-                return (params.row.SUB_ID as ISubject).SUB_DESCRIPTION
+
+                return (
+                    <Link
+                    component={RouterLink}
+                    to={`/${role.admin ? "admin" : role.campusDirector ? "campusDirector" : "dean" }/subject/${(params.row.SUB_ID as ISubject).SUB_ID!}`}
+                    underline="none">
+                        {(params.row.SUB_ID as ISubject).SUB_DESCRIPTION}
+                    </Link>
+                )
             },
-            minWidth: 192,
+            minWidth: 256,
             flex: 1
         },
         {
             field: "SUB_ID.USER_ID",
             headerName: "Instructor assigned",
             renderCell: (params) => {
-                // ((params.row.SUB_ID as ISubject).USER_ID as IUser).USER_FULLNAME
-
-                return ((params.row.SUB_ID as ISubject).USER_ID as IUser).USER_FULLNAME
+                const instructor = (params.row.SUB_ID as ISubject).USER_ID 
+                return instructor !== null ? (instructor as IUser).USER_FULLNAME as string : " No Instructor"
             },
-            minWidth: 256,
+            minWidth: 224,
             flex: 0.5
+        },
+        {
+            field: "ATTD_COMMENT",
+            headerName: "Comment",
+            minWidth: 320
         },
         {
             field: "USER_ID",
             headerName: "Submitted By",
             renderCell: (params) => {
-                console.log(params.row.USER_ID)
-
                 return params.row.USER_ID !== null ? (params.row.USER_ID as IUser).USER_FULLNAME : ""
             },
-            minWidth: 160,
+            minWidth: 256,
             flex: 0.5
         },
         {
@@ -68,7 +78,7 @@ const AttendanceList = () => {
                 const status = params.row.ATTD_TEACHERSTATUS
 
                 return (
-                    status === "present" || status === "missing" ? 
+                    status === "present" || status === "not-in-room" ? 
                     <Typography
                     variant="body2"
                     fontWeight={400}
@@ -83,7 +93,7 @@ const AttendanceList = () => {
                     </Typography>
                 )
             },
-            minWidth: 160,
+            minWidth: 192,
             flex: 0.5
         },
         {
@@ -132,7 +142,7 @@ const AttendanceList = () => {
         columns={AttendanceHeaders}
         getRowId={(row) => row.ATTD_ID!}
         loading={load}
-        rows={role.admin ? attendances : getCompleteAttendancesByCreator(getCurrentUser()?.USER_ID as string)}/>
+        rows={role.admin || role.campusDirector ? attendances : getCompleteAttendancesByCreator(getCurrentUser()?.USER_ID as string)}/>
     )
 }
 

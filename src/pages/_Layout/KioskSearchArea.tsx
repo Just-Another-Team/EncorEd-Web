@@ -9,6 +9,8 @@ import { MoreVertOutlined } from "@mui/icons-material"
 import MapLogout from "../../components/MapLogout"
 import { useUsers } from "../../hooks/useUsers"
 import { useModal } from "../../hooks/useModal"
+import IFloor from "../../data/IFloor"
+import { availableFloors } from "../../data/availableFloors"
 
 const KioskSearchArea = () => {
     const { getRooms } = useRooms()
@@ -21,6 +23,8 @@ const KioskSearchArea = () => {
         addSearchLog(room)
         setRoomAndFloor(room)
     }
+
+    const rooms = getRooms().filter(room => availableFloors.includes((room.FLR_ID as IFloor).FLR_LEVEL))
 
     return (
         <Box
@@ -42,7 +46,7 @@ const KioskSearchArea = () => {
                         <MoreVertOutlined />
                     </IconButton>
                 </Box>
-                <Box
+                {/* <Box
                 display={'flex'}
                 gap={1}
                 marginTop={1}
@@ -53,7 +57,7 @@ const KioskSearchArea = () => {
                         label={room.ROOM_NAME}
                         onClick={() => handleClickChips(room)}/>
                     ))}
-                </Box>
+                </Box> */}
             </Box>
 
             <Box

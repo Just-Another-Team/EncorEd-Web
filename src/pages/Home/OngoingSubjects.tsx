@@ -2,13 +2,19 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid"
 import { useSubject } from "../../hooks/useSubject"
 import ISubject from "../../data/ISubject"
 import dayjs from "dayjs"
-import IUser from "../../data/IUser"
+import IUser, { UserRole } from "../../data/IUser"
 import ISchedule from "../../data/ISchedule"
 import { Box } from "@mui/material"
 import useClock from "../../hooks/useClock"
+import { useUsers } from "../../hooks/useUsers"
 
 const OngoingSubjects = () => {
     const { getOngoingSubjects } = useSubject()
+    const { getCurrentUser } = useUsers()
+
+    // Get Ongoing Subjects
+    // - If Admin or CD, show all ongoing subjects
+    // - If Dean, show ongoing subjects that dean created
 
     const SubjectHeaders: Array<GridColDef<ISubject>> = [
         {
@@ -35,7 +41,9 @@ const OngoingSubjects = () => {
             field: "USER_ID.USER_FULLNAME",
             headerName: "Instructor",
             renderCell: (params) => {
-                return (params.row.USER_ID as IUser).USER_FULLNAME
+                const user = params.row.USER_ID
+
+                return user !== null ? (params.row.USER_ID as IUser).USER_FULLNAME : "No Instructor"
             },
             sortable: false,
             minWidth: 256,
@@ -51,6 +59,11 @@ const OngoingSubjects = () => {
             minWidth: 192,
         },
     ]
+
+    const role = getCurrentUser()?.ROLE_ID as UserRole
+    const subjects = (role: UserRole) => {
+        return getOngoingSubjects(dayjs().toISOString()).filter(subject => (role.admin || role.campusDirector ? true : subject.SUB_CREATEDBY === getCurrentUser()?.USER_ID) && subject.USER_ID !== null)
+    }
 
     //Teacher
     //Subject
@@ -73,8 +86,9 @@ const OngoingSubjects = () => {
                     }
                 },
             }}
+            pageSizeOptions={[5]}
             columns={SubjectHeaders}
-            rows={getOngoingSubjects(dayjs().toISOString())}/>
+            rows={subjects(role)}/>
         </Box>
     )
 }

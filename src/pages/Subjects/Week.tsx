@@ -1,13 +1,16 @@
-import { Box, FormControl, FormLabel, PaginationItem } from "@mui/material"
+import { Box, FormControl, FormHelperText, FormLabel, PaginationItem } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Controller, FieldValues, UseControllerProps, UseFormSetValue } from "react-hook-form"
 
 type WeekType<T extends FieldValues> = {
     setValue: UseFormSetValue<T>;
+    updateWeeks?: Array<string>
 } & UseControllerProps<T>
 
 const Week = <T extends FieldValues>(props: WeekType<T>) => {
-    const [selectedWeeks, setSelectedWeeks] = useState<any>([])
+    const { updateWeeks = [] } = props
+
+    const [selectedWeeks, setSelectedWeeks] = useState<Array<string>>(updateWeeks)
 
     const handleSelectedWeek = (selectedWeek: string) => {
         if (selectedWeeks.includes(selectedWeek)) {
@@ -18,7 +21,13 @@ const Week = <T extends FieldValues>(props: WeekType<T>) => {
     }
 
     useEffect(() => {
-        props.setValue(props.name, selectedWeeks)
+        setSelectedWeeks(updateWeeks)
+    }, [updateWeeks])
+
+    useEffect(() => {
+        props.setValue(props.name, selectedWeeks as any)
+
+        console.log("Default Value: ", selectedWeeks)
     }, [props.name, selectedWeeks, props.setValue])
 
     const weeks: Array<{ label: string, value: string }> = [
@@ -32,26 +41,28 @@ const Week = <T extends FieldValues>(props: WeekType<T>) => {
 
     return (
         <FormControl variant="outlined">
-            <FormLabel component="legend">Weeks Assigned</FormLabel>
-            <Box
-            paddingY={1}>
+            <FormLabel component="legend">Days Assigned</FormLabel>
+            <Box>
                 {weeks.map((el) => (
                     <Controller
                     key={el.value}
                     name={props.name}
                     control={props.control}
                     rules={props.rules}
-                    render={({ field }) => (
-                        <PaginationItem
-                        key={el.value}
-                        onClick={() => handleSelectedWeek(el.value)}
-                        selected={selectedWeeks.includes(el.value)}
-                        color="primary"
-                        page={el.label}
-                        size="large"/>
-                    )}/>
+                    render={({ field }) => {
+                        return (
+                            <PaginationItem
+                            key={el.value}
+                            onClick={() => handleSelectedWeek(el.value)}
+                            selected={selectedWeeks.includes(el.value)}
+                            color="primary"
+                            page={el.label}
+                            size="large"/>
+                        )
+                    }}/>
                 ))}
             </Box>
+            {/* <FormHelperText>{props.}</FormHelperText> */}
         </FormControl>
     )
 }

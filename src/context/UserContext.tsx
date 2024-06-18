@@ -80,11 +80,11 @@ export const UserProvider = ({ children }: UserProviderType) => {
                 ...user,
                 DEPT_ID: department ? department : null,
             })
-        })
+        }).filter(user => !user.USER_ISDELETED)
     }
 
-    const getUsersByCreator = (creatorId: string) => {
-        return users.filter(user => user.USER_CREATEDBY === creatorId).map((user): IUser => {
+    const getAllUsers = () => {
+        return users.map((user): IUser => {
             const department = departments.find(department => department.DEPT_ID === user.DEPT_ID as string)
 
             return ({
@@ -92,6 +92,10 @@ export const UserProvider = ({ children }: UserProviderType) => {
                 DEPT_ID: department ? department : null,
             })
         })
+    }
+
+    const getUsersByCreator = (creatorId: string) => {
+        return getUsers().filter(user => user.USER_CREATEDBY === creatorId)
     }
 
     const getUser = (userId: string) => {

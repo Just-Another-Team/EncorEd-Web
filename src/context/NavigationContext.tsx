@@ -12,18 +12,24 @@ import { defaultFloor } from "../data/defaultFloor";
 import { IKioskLog } from "../data/IKioskLog";
 import useClock from "../hooks/useClock";
 import dayjs from "dayjs";
+import IGraphData from "../data/IGraphData";
+import { PathInputType } from "../data/IPathData";
 
 type NavigationContextType = {
     accessToken: AccessTokenType | undefined;
     selectedRoom: IRoom | undefined
+    destination: IRoom | undefined
     selectedRoomInputValue: string
     selectedFloor: IFloor | undefined
+    navigateTo: (room: IRoom) => void
     addSearchLog: (room: IRoom) => Promise<AxiosResponse<any, any>>
     setFloor: (room: IFloor) => void
     setRoom: (room: IRoom | undefined) => void
     setRoomInputValue: (room: string) => void
     setRoomAndFloor: (room: IRoom) => void
     getRoomsByFloor: () => Array<IRoom>
+    initializeGraph: (data: IGraphData) => Promise<AxiosResponse<any, any>>
+    generatePath: (data: PathInputType) => Promise<AxiosResponse<any, any>>
     load: boolean;
 }
 
@@ -40,9 +46,14 @@ export const NavigationProvider = ({ children }: NavigationProviderType) => {
 
     const [accessToken, setAccessToken] = useState<AccessTokenType>();
     const [selectedRoom, setSelectedRoom] = useState<IRoom>();
+    const [destination, setDestination] = useState<IRoom>();
     const [selectedRoomInputValue, setSelectedRoomInputValue] = useState<string>('');
     const [selectedFloor, setSelectedFloor] = useState<IFloor | undefined>(defaultFloor);
     const [load, setLoad] = useState<boolean>(true);
+
+    const initializeGraph = (data: IGraphData) => {
+        return navigationService.initializeGraph(data)
+    }
 
     const addSearchLog = (room: IRoom) => {
         const user = getCurrentUser()
@@ -57,15 +68,12 @@ export const NavigationProvider = ({ children }: NavigationProviderType) => {
         return navigationService.addLog(log)
     }
 
-    const addNavigationLog = (room: IRoom) => {
-        // const user = getCurrentUser()
+    const navigateTo = (room: IRoom) => {
+        setDestination(room)
+    }
 
-        // const log: IKioskLog = {
-        //     KILG_DATE: dayjs().toISOString(),
-        //     KILG_TYPE: 'Search',
-        //     ROOM_ID: room.ROOM_ID as string,
-        //     USER_ID: user ? user.USER_ID! : null,
-        // }
+    const generatePath = (data: PathInputType) => {
+        return navigationService.generatePath(data)
     }
 
     const getRoomsByFloor = () => {
@@ -90,9 +98,9 @@ export const NavigationProvider = ({ children }: NavigationProviderType) => {
             FLR_ID: floor ? floor : roomInput.FLR_ID
         }
 
+        setSelectedFloor( typeof room.FLR_ID === 'string' ? floor : room.FLR_ID as IFloor)
         setSelectedRoom(room)
         setSelectedRoomInputValue(room.ROOM_NAME)
-        setSelectedFloor( typeof room.FLR_ID === 'string' ? floor : room.FLR_ID as IFloor)
     }
 
     const setFloor = (floor: IFloor) => {
@@ -112,14 +120,18 @@ export const NavigationProvider = ({ children }: NavigationProviderType) => {
     const value = {
         accessToken,
         selectedRoom,
+        destination,
         selectedFloor,
         selectedRoomInputValue,
         addSearchLog,
+        navigateTo,
         setRoom,
         setFloor,
         getRoomsByFloor,
         setRoomAndFloor,
         setRoomInputValue,
+        initializeGraph,
+        generatePath,
         load
     }
 

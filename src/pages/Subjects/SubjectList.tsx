@@ -11,20 +11,24 @@ import ISchedule from "../../data/ISchedule"
 import { DeleteOutlineOutlined, PersonAddAlt1Outlined, UpdateOutlined } from "@mui/icons-material"
 import { useState } from "react"
 import { useModal } from "../../hooks/useModal"
-import DeleteDialog from "./DeleteSubject"
-import UpdateDialog from "./UpdateSubject"
-import DeleteSubject from "./DeleteSubject"
 import { useUsers } from "../../hooks/useUsers"
-import { Button } from "@mui/material"
+import { Alert, Button, Fade, Link, Snackbar } from "@mui/material"
 import AssignTeacher from "./AssignTeacher"
+import { Link as RouterLink } from 'react-router-dom'
+import SubjectForm from "./SubjectForm"
+import useLoading from "../../hooks/useLoading"
+import DeleteDialog from "../../components/DialogDelete"
+import { useRooms } from "../../hooks/useRooms"
 
 type SubjectDeleteType = {
     password: string | null;
 }
 
 const SubjectList = () => {
-    const { subjects, getSubjects, getSubjectsByCreator } = useSubject();
+    const { subjects, getSubjects, getSubjectsByCreator, updateSubject, deleteSubject } = useSubject();
     const { getUser, getCurrentUser } = useUsers()
+    const { assignTeacherToSubject } = useSubject()
+    const { getRoom } = useRooms()
 
     const { 
         openModal: assignModal,
@@ -44,11 +48,92 @@ const SubjectList = () => {
         handleCloseModal: closeDeleteModal
     } = useModal();
 
+    const { 
+        openModal: successSnackbar,
+        handleOpenModal: openSuccessSnackbar,
+        handleCloseModal: closeSuccessSnackbar
+    } = useModal();
+
+    const { 
+        openModal: errorSnackbar,
+        handleOpenModal: openErrorSnackbar,
+        handleCloseModal: closeErrorSnackbar
+    } = useModal();
+
+    const { loading, openLoading, closeLoading } = useLoading();
+
     const [ subject, setSubject] = useState<ISubject>();
+    const [ message, setMessage ] = useState<string>();
+
+    const assignTeacherHandler = async (data: ISubject) => {
+        //Check if the teacher has other schedule overlapping here
+
+        const assignedTeacher: { SUB_ID: string, USER_ID: string} = {
+            SUB_ID: subject?.SUB_ID as string,
+            USER_ID: data.USER_ID as string
+        }
+
+        await assignTeacherToSubject(assignedTeacher)
+            .then((result) => {
+                console.log(result.data)
+                setMessage(result.data)
+                openSuccessSnackbar()
+            })
+            .catch((error) => {
+                console.error(error)
+                setMessage(error.response.data)
+                openErrorSnackbar()
+            })
+
+        closeAssignModal()
+    }
 
     const handleClear = () => {
         setSubject(undefined)
     }
+
+    const updateData = async (data: ISubject) => {
+        openLoading();
+
+        // Update function
+        await updateSubject({
+            ...data as ISubject,
+            SUB_ID: subject?.SUB_ID,
+            SUB_UPDATEDBY: getCurrentUser()?.USER_ID,
+            USER_ID: data.USER_ID && data.USER_ID !== "" ? data.USER_ID : null
+        })
+            .then((result) => {
+
+                console.log(result.data)
+                setMessage(result.data)
+                openSuccessSnackbar()
+            })
+            .catch((error) => {
+                console.error(error)
+                setMessage(error.response.data)
+                openErrorSnackbar()
+            })
+
+        closeLoading();
+        //When it updates, move to the list
+        closeUpdateModal()
+    }
+
+    const handleDelete = async () => {
+        await deleteSubject(subject?.SUB_ID!)
+            .then((result) => {
+                console.log(result.data)
+                setMessage(result.data)
+                openSuccessSnackbar()
+            })
+            .catch((error) => {
+                console.error(error)
+                setMessage(error.response.data)
+                openErrorSnackbar()
+            })
+    }
+
+    const role = getCurrentUser()?.ROLE_ID as UserRole
 
     const SubjectHeaders: Array<GridColDef<ISubject>> = [
         {
@@ -56,8 +141,12 @@ const SubjectList = () => {
             headerName: "ID",
         },
         {
-            field: "SUB_CODE",
+            field: "SUB_EDP_CODE",
             headerName: "EDP Code",
+        },
+        {
+            field: "SUB_CODE",
+            headerName: "Course Code",
             renderCell: (params) => {
                 return params.row.SUB_CODE
             },
@@ -67,7 +156,14 @@ const SubjectList = () => {
             field: "SUB_DESCRIPTION",
             headerName: "Subject Description",
             renderCell: (params) => {
-                return params.row.SUB_DESCRIPTION
+                return (
+                    <Link
+                    component={RouterLink}
+                    to={params.row.SUB_ID!}
+                    underline="none">
+                        {params.row.SUB_DESCRIPTION}
+                    </Link>
+                )
             },
             minWidth: 360,
             flex: 1
@@ -81,6 +177,27 @@ const SubjectList = () => {
                 return createdBy ? getUser(createdBy)?.USER_FULLNAME : "No creator"
             },
             // flex: 0.6
+        },
+        {
+            field: "SUB_ID.ROOM_ID",
+            headerName: "Room Assigned",
+            renderCell: (params) => {
+                
+                if (!getRoom(params.row.ROOM_ID as string)) {
+                    return "No Room Assigned"
+                }
+
+                return (
+                    <Link
+                    component={RouterLink}
+                    to={`/${role.admin ? "admin" : role.campusDirector ? "campusDirector" : "dean" }/rooms/${getRoom(params.row.ROOM_ID as string)?.ROOM_ID!}`}
+                    underline="none">
+                        {getRoom(params.row.ROOM_ID as string)?.ROOM_NAME}
+                    </Link>
+                )
+            },
+            sortable: false,
+            minWidth: 256,
         },
         {
             field: "SUB_ID.USER_ID",
@@ -103,7 +220,14 @@ const SubjectList = () => {
                         </Button>
                     )
 
-                return (params.row.USER_ID as IUser).USER_FULLNAME
+                return (
+                    <Link
+                    component={RouterLink}
+                    to={`/${role.admin ? "admin" : role.campusDirector ? "campusDirector" : "dean" }/users/${(params.row.USER_ID as IUser).USER_ID}`}
+                    underline="none">
+                        {(params.row.USER_ID as IUser).USER_FULLNAME}
+                    </Link>
+                )
             },
             sortable: false,
             minWidth: 256,
@@ -173,8 +297,6 @@ const SubjectList = () => {
         },
     ]
 
-    const role = getCurrentUser()?.ROLE_ID as UserRole
-
     return (
         <>
             <DataGrid
@@ -182,6 +304,7 @@ const SubjectList = () => {
                 columns: {
                     columnVisibilityModel: {
                         SUB_ID: false,
+                        SUB_CREATEDBY: role.admin ? true : false
                     }
                 },
                 pagination: {
@@ -194,23 +317,54 @@ const SubjectList = () => {
             getRowId={(row) => row.SUB_ID!}
             rows={role.admin ? getSubjects() : getSubjectsByCreator(getCurrentUser()?.USER_ID as string)}/>
 
-            {/* Update dialog */}
-            <UpdateDialog
-            subject={subject!}
-            updateModal={updateModal}
-            closeUpdateModal={closeUpdateModal}/>
-
-            <DeleteSubject
-            subject={subject!}
-            openModal={deleteModal}
-            handleCloseModal={closeDeleteModal}
-            handleClear={handleClear}/>
-
             {/* Assign a teacher */}
             <AssignTeacher
+            onSubmit={assignTeacherHandler}
             subject={subject}
             openModal={assignModal}
             closeModal={closeAssignModal}/>
+
+            <SubjectForm
+            loading={loading}
+            title={`Update ${subject?.SUB_CODE}`}
+            selectedSubject={subject!}
+            openModal={updateModal}
+            onSubmit={updateData}
+            closeModal={closeUpdateModal}/>
+
+            <DeleteDialog
+            selectedObject={subject!}
+            title={subject?.SUB_DESCRIPTION!}
+            onDelete={handleDelete}
+            deleteModal={deleteModal}
+            closeDeleteModal={closeDeleteModal}
+            handleClear={handleClear}/>
+
+            <Snackbar
+            open={successSnackbar}
+            autoHideDuration={3000}
+            TransitionComponent={Fade}
+            onClose={closeSuccessSnackbar}>
+                <Alert
+                variant="filled"
+                severity="success"
+                onClose={closeSuccessSnackbar}>
+                    { message }
+                </Alert>
+            </Snackbar>
+
+            <Snackbar
+            open={errorSnackbar}
+            autoHideDuration={3000}
+            TransitionComponent={Fade}
+            onClose={closeErrorSnackbar}>
+                <Alert
+                variant="filled"
+                severity="error"
+                onClose={closeErrorSnackbar}>
+                    { message }
+                </Alert>
+            </Snackbar>
         </>
     )
 }

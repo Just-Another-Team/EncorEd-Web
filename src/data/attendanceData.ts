@@ -1,6 +1,6 @@
 export enum AttendanceTeacherStatus {
-    Present,
-    Missing
+    Present = "present",
+    NotInRoom = "not-in-room"
 }
 
 export enum AttendanceStatus {

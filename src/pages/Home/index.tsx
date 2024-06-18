@@ -1,11 +1,14 @@
 import { Box, Button, Grid, Stack, Typography, useMediaQuery, useTheme } from "@mui/material"
 import { PieChart } from "@mui/x-charts"
-import AttendanceChart from "./AttendanceChart"
+import AttendanceChart from "../../components/AttendanceChart"
 import OngoingSubjects from "./OngoingSubjects"
 import { useSubject } from "../../hooks/useSubject"
 import { useUsers } from "../../hooks/useUsers"
 import IUser, { UserRole } from "../../data/IUser"
 import { useAttendances } from "../../hooks/useAttendances"
+import RecentlySubmittedAttendance from "./RecentlySubmittedAttendance"
+import IAttendance from "../../data/IAttendance"
+import { AttendanceSubmissionDate } from "../../data/AttendanceSubmissionDate"
 
 const Home = () => {
     const { getAttendancesByCurrentDay, getAttendancesByReduction, getAttendances } = useAttendances()
@@ -15,8 +18,27 @@ const Home = () => {
 
     const role = getCurrentUser()?.ROLE_ID as UserRole
 
+    const attendances = (role: UserRole) => {
+        return getAttendancesByCurrentDay()
+                .filter(attendance => {
+                    const attendanceChecker = attendance.USER_ID as IUser
+                    return (
+                        attendance.ATTD_TEACHERSTATUS !== "not-in-room" && 
+                        (role.admin || role.campusDirector ? true : attendanceChecker.USER_CREATEDBY === getCurrentUser()?.USER_ID)
+                    )
+                })
+                .map((attendance) => {
+                    return ({
+                        ...attendance as IAttendance,
+                        ATTD_SUBMISSIONDATE: typeof attendance.ATTD_SUBMISSIONDATE === "string" ? 
+                            attendance.ATTD_SUBMISSIONDATE : 
+                            (attendance.ATTD_SUBMISSIONDATE as AttendanceSubmissionDate).lastSubmission,
+                    })
+                })
+    }
+
     const attendanceData = () => {
-        const reducedAttendances = getAttendancesByCurrentDay() // getAttendancesByReduction(getAttendances())
+        const reducedAttendances = attendances(role)
         
         const presentValue = reducedAttendances.filter((attd) => attd.ATTD_TEACHERSTATUS === "Present").length
         const earlyDismissalValue = reducedAttendances.filter((attd) => attd.ATTD_TEACHERSTATUS === "Early Dismissal").length
@@ -60,15 +82,17 @@ const Home = () => {
                 fontWeight={700}>
                     Home
                 </Typography>
-                <Button
+                {/* <Button
                 variant="contained">
                     Print Report
-                </Button>
+                </Button> */}
             </Box>
 
             <Grid container spacing={2} marginBottom={2}>
                 <Grid item xs={12} lg={6}>
-                    <AttendanceChart />
+                    <AttendanceChart
+                    showLabel
+                    attendanceData={(attendances(role))}/>
                 </Grid>
 
                 {/* Separate in another box */}
@@ -91,7 +115,14 @@ const Home = () => {
                             alignItems={'center'}
                             borderRadius={2}>
                                 <Typography flex={1} variant="h5" fontWeight={700} lineHeight={1}>Present</Typography>
-                                <Typography variant="h6" lineHeight={1} textAlign={"end"}>{ attendanceData().find(attd => attd.label === 'Present')?.value }</Typography>
+                                <Typography
+                                variant="h6"
+                                lineHeight={1}
+                                textAlign={"end"}>
+                                    { 
+                                        attendanceData().find(attd => attd.label === 'Present')?.value 
+                                    }
+                                </Typography>
                             </Box>
 
                             <Box
@@ -103,7 +134,14 @@ const Home = () => {
                             alignItems={'center'}
                             borderRadius={2}>
                                 <Typography flex={1} variant="h5" fontWeight={700} lineHeight={1}>Early Dismissal</Typography>
-                                <Typography variant="h5" lineHeight={1} textAlign={"end"}>{ attendanceData().find(attd => attd.label === 'Early Dismissal')?.value }</Typography>
+                                <Typography
+                                variant="h5"
+                                lineHeight={1}
+                                textAlign={"end"}>
+                                    { 
+                                        attendanceData().find(attd => attd.label === 'Early Dismissal')?.value
+                                    }
+                                </Typography>
                             </Box>
                         </Box>
 
@@ -120,7 +158,14 @@ const Home = () => {
                             alignItems={'center'}
                             borderRadius={2}>
                                 <Typography flex={1} variant="h5" fontWeight={700} lineHeight={1}>Late</Typography>
-                                <Typography variant="h6" lineHeight={1} textAlign={"end"}>{ attendanceData().find(attd => attd.label === 'Late')?.value }</Typography>
+                                <Typography
+                                variant="h6"
+                                lineHeight={1}
+                                textAlign={"end"}>
+                                    {
+                                        attendanceData().find(attd => attd.label === 'Late')?.value
+                                    }
+                                </Typography>
                             </Box>
 
                             <Box
@@ -132,7 +177,14 @@ const Home = () => {
                             alignItems={'center'}
                             borderRadius={2}>
                                 <Typography flex={1} variant="h5" fontWeight={700} lineHeight={1}>Absent</Typography>
-                                <Typography variant="h5" lineHeight={1} textAlign={"end"}>{ attendanceData().find(attd => attd.label === 'Absent')?.value }</Typography>
+                                <Typography
+                                variant="h5"
+                                lineHeight={1}
+                                textAlign={"end"}>
+                                    {
+                                        attendanceData().find(attd => attd.label === 'Absent')?.value
+                                    }
+                                </Typography>
                             </Box>
                         </Box>
 
@@ -181,8 +233,14 @@ const Home = () => {
                 </Grid>
             </Grid>
 
-            <Box>
+            {/* Recently submitted attendance */}
+            <Box marginBottom={2}>
                 <Typography variant="h6" marginBottom={1}>Recently Submitted Attendances</Typography>
+                <RecentlySubmittedAttendance />
+            </Box>
+
+            <Box marginBottom={2}>
+                <Typography variant="h6" marginBottom={1}>Ongoing Subjects</Typography>
                 <OngoingSubjects />
             </Box>
         </Box>

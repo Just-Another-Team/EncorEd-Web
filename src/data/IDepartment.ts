@@ -7,4 +7,5 @@ export default interface IDepartment {
     DEPT_FLOORSASSIGNED: Array<IFloor> | Array<string>
 
     DEPT_NOOFUSERS?: number
+    DEPT_ISDELETED?: boolean
 }

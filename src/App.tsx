@@ -21,6 +21,10 @@ import Kiosk from './pages/Kiosk';
 import { useUsers } from './hooks/useUsers';
 import Map from './pages/Map';
 import Room from './pages/Room';
+import SelectedSubject from './pages/SelectedSubject';
+import SelectedUser from './pages/UserSelected';
+import AddUserPage from './pages/Users/AddUserPage';
+import AddSubjectPage from './pages/Subjects/AddSubjectPage';
 
 function App() {
   const { user } = useAuth()
@@ -48,8 +52,18 @@ function App() {
         </Route>
 
         <Route path='department' element={<Department />} />
-        <Route path='subject' element={<Subjects />}/>
-        <Route path='users' element={<Users />}/>
+
+        <Route path='subject'>
+          <Route element={<Subjects />} index/>
+          <Route path=':subjectId' element={<SelectedSubject />} />
+          <Route path='add' element={<AddSubjectPage />}/>
+        </Route>
+
+        <Route path='users'>
+          <Route element={<Users />} index/>
+          <Route path=':userId' element={<SelectedUser />}/>
+          <Route path='add' element={<AddUserPage />}/>
+        </Route>
 
         <Route path='kiosk'>
           <Route element={<Kiosks />} index />
@@ -70,9 +84,17 @@ function App() {
           <Route path=':roomId' element={<SelectedRoom />}/>
         </Route>
 
-        <Route path='subject' element={<Subjects />}/>
+        <Route path='subject'>
+          <Route element={<Subjects />} index/>
+          <Route path=':subjectId' element={<SelectedSubject />} />
+          <Route path='add' element={<AddSubjectPage />}/>
+        </Route>
 
-        <Route path='users' element={<Users />}/>
+        <Route path='users'>
+          <Route element={<Users />} index/>
+          <Route path=':userId' element={<SelectedUser />}/>
+          <Route path='add' element={<AddUserPage />}/>
+        </Route>
 
         <Route path='kiosk'>
           <Route element={<Kiosks />} index />
@@ -92,7 +114,12 @@ function App() {
         <Route path='attendances' element={<Attendances />} />
 
         <Route path='department' element={<Department />} />
-        <Route path='users' element={<Users />}/>
+
+        <Route path='users'>
+          <Route element={<Users />} index/>
+          <Route path=':userId' element={<SelectedUser />}/>
+          <Route path='add' element={<AddUserPage />}/>
+        </Route>
 
         <Route path='kiosk'>
           <Route element={<Kiosks />} index />

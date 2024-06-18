@@ -25,6 +25,7 @@ type RoomContextType = {
     getFloorSortedByLevel: () => Array<IFloor>
     load: boolean;
     setLoad: React.Dispatch<React.SetStateAction<boolean>>;
+    getRoom: (roomId: string) => IRoom | undefined
 }
 
 export const RoomContext = createContext<RoomContextType>({} as RoomContextType);
@@ -87,6 +88,10 @@ export const RoomProvider = ({
         return getRooms().filter(room => room.ROOM_TYPE === RoomType.office)
     }
 
+    const getRoom = (roomId: string) => {
+        return getRooms().find(room => room.ROOM_ID === roomId)
+    }
+
     useEffect(() => {
         const fetchFloorSnapshots = onSnapshot(floorCollection, (snapshot) => {
             const floorDocs = snapshot.docs.map((floor):IFloor => {
@@ -133,6 +138,7 @@ export const RoomProvider = ({
         getFloorSortedByLevel,
         getClassrooms,
         getOffices,
+        getRoom,
         load,
         setLoad,
     }

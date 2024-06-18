@@ -1,4 +1,4 @@
-import { DeleteOutlineOutlined, PersonAddAlt, UpdateOutlined } from "@mui/icons-material";
+import { DeleteOutlineOutlined, PersonAddAlt, PersonAddAlt1Outlined, UpdateOutlined } from "@mui/icons-material";
 import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import IDepartment from "../../data/IDepartment";
 import { useState } from "react";
@@ -9,10 +9,13 @@ import DeleteDialog from "../../components/DialogDelete";
 import DepartmentForm from "./DepartmentForm";
 import { useUsers } from "../../hooks/useUsers";
 import { UserRole } from "../../data/IUser";
-import { Box, Chip, Stack } from "@mui/material";
+import { Alert, Box, Button, Chip, Fade, Snackbar, Stack } from "@mui/material";
 import { useRooms } from "../../hooks/useRooms";
+import IFloor from "../../data/IFloor";
+import AssignDepartment from "./AssignDepartment";
 
 const DepartmentList = () => {
+    const { assignDean } = useDepartment()
     const { users, getUser } = useUsers()
     const { getRoomFloor } = useRooms()
     const { 
@@ -20,6 +23,12 @@ const DepartmentList = () => {
         deleteDepartment,
         updateDepartment
     } = useDepartment();
+
+    const { 
+        openModal: assignModal,
+        handleOpenModal: openAssignModal,
+        handleCloseModal: closeAssignModal
+    } = useModal();
 
     const { 
         openModal: updateModal,
@@ -39,32 +48,69 @@ const DepartmentList = () => {
         closeLoading
     } = useLoading();
 
+    const { 
+        openModal: successSnackbar,
+        handleOpenModal: openSuccessSnackbar,
+        handleCloseModal: closeSuccessSnackbar
+    } = useModal();
+
+    const { 
+        openModal: errorSnackbar,
+        handleOpenModal: openErrorSnackbar,
+        handleCloseModal: closeErrorSnackbar
+    } = useModal();
+
+    const [ message, setMessage ] = useState<string>()
     const [ department, setDepartment ] = useState<IDepartment>();
+
+    const handleAssignDean = async (data: IDepartment) => {
+        const assignedDean: { DEPT_ID: string, USER_ID: string} = {
+            DEPT_ID: department?.DEPT_ID as string,
+            USER_ID: data.DEPT_DEAN as string
+        }
+
+        await assignDean(assignedDean)
+            .then((result) => {
+                console.log(result.data)
+                setMessage(result.data)
+                openSuccessSnackbar()
+            })
+            .catch((error) => {
+                console.error(error)
+                setMessage(error.response.data)
+                openErrorSnackbar()
+            })
+
+        closeAssignModal()
+    }
 
     const handleClear = () => {
         setDepartment(undefined)
     }
 
     const handleUpdate = async (departmentData: IDepartment) => {
+        const floorAssigned = departmentData.DEPT_FLOORSASSIGNED!.map((floor) => (floor as IFloor).FLR_ID as string)
 
         const data: IDepartment = {
             DEPT_ID: department?.DEPT_ID,
             DEPT_NAME: departmentData.DEPT_NAME,
             DEPT_DEAN: departmentData.DEPT_DEAN,
-            DEPT_FLOORSASSIGNED: departmentData.DEPT_FLOORSASSIGNED,
+            DEPT_FLOORSASSIGNED: floorAssigned,
         }
 
         openLoading()
 
-        console.log(data)
-
-        // await updateDepartment(data)
-        //     .then((result) => {
-        //         console.log(result)
-        //     })
-        //     .catch((error) => {
-        //         console.error(error)
-        //     })
+        await updateDepartment(data)
+            .then((result) => {
+                console.log(result)
+                setMessage(result.data)
+                openSuccessSnackbar()
+            })
+            .catch((error) => {
+                console.error(error)
+                setMessage(error.response.data)
+                openErrorSnackbar()
+            })
 
         closeLoading()
         closeUpdateModal()
@@ -97,7 +143,21 @@ const DepartmentList = () => {
             minWidth: 256,
             renderCell: (params) => {
                 const userId = params.row.DEPT_DEAN as string
-                return getUser(userId) ? getUser(userId)?.USER_FULLNAME : "No Dean"
+
+                const handleOnClickAssign = (department: IDepartment) => {
+                    setDepartment(department)
+                    openAssignModal();
+                }
+
+                return getUser(userId) ? getUser(userId)?.USER_FULLNAME : (
+                    <Button
+                    onClick={() => handleOnClickAssign(params.row)}
+                    startIcon={<PersonAddAlt1Outlined />}
+                    size="small"
+                    variant="outlined">
+                        Assign a Dean
+                    </Button>
+                )
             }
         },
         {
@@ -147,14 +207,14 @@ const DepartmentList = () => {
                 }
 
                 return [
-                    <GridActionsCellItem
-                    key={"assign"}
-                    icon={<PersonAddAlt />}
-                    label="Assign"
-                    className="textPrimary"
-                    onClick={() => {}}
-                    color="primary"
-                    />,
+                    // <GridActionsCellItem
+                    // key={"assign"}
+                    // icon={<PersonAddAlt />}
+                    // label="Assign"
+                    // className="textPrimary"
+                    // onClick={() => {}}
+                    // color="primary"
+                    // />,
                     <GridActionsCellItem
                     key={"update"}
                     icon={<UpdateOutlined />}
@@ -211,6 +271,38 @@ const DepartmentList = () => {
             deleteModal={deleteModal}
             onDelete={handleDelete}
             closeDeleteModal={closeDeleteModal}/>
+
+            <AssignDepartment
+            onSubmit={handleAssignDean}
+            department={department}
+            openModal={assignModal}
+            closeModal={closeAssignModal}/>
+
+            <Snackbar
+            open={successSnackbar}
+            autoHideDuration={3000}
+            TransitionComponent={Fade}
+            onClose={closeSuccessSnackbar}>
+                <Alert
+                variant="filled"
+                severity="success"
+                onClose={closeSuccessSnackbar}>
+                    { message }
+                </Alert>
+            </Snackbar>
+
+            <Snackbar
+            open={errorSnackbar}
+            autoHideDuration={3000}
+            TransitionComponent={Fade}
+            onClose={closeErrorSnackbar}>
+                <Alert
+                variant="filled"
+                severity="error"
+                onClose={closeErrorSnackbar}>
+                    { message }
+                </Alert>
+            </Snackbar>
         </>
     )
 }

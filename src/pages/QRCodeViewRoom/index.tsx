@@ -14,7 +14,7 @@ import { useRef, useState } from "react";
 import { useRooms } from "../../hooks/useRooms";
 import { useSubject } from "../../hooks/useSubject";
 import ReactToPrint from "react-to-print";
-import pageStyle from '!!css-loader?{"sourceMap":false,"exportType":"string"}!../../assets/pageStyle.css'
+import pageStyle from '!!css-loader?{"sourceMap":false,"exportType":"string"}!../../assets/QRPageStyle.css'
 import IFloor from "../../data/IFloor";
 
 const SelectedRoom = () => {
@@ -69,8 +69,7 @@ const SelectedRoom = () => {
             </Grid>
 
             <Grid
-            item
-            >
+            item>
                 <Paper
                 variant="outlined"
                 elevation={0}

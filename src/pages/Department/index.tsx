@@ -1,6 +1,9 @@
 import { 
+    Alert,
     Box,
     Button,
+    Fade,
+    Snackbar,
     Typography
 } from "@mui/material"
 import { useModal } from "../../hooks/useModal";
@@ -10,11 +13,26 @@ import DepartmentForm from "./DepartmentForm";
 import IDepartment from "../../data/IDepartment";
 import useDepartment from "../../hooks/useDepartment";
 import IFloor from "../../data/IFloor";
+import { useState } from "react";
 
 const Department = () => {
     const { addDepartment } = useDepartment()
     const { openModal, handleCloseModal, handleOpenModal } = useModal();
     const { loading, closeLoading, openLoading } = useLoading()
+
+    const { 
+        openModal: successSnackbar,
+        handleOpenModal: openSuccessSnackbar,
+        handleCloseModal: closeSuccessSnackbar
+    } = useModal();
+
+    const { 
+        openModal: errorSnackbar,
+        handleOpenModal: openErrorSnackbar,
+        handleCloseModal: closeErrorSnackbar
+    } = useModal();
+
+    const [ message, setMessage ] = useState<string>()
 
     const handleAddDepartment = async (data: IDepartment) => {
         openLoading()
@@ -26,15 +44,17 @@ const Department = () => {
             DEPT_FLOORSASSIGNED: floorAssigned,
         }
 
-        console.log(newDepartment)
-
-        // await addDepartment(data)
-        //     .then((result) => {
-        //         console.log(result.data)
-        //     })
-        //     .catch((error) => {
-        //         console.error(error)
-        //     })
+        await addDepartment(newDepartment)
+            .then((result) => {
+                console.log(result.data)
+                setMessage(result.data)
+                openSuccessSnackbar()
+            })
+            .catch((error) => {
+                console.error(error)
+                setMessage(error.response.data)
+                openErrorSnackbar()
+            })
 
         closeLoading()
         handleCloseModal()
@@ -75,6 +95,32 @@ const Department = () => {
             onSubmit={handleAddDepartment}
             openModal={openModal}
             closeModal={handleCloseModal}/>
+
+            <Snackbar
+            open={successSnackbar}
+            autoHideDuration={3000}
+            TransitionComponent={Fade}
+            onClose={closeSuccessSnackbar}>
+                <Alert
+                variant="filled"
+                severity="success"
+                onClose={closeSuccessSnackbar}>
+                    { message }
+                </Alert>
+            </Snackbar>
+
+            <Snackbar
+            open={errorSnackbar}
+            autoHideDuration={3000}
+            TransitionComponent={Fade}
+            onClose={closeErrorSnackbar}>
+                <Alert
+                variant="filled"
+                severity="error"
+                onClose={closeErrorSnackbar}>
+                    { message }
+                </Alert>
+            </Snackbar>
         </Box>
     )
 }

@@ -26,6 +26,7 @@ const NotificationItems = () => {
             headerName: "Description",
             renderCell: (params) => {
                 const notifData = params.row.NOTF_DATA
+                console.log(notifData)
                 return params.row.NOTF_TYPE === "Attendance" ? `${(((notifData as IAttendance).SUB_ID as ISubject).USER_ID as IUser).USER_FULLNAME} is confirmed ${(notifData as IAttendance).ATTD_TEACHERSTATUS} in ${((notifData as IAttendance).ROOM_ID as IRoom).ROOM_NAME}` : "Description must be added here"
             },
             minWidth: 516

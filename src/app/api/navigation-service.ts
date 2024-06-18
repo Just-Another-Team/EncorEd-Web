@@ -1,4 +1,6 @@
+import IGraphData from "../../data/IGraphData";
 import { IKioskLog } from "../../data/IKioskLog";
+import { PathInputType } from "../../data/IPathData";
 import { AccessTokenType } from "../../types/AccessTokenType";
 import http from "./http-common";
 
@@ -13,12 +15,12 @@ class NavigationService {
         return http.get<AccessTokenType>(`${this.navigationCommon}/token`)
     }
 
-    initializeGraph() {
-
+    initializeGraph(data: IGraphData) {
+        return http.post(`${this.navigationCommon}/initialize`, data)
     }
 
-    generatePath() {
-
+    generatePath(data: PathInputType) {
+        return http.post(`${this.navigationCommon}/generate`, data)
     }
 }
 

@@ -25,7 +25,9 @@ const TimePickerControlled = <T extends FieldValues>(props: FormPropsInput<T>) =
                 slotProps={{
                     textField: {
                         size: "small", 
-                        error: !!error
+                        error: !!error,
+                        helperText: error ? error.message : " ",
+                        fullWidth: props.fullWidth
                     }
                 }}/>
             )

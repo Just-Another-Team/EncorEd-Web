@@ -1,6 +1,7 @@
 import { initializeApp, getApp } from 'firebase/app';
 import { initializeAuth, getAuth, setPersistence, browserSessionPersistence, browserPopupRedirectResolver, browserLocalPersistence, indexedDBLocalPersistence } from 'firebase/auth';
 import { getFirestore, onSnapshot, connectFirestoreEmulator } from 'firebase/firestore'
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
     apiKey: "AIzaSyBoKPIYalfZbmEQ22-l9yLmloSHRmXf5Z0",
@@ -21,6 +22,7 @@ const FIREBASE_AUTH = initializeAuth(FIREBASE_APP, {
 
 const db = getFirestore(FIREBASE_APP)
 
+const storage = getStorage(FIREBASE_APP, 'gs://encored-bd6f8.appspot.com')
 // connectFirestoreEmulator(db, '127.0.0.1', 8080)
 
-export { FIREBASE_APP, FIREBASE_AUTH, getApp, getAuth, db, onSnapshot }
+export { FIREBASE_APP, FIREBASE_AUTH, storage, getApp, getAuth, db, onSnapshot }

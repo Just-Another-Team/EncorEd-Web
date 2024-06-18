@@ -19,6 +19,8 @@ type AttendanceContextType = {
     getAttendancesByCurrentDay: () => Array<IAttendance>;
     getAttendances: () => IAttendance[];
     getCompleteAttendancesByCreator: (userCreatorId: string) => Array<IAttendance>
+    getAttendancesBySubjectId: (subId: string) => Array<IAttendance>
+    getAttendancesByInstructor: (instructorId: string) => Array<IAttendance>
     load: boolean;
     setLoad: Dispatch<React.SetStateAction<boolean>>
 }
@@ -73,7 +75,7 @@ export const AttendanceProvider = ({ children }: AttendanceProviderType) => {
                 ATTD_SUBMISSIONDATE: {
                     firstSubmission: prevAttd.ATTD_SUBMISSIONDATE,
                     lastSubmission: curr.ATTD_SUBMISSIONDATE,
-                } as AttendanceSubmissionDate
+                } as AttendanceSubmissionDate,
             }
 
             // The mergedAttendance is duplicated from the previousAttendance
@@ -106,6 +108,16 @@ export const AttendanceProvider = ({ children }: AttendanceProviderType) => {
                 SUB_ID: subject ? subject : null,
             })
         })
+    }
+
+    const getAttendancesByInstructor = (instructorId: string) => {
+        return getAttendances().filter(attendance => {
+            return (attendance.SUB_ID as ISubject).USER_ID !== null && ((attendance.SUB_ID as ISubject).USER_ID as IUser).USER_ID === instructorId
+        })
+    }
+
+    const getAttendancesBySubjectId = (subId: string) => {
+        return getAttendances().filter(attendance => (attendance.SUB_ID as ISubject).SUB_ID === subId)
     }
 
     const getCompleteAttendancesByCreator = (userCreatorId: string): Array<IAttendance> => {
@@ -148,6 +160,8 @@ export const AttendanceProvider = ({ children }: AttendanceProviderType) => {
         getAttendancesByCurrentDay,
         getAttendances,
         getCompleteAttendancesByCreator,
+        getAttendancesBySubjectId,
+        getAttendancesByInstructor,
         setLoad,
         load
     }

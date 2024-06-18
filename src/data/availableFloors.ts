@@ -1,0 +1,1 @@
+export const availableFloors = [1, 2]

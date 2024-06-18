@@ -1,5 +1,6 @@
 import { 
     Box,
+    Button,
     ButtonBase,
     Paper,
     Stack,
@@ -39,6 +40,7 @@ const CardQR = ({
             sx={paperStyle}>
                 <Stack
                 alignItems={"center"}
+                marginBottom={1}
                 direction={"row"}>
                     
                     <Box

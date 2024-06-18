@@ -1,7 +1,10 @@
 import { 
     Box,
     Typography,
-    Button
+    Button,
+    Snackbar,
+    Alert,
+    Fade
 } from "@mui/material"
 import UsersList from "./UserList"
 import { useModal } from "../../hooks/useModal"
@@ -9,11 +12,26 @@ import UserForm from "./UserForm";
 import IUser from "../../data/IUser";
 import useLoading from "../../hooks/useLoading";
 import { useUsers } from "../../hooks/useUsers";
+import { useState } from "react";
 
 const Users = () => {
     const { addUser, getCurrentUser } = useUsers()
     const { openModal, handleCloseModal, handleOpenModal } = useModal();
     const { loading, closeLoading, openLoading } = useLoading()
+
+    const { 
+        openModal: successSnackbar,
+        handleOpenModal: openSuccessSnackbar,
+        handleCloseModal: closeSuccessSnackbar
+    } = useModal();
+
+    const { 
+        openModal: errorSnackbar,
+        handleOpenModal: openErrorSnackbar,
+        handleCloseModal: closeErrorSnackbar
+    } = useModal();
+
+    const [message, setMessage] = useState<string>()
 
     const handleAddUser = async (data: IUser) => {
         openLoading()
@@ -30,17 +48,18 @@ const Users = () => {
             },
             USER_CREATEDBY: getCurrentUser()?.USER_ID,
             USER_UPDATEDBY: getCurrentUser()?.USER_ID,
+            USER_ATTENDANCECHECKERSCHEDULE: data.USER_ATTENDANCECHECKERSCHEDULE ? data.USER_ATTENDANCECHECKERSCHEDULE : null
         }
 
-        console.log(user)
-
-        // await addUser(user)
-        //     .then((result) => {
-        //         console.log(result)
-        //     })
-        //     .catch((error) => {
-        //         console.error(error)
-        //     })
+        await addUser(user)
+            .then((result) => {
+                setMessage(result.data)
+                openSuccessSnackbar()
+            })
+            .catch((error) => {
+                setMessage(error.data)
+                openErrorSnackbar()
+            })
 
         handleCloseModal()
         closeLoading()
@@ -81,6 +100,32 @@ const Users = () => {
             onSubmit={handleAddUser}
             openModal={openModal}
             closeModal={handleCloseModal}/>
+
+            <Snackbar
+            open={successSnackbar}
+            autoHideDuration={3000}
+            TransitionComponent={Fade}
+            onClose={closeSuccessSnackbar}>
+                <Alert
+                variant="filled"
+                severity="success"
+                onClose={closeSuccessSnackbar}>
+                    { message }
+                </Alert>
+            </Snackbar>
+
+            <Snackbar
+            open={errorSnackbar}
+            autoHideDuration={3000}
+            TransitionComponent={Fade}
+            onClose={closeErrorSnackbar}>
+                <Alert
+                variant="filled"
+                severity="error"
+                onClose={closeErrorSnackbar}>
+                    { message }
+                </Alert>
+            </Snackbar>
 
         </Box>
     )

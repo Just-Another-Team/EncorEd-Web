@@ -9,7 +9,8 @@ const Map = () => {
         <>
             <MapComponent
             accessToken={accessToken!.token}
-            selectedFloor={selectedFloor?.FLR_NAME.charAt(0) as string}/>
+            selectedFloor={selectedFloor?.FLR_NAME.charAt(0) as string}
+            />
         </>
     )
 }
